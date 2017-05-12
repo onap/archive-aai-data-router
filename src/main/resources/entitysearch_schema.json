@@ -1,0 +1,35 @@
+{ 
+   "fields": [
+      {    
+           "name": "entityType", 
+           "data-type": "string",
+           "searchable": "true",
+           "index-analyzer": "ngram_analyzer"
+      },
+      {    
+           "name": "entityPrimaryKeyValue", 
+           "data-type": "string", 
+           "searchable": "false"
+      },
+      {
+           "name": "searchTagIDs", 
+           "data-type": "string", 
+           "searchable": "true"
+      },
+      {
+           "name": "searchTags", 
+           "data-type": "string", 
+           "index-analyzer": "ngram_analyzer"
+      },
+      {
+           "name": "crossEntityReferenceValues", 
+           "data-type": "string", 
+           "index-analyzer": "ngram_analyzer"
+      },
+      {
+           "name": "lastmodTimestamp", 
+           "data-type": "date", 
+           "format": "MMM d y HH:m:s||dd-MM-yyyy HH:mm:ss||yyyy-MM-dd'T'HH:mm:ss.SSSZZ||yyyy-MM-dd HH:mm:ss||MM\/dd\/yyyy||yyyyMMdd'T'HHmmssZ"
+      }
+   ]
+}
