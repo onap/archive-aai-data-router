@@ -39,6 +39,7 @@
 		<testRouteOffer>workstation</testRouteOffer>
 		<testEnv>DEV</testEnv>
 		<checkstyle.config.location>google_checks.xml</checkstyle.config.location>
+		<nexusproxy>https://nexus.onap.org</nexusproxy>
 	</properties>
 
 	<dependencies>
