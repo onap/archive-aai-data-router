@@ -61,6 +61,8 @@ import java.util.List;
 import javax.json.Json;
 import javax.json.JsonObject;
 
+import org.openecomp.datarouter.util.NodeUtils;
+
 /**
  * Note: AAIEventEntity is a port forward of IndexDocument Has been renamed here to move forward
  * with abstraction of document store technology.
@@ -128,26 +130,6 @@ public class AaiEventEntity implements DocumentStoreDataEntity, Serializable {
 
   }
 
-  /*
-   * We'll try and create a unique identity key that we can use for differencing the previously
-   * imported record sets as we won't have granular control of what is created/removed and when. The
-   * best we can hope for is identification of resources by generated Id until the Identity-Service
-   * UUID is tagged against all resources, then we can use that instead.
-   */
-
-  private static String generateUniqueShaDigest(String entityType, String fieldName,
-      String fieldValue) throws NoSuchAlgorithmException {
-
-    /*
-     * Basically SHA-256 will result in an identity with a guaranteed uniqueness compared to just a
-     * java hashcode value.
-     */
-    MessageDigest digest = MessageDigest.getInstance("SHA-256");
-    digest.update(String.format("%s.%s.%s", entityType, fieldName, fieldValue).getBytes());
-    return convertBytesToHexString(digest.digest());
-  }
-
-
   public AaiEventEntity() {
     SimpleDateFormat dateFormat = new SimpleDateFormat(TIMESTAMP_FORMAT);
     Timestamp timestamp = new Timestamp(System.currentTimeMillis());
@@ -156,7 +138,7 @@ public class AaiEventEntity implements DocumentStoreDataEntity, Serializable {
   }
 
   public void deriveFields() throws NoSuchAlgorithmException {
-    this.id = generateUniqueShaDigest(entityType, entityPrimaryKeyName, entityPrimaryKeyValue);
+    this.id = NodeUtils.generateUniqueShaDigest(this.getLink());
     this.searchTags = concatArray(searchTagCollection, ';');
     this.searchTagIds = concatArray(searchTagIdCollection, ';');
     this.crossReferenceEntityValues = concatArray(crossEntityReferenceCollection, ';');
