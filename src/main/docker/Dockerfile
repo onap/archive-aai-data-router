@@ -23,4 +23,4 @@ RUN ln -s /logs $MICRO_HOME/logs
 
 EXPOSE 9502 9502
 
-CMD /opt/app/data-router/bin/start.sh
+CMD ["/opt/app/data-router/bin/start.sh"]

@@ -73,7 +73,8 @@ PROPS="$PROPS -DAJSC_SERVICE_NAMESPACE=data-router"
 PROPS="$PROPS -DAJSC_SERVICE_VERSION=v1"
 PROPS="$PROPS -Dserver.port=9502"
 PROPS="$PROPS -DCONFIG_HOME=$CONFIG_HOME"
+JVM_MAX_HEAP=${MAX_HEAP:-1024}
 
 echo $CLASSPATH
 
-java -Xms1024m -Xmx4096m -XX:PermSize=2024m $PROPS -classpath $CLASSPATH com.att.ajsc.runner.Runner context=// sslport=9502
+exec java -Xmx${JVM_MAX_HEAP}m $PROPS -classpath $CLASSPATH com.att.ajsc.runner.Runner context=// sslport=9502
