@@ -28,6 +28,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 import java.io.BufferedReader;
@@ -65,7 +66,6 @@ import org.openecomp.datarouter.entity.OxmEntityDescriptor;
 import org.openecomp.datarouter.entity.SuggestionSearchEntity;
 import org.openecomp.datarouter.entity.TopographicalEntity;
 import org.openecomp.datarouter.entity.UebEventHeader;
-import org.openecomp.datarouter.logging.DataRouterMsgs;
 import org.openecomp.datarouter.logging.EntityEventPolicyMsgs;
 import org.openecomp.datarouter.util.CrossEntityReference;
 import org.openecomp.datarouter.util.DataRouterConstants;
@@ -80,6 +80,7 @@ import org.openecomp.restclient.client.Headers;
 import org.openecomp.restclient.client.OperationResult;
 import org.openecomp.restclient.client.RestClient;
 import org.openecomp.restclient.rest.HttpUtil;
+import org.openecomp.datarouter.util.NodeUtils;
 import org.slf4j.MDC;
 
 public class EntityEventPolicy implements Processor {
@@ -175,7 +176,7 @@ public class EntityEventPolicy implements Processor {
         Map.Entry pair = (Map.Entry) it.next();
 
         String version = pair.getKey().toString();
-        int versionNum = Integer.parseInt(version.substring(1, 2));
+        int versionNum = Integer.parseInt(version.substring(1, version.length()));
 
         if (versionNum > latestVersion) {
           latestVersion = versionNum;
@@ -467,11 +468,18 @@ public class EntityEventPolicy implements Processor {
         EntityOxmReferenceHelper.getInstance().getVersionedOxmEntities(Version.valueOf(oxmVersion));
 
     /**
-     * If the entity type is "customer", the below check will return true if any nested entityType
+     * NOTES:
+     * 1. If the entity type is "customer", the below check will return true if any nested entityType
      * in that model could contain a CER based on the OXM model version that has been loaded.
+     * 2. For a DELETE operation on outer/parent entity (handled by the regular flow: 
+     * handleSearchServiceOperation()), ignore processing for cross-entity-reference under the
+     * assumption that AAI will push down all required cascade-deletes for nested entities as well
+     * 3. Handling the case where UEB events arrive out of order: CREATE customer is received before
+     *  CREATE service-instance.
      */
 
-    if (oxmEntities != null && oxmEntities.entityModelContainsCrossEntityReference(topEntityType)) {
+    if (!action.equalsIgnoreCase(ACTION_DELETE) && oxmEntities != null 
+        && oxmEntities.entityModelContainsCrossEntityReference(topEntityType)) {
 
       // We know the model "can" contain a CER reference definition, let's process a bit more
 
@@ -481,6 +489,10 @@ public class EntityEventPolicy implements Processor {
       JSONObject entityJsonObject = getUebEntity(uebPayload);
 
       JsonNode entityJsonNode = convertToJsonNode(entityJsonObject.toString());
+      
+      String parentEntityType = entityType;
+      
+      String targetEntityUrl = entityLink;
 
       for (String key : crossEntityRefMap.keySet()) {
 
@@ -498,6 +510,19 @@ public class EntityEventPolicy implements Processor {
         if (foundNodes.size() > 0) {
 
           for (JsonNode n : foundNodes) {
+            if (parentEntityType.equalsIgnoreCase("customer")){  
+              /*
+               * NOTES:
+               * 1. prepare to hand-create url for service-instance
+               * 2. this will break if the URL structure for service-instance changes
+               */
+              if (n.has("service-type")){
+                targetEntityUrl += "/service-subscriptions/service-subscription/" 
+                    + RouterServiceUtil.getNodeFieldAsText(n, "service-type") 
+                    + "/service-instances/service-instance/";
+              }
+              
+            }
 
             List<String> extractedParentEntityAttributeValues = new ArrayList<String>();
 
@@ -518,6 +543,16 @@ public class EntityEventPolicy implements Processor {
                * 5. Put data into ES with ETAG + updated doc 
                */
 
+              // Get the complete URL for target entity
+              if (targetEntityInstance.has("link")) {   // nested SI has url mentioned
+                targetEntityUrl = RouterServiceUtil.getNodeFieldAsText(targetEntityInstance, 
+                    "link");
+              } else if (parentEntityType.equalsIgnoreCase("customer") && 
+                  targetEntityInstance.has("service-instance-id")){
+                targetEntityUrl += "/" + RouterServiceUtil.getNodeFieldAsText(targetEntityInstance, 
+                    "service-instance-id");
+              }
+                    
               OxmEntityDescriptor searchableDescriptor =
                   oxmEntities.getSearchableEntityDescriptor(cerDescriptor.getTargetEntityType());
 
@@ -540,11 +575,10 @@ public class EntityEventPolicy implements Processor {
                           .addCrossEntityReferenceValue(parentCrossEntityReferenceAttributeValue);
                     }
 
-                    entityToSync.setEntityPrimaryKeyName(entityPrimaryKeyFieldName);
-                    entityToSync.setLink(entityLink);
+                    entityToSync.setLink(targetEntityUrl);
                     entityToSync.deriveFields();
 
-                    syncEntity(entityToSync);
+                    updateCerInEntity(entityToSync);
 
                   } catch (NoSuchAlgorithmException e) {
                     e.printStackTrace();
@@ -872,12 +906,14 @@ public class EntityEventPolicy implements Processor {
     d.setEntityType(resultDescriptor.getEntityName());
 
     List<String> primaryKeyValues = new ArrayList<String>();
+    List<String> primaryKeyNames = new ArrayList<String>();
     String pkeyValue = null;
 
     for (String keyName : resultDescriptor.getPrimaryKeyAttributeName()) {
       pkeyValue = RouterServiceUtil.getNodeFieldAsText(entityNode, keyName);
       if (pkeyValue != null) {
         primaryKeyValues.add(pkeyValue);
+        primaryKeyNames.add(keyName);
       } else {
         // logger.warn("getPopulatedDocument(), pKeyValue is null for entityType = " +
         // resultDescriptor.getEntityName());
@@ -888,6 +924,8 @@ public class EntityEventPolicy implements Processor {
 
     final String primaryCompositeKeyValue = RouterServiceUtil.concatArray(primaryKeyValues, "/");
     d.setEntityPrimaryKeyValue(primaryCompositeKeyValue);
+    final String primaryCompositeKeyName = RouterServiceUtil.concatArray(primaryKeyNames, "/");
+    d.setEntityPrimaryKeyName(primaryCompositeKeyName);
 
     final List<String> searchTagFields = resultDescriptor.getSearchableAttributes();
 
@@ -907,19 +945,26 @@ public class EntityEventPolicy implements Processor {
     return d;
   }
 
-  private void syncEntity(AaiEventEntity aaiEventEntity) {
+  private void updateCerInEntity(AaiEventEntity aaiEventEntity) {
     try {
       Map<String, List<String>> headers = new HashMap<>();
-      headers.put(Headers.FROM_APP_ID, Arrays.asList("DataLayer"));
+      headers.put(Headers.FROM_APP_ID, Arrays.asList("Data Router"));
       headers.put(Headers.TRANSACTION_ID, Arrays.asList(MDC.get(MdcContext.MDC_REQUEST_ID)));
 
       String entityId = aaiEventEntity.getId();
+      String jsonPayload = aaiEventEntity.getAsJson();
 
       // Run the GET to retrieve the ETAG from the search service
       OperationResult storedEntity =
-          searchClient.get(entitySearchTarget + entityId, headers, MediaType.APPLICATION_JSON_TYPE);
+          searchClient.get(entitySearchTarget+entityId, headers, MediaType.APPLICATION_JSON_TYPE);
 
       if (HttpUtil.isHttpResponseClassSuccess(storedEntity.getResultCode())) {
+        /*
+         * NOTES: aaiEventEntity (ie the nested entity) may contain a subset of properties of 
+         * the pre-existing object, 
+         * so all we want to do is update the CER on the pre-existing object (if needed).
+         */
+        
         List<String> etag = storedEntity.getHeaders().get(Headers.ETAG);
 
         if (etag != null && etag.size() > 0) {
@@ -928,9 +973,34 @@ public class EntityEventPolicy implements Processor {
           logger.error(EntityEventPolicyMsgs.NO_ETAG_AVAILABLE_FAILURE,
               entitySearchTarget + entityId, entityId);
         }
+        
+        ArrayList<JsonNode> sourceObject = new ArrayList<JsonNode>();
+        NodeUtils.extractObjectsByKey(
+            NodeUtils.convertJsonStrToJsonNode(storedEntity.getResult()),
+            "content", sourceObject);
 
-        searchClient.put(entitySearchTarget + entityId, aaiEventEntity.getAsJson(), headers,
-            MediaType.APPLICATION_JSON_TYPE, MediaType.APPLICATION_JSON_TYPE);
+        if (!sourceObject.isEmpty()) {
+          JsonNode node = sourceObject.get(0);
+          final String sourceCer = NodeUtils.extractFieldValueFromObject(node, 
+              "crossEntityReferenceValues");
+          String newCer = aaiEventEntity.getCrossReferenceEntityValues();
+          boolean hasNewCer = true;
+          if (sourceCer != null && sourceCer.length() > 0){ // already has CER
+            if ( !sourceCer.contains(newCer)){//don't re-add
+              newCer = sourceCer + ";" + newCer;
+            } else {
+              hasNewCer = false;
+            }
+          }
+          
+          if (hasNewCer){
+            // Do the PUT with new CER
+            ((ObjectNode)node).put("crossEntityReferenceValues", newCer);
+            jsonPayload = NodeUtils.convertObjectToJson(node, false);
+            searchClient.put(entitySearchTarget + entityId, jsonPayload, headers,
+                MediaType.APPLICATION_JSON_TYPE, MediaType.APPLICATION_JSON_TYPE);
+          }
+         }
       } else {
 
         if (storedEntity.getResultCode() == 404) {
