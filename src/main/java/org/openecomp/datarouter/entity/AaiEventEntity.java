@@ -138,7 +138,7 @@ public class AaiEventEntity implements DocumentStoreDataEntity, Serializable {
   }
 
   public void deriveFields() throws NoSuchAlgorithmException {
-    this.id = NodeUtils.generateUniqueShaDigest(this.getLink());
+    this.id = NodeUtils.generateUniqueShaDigest(link);
     this.searchTags = concatArray(searchTagCollection, ';');
     this.searchTagIds = concatArray(searchTagIdCollection, ';');
     this.crossReferenceEntityValues = concatArray(crossEntityReferenceCollection, ';');
@@ -273,6 +273,14 @@ public class AaiEventEntity implements DocumentStoreDataEntity, Serializable {
    * 
    * }
    */
+
+  public String getCrossReferenceEntityValues() {
+    return crossReferenceEntityValues;
+  }
+
+  public void setCrossReferenceEntityValues(String crossReferenceEntityValues) {
+    this.crossReferenceEntityValues = crossReferenceEntityValues;
+  }
 
   @Override
   public String toString() {
