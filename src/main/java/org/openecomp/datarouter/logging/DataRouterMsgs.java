@@ -127,6 +127,11 @@ public enum DataRouterMsgs implements LogMessageEnum {
   PROCESS_REST_REQUEST,
 
   /**
+   * Index {0} may not exist in the search data store.  Attempting to create it now.
+   */
+  CREATE_MISSING_INDEX,
+  
+  /**
    * Processed event {0}. Result: {1}
    * Arguments: {0} = event topic {1} = result
    */
@@ -150,7 +155,16 @@ public enum DataRouterMsgs implements LogMessageEnum {
   
   INVALID_OXM_FILE,
   
-  INVALID_OXM_DIR;
+  INVALID_OXM_DIR,
+  
+  /**
+   * Failed to create or update document in index {0}.  Cause: {1}
+   * 
+   * Arguments:
+   *    {0} = Index name
+   *    {1} = Failure cause
+   */
+  FAIL_TO_CREATE_UPDATE_DOC;
 
   /**
    * Static initializer to ensure the resource bundles for this class are loaded...
