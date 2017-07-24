@@ -1,0 +1,10 @@
+Verified+1: ONAP Jobbuilder <onap-jobbuilder@jenkins.onap.org>
+Code-Review+1: Daniel Silverthorn <daniel.silverthorn@amdocs.com>
+Code-Review+1: Shwetank Dave <shwetank.dave@amdocs.com>
+Code-Review+1: Steven Blimkie <Steven.Blimkie@amdocs.com>
+Code-Review+2: James Forsyth <jf2512@att.com>
+Submitted-by: James Forsyth <jf2512@att.com>
+Submitted-at: Mon, 24 Jul 2017 21:16:57 +0000
+Reviewed-on: http://gerrit.onap.org/r/6115
+Project: aai/data-router
+Branch: refs/heads/master
