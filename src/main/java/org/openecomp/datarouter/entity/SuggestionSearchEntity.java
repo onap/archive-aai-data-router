@@ -34,12 +34,20 @@ import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.openecomp.datarouter.search.filters.config.UiFilterConfig;
+import org.openecomp.datarouter.search.filters.config.UiFiltersConfig;
+import org.openecomp.datarouter.search.filters.config.UiFiltersSchemaUtility;
 import org.openecomp.datarouter.util.NodeUtils;
+import org.openecomp.datarouter.util.SearchSuggestionPermutation;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
 public class SuggestionSearchEntity implements DocumentStoreDataEntity, Serializable {
   private static final long serialVersionUID = -3636393943669310760L;
+
+  private static final String FILTER_ID = "filterId";
+  private static final String FILTER_VALUE = "filterValue";
+  private static final String FILTER_LIST = "filterList";
 
   protected String id; // generated SHA-256 digest
   private String entityType;
@@ -47,35 +55,65 @@ public class SuggestionSearchEntity implements DocumentStoreDataEntity, Serializ
   private List<String> suggestionInputPermutations = new ArrayList<>();
   private List<String> statusPermutations = new ArrayList<>();
   private List<String> suggestableAttr = new ArrayList<>();
-  private Map<String, String> payload = new HashMap<>();
-  private JSONObject payloadJsonNode = new JSONObject();
-  private StringBuffer outputString = new StringBuffer();
+  
+  private Map<String, String> inputOutputData = new HashMap<>();
+  private Map<String, UiFilterConfig> filters = new HashMap<>();
+  private JSONObject filterPayload = new JSONObject();
+  private StringBuffer searchSuggestionDisplayString = new StringBuffer();
+  private JSONArray payloadFilters = new JSONArray();
+  private UiFiltersSchemaUtility filtersSchemaUtility = new UiFiltersSchemaUtility();
 
-  public void deriveFields() throws NoSuchAlgorithmException {
+  public SuggestionSearchEntity() {
+    UiFiltersConfig filterConfigList = filtersSchemaUtility.loadUiFiltersConfig();
+
+    // Populate the map with keys that will match the suggestableAttr values
+    for (UiFilterConfig filter : filterConfigList.getFilters()) {
+      if (filter.getDataSource() != null) {
+        filters.put(filter.getDataSource().getFieldName(), filter);
+      }
+    }
+  }
+
+  /**
+   * Create the search suggestion string to display to the user in the search suggestion drop-down
+   * 
+   * @throws NoSuchAlgorithmException
+   */
+  public void generateSearchSuggestionDisplayStringAndId() throws NoSuchAlgorithmException {
     int payloadEntryCounter = 1;
 
-    for (Map.Entry<String, String> payload : getPayload().entrySet()) {
-      if (payload.getValue() != null && payload.getValue().length() > 0) {
-        this.getPayloadJsonNode().put(payload.getKey(), payload.getValue());
-        this.outputString.append(payload.getValue());
+    for (Map.Entry<String, String> outputValue : inputOutputData.entrySet()) {
+      if (outputValue.getValue() != null && outputValue.getValue().length() > 0) {
+        this.searchSuggestionDisplayString.append(outputValue.getValue());
 
-        if (payloadEntryCounter < getPayload().entrySet().size()) {
-          this.outputString.append(" and ");
+        if (payloadEntryCounter < inputOutputData.entrySet().size()) {
+          this.searchSuggestionDisplayString.append(" and ");
         } else {
-          this.outputString.append(" ");
+          this.searchSuggestionDisplayString.append(" ");
         }
       }
 
       payloadEntryCounter++;
     }
 
-    this.outputString.append(getEntityTypeAliases().get(0));
-    this.id = NodeUtils.generateUniqueShaDigest(outputString.toString());
+    this.searchSuggestionDisplayString.append(getEntityTypeAliases().get(0));
+    generateSearchSuggestionId(searchSuggestionDisplayString.toString());
+  }
+  
+  /**
+   * Generates an ID by encrypting the string to display to the user in the search suggestion
+   * drop-down
+   * 
+   * @param outputString The string to create the encrypted ID from
+   */
+  private void generateSearchSuggestionId(String searchSuggestionDisplayString) {
+    this.id = NodeUtils.generateUniqueShaDigest(searchSuggestionDisplayString);
   }
 
   /**
    * Launch pad for performing permutations of the entity type, aliases, prov status and orchestration status.
-   * SHA-256 will result in an ID with a guaranteed uniqueness compared to just a java hashcode value.
+   * SHA-256 will result in an ID with a guaranteed uniqueness compared to just a java hashcode value
+   * 
    * @return
    */
   public List<String> generateSuggestionInputPermutations() {
@@ -88,24 +126,75 @@ public class SuggestionSearchEntity implements DocumentStoreDataEntity, Serializ
       }
     }
 
-    ArrayList<String> listToPermutate = new ArrayList<>(statusPermutations);
-    ArrayList<String> listOfSearchSuggestionPermutations = new ArrayList<>();
+    ArrayList<String> listOfSearchSuggestionPermutations = new ArrayList<String>();
+    ArrayList<String> listToPermutate = 
+        new ArrayList<>(this.getInputOutputData().values());
 
     for (String entityName : entityNames) {
       listToPermutate.add(entityName);
-      permutateList(listToPermutate, new ArrayList<String>(), listToPermutate.size(), listOfSearchSuggestionPermutations);
+      List<List<String>> lists = SearchSuggestionPermutation.getListPermutations(listToPermutate);
+      for (List<String> li : lists){
+        listOfSearchSuggestionPermutations.add(String.join(" ", li));
+      }
       listToPermutate.remove(entityName);
     }
 
     return listOfSearchSuggestionPermutations;
   }
 
-  public boolean isSuggestableDoc() {
-    return this.getPayload().size() != 0;
+  /**
+   * Return a custom JSON representation of this class
+   */
+  @Override
+  public String getAsJson() throws IOException {
+    if (entityType == null || suggestionInputPermutations == null) {
+      return null;
+    }
+
+    JSONObject rootNode = new JSONObject();
+    JSONArray inputArray = new JSONArray();
+    JSONObject payloadNode = new JSONObject();
+    StringBuffer outputString = new StringBuffer();
+
+    int payloadEntryCounter = 1;
+
+    // Add prov and orchestration status to search suggestion string
+    for (Map.Entry<String, String> payload : inputOutputData.entrySet()) {
+      payloadNode.put(payload.getKey(), payload.getValue());
+      outputString.append(payload.getValue());
+
+      if (payloadEntryCounter < inputOutputData.entrySet().size()) {
+        // Add the word "and" between prov and orchestration statuses, if both are present
+        outputString.append(" and ");
+        payloadEntryCounter++;
+      }
+    }
+
+    /* Add entity type to search suggestion string. We've decided to use the first entity type alias
+     * from the OXM */
+    outputString.append(" ").append(getEntityTypeAliases().get(0));
+
+    for (String permutation : suggestionInputPermutations) {
+      inputArray.put(permutation);
+    }
+
+    // Build up the search suggestion as JSON
+    JSONObject entitySuggest = new JSONObject();
+    entitySuggest.put("input", inputArray);
+    entitySuggest.put("output", outputString);
+    entitySuggest.put("payload", this.filterPayload);
+    rootNode.put("entity_suggest", entitySuggest);
+
+    return rootNode.toString();
   }
-  
+
+  public boolean isSuggestableDoc() {
+    return this.getFilterPayload().length() != 0;
+  }
+
   /**
    * Generate all permutations of Entity Type and (Prov Status and/or Orchestration Status)
+   * 
    * @param list The list of unique elements to create permutations of
    * @param permutation A list to hold the current permutation used during
    * @param size To keep track of the original size of the number of unique elements
@@ -137,48 +226,51 @@ public class SuggestionSearchEntity implements DocumentStoreDataEntity, Serializ
   }
 
   /**
-   * return Custom-built JSON representation of this class
+   * Populate a string that will represent the UI filters portion of the JSON payload that's stored in the
+   * search engine
+   * 
+   * @param entityFromUebEvent
+   * @param suggestibleAttrInPayload
    */
-  @Override
-  public String getAsJson() throws IOException {
-    if (entityType == null || suggestionInputPermutations == null) {
-      return null;
+  public void setFilterBasedPayloadFromResponse(JsonNode entityFromUebEvent,
+      List<String> suggestibleAttrInOxm, List<String> suggestibleAttrInPayload) {
+    if (suggestibleAttrInOxm != null) {
+      for (String attribute : suggestibleAttrInOxm) {
+        UiFilterConfig filterConfig = filters.get(attribute);
+
+        if (suggestibleAttrInPayload.contains(attribute)) {
+          inputOutputData.put(attribute, entityFromUebEvent.get(attribute).asText());
+
+          if(filterConfig != null) {
+            JSONObject filterPayload = new JSONObject();
+            filterPayload.put(FILTER_ID, filterConfig.getFilterId());
+            filterPayload.put(FILTER_VALUE, entityFromUebEvent.get(attribute).asText());
+            this.payloadFilters.put(filterPayload);
+          } else {
+            this.filterPayload.put(attribute, entityFromUebEvent.get(attribute).asText()); 
+          }
+        } else {
+          if(filterConfig != null) {
+            JSONObject emptyValueFilterPayload = new JSONObject();
+            emptyValueFilterPayload.put(FILTER_ID, filterConfig.getFilterId());
+            this.payloadFilters.put(emptyValueFilterPayload);
+          }
+        }
+      }
+
+      this.filterPayload.put(FILTER_LIST, this.payloadFilters);
     }
+  }
 
-    JSONObject rootNode = new JSONObject();
-    JSONArray inputArray = new JSONArray();
-    JSONObject payloadNode = new JSONObject();
-    StringBuffer outputString = new StringBuffer();
-
-    int payloadEntryCounter = 1;
-
-    // Add prov and orchestration status to search suggestion string
-    for (Map.Entry<String, String> payload : getPayload().entrySet()) {
-      payloadNode.put(payload.getKey(), payload.getValue());
-      outputString.append(payload.getValue());
-
-      if (payloadEntryCounter < getPayload().entrySet().size()) {
-        // Add the word "and" between prov and orchestration statuses, if both are present
-        outputString.append(" and ");
-        payloadEntryCounter++;
+  public void setPayloadFromResponse(JsonNode node) {
+    if (suggestableAttr != null) {
+      for (String attribute : suggestableAttr) {
+        if (node.get(attribute) != null) {
+          inputOutputData.put(attribute, node.get(attribute).asText());
+          this.filterPayload.put(attribute, node.get(attribute).asText());
+        }
       }
     }
-
-    // Add entity type to search suggestion string. We've decided to use the first entity type alias from the OXM
-    outputString.append(" ").append(getEntityTypeAliases().get(0));
-
-    for (String permutation : suggestionInputPermutations) {
-      inputArray.put(permutation);
-    }
-
-    // Build up the search suggestion as JSON
-    JSONObject entitySuggest = new JSONObject();
-    entitySuggest.put("input", inputArray);
-    entitySuggest.put("output", outputString);
-    entitySuggest.put("payload", payloadNode);
-    rootNode.put("entity_suggest", entitySuggest);
-
-    return rootNode.toString();
   }
 
   public String getEntityType() {
@@ -202,46 +294,12 @@ public class SuggestionSearchEntity implements DocumentStoreDataEntity, Serializ
     return id;
   }
 
-  public void setId(String id) {
-    this.id = id;
+  public StringBuffer getSearchSuggestionDisplayString() {
+    return searchSuggestionDisplayString;
   }
 
-  public StringBuffer getOutputString() {
-    return outputString;
-  }
-
-  public void setOutputString(StringBuffer outputString) {
-    this.outputString = outputString;
-  }
-
-  public Map<String, String> getPayload() {
-    return payload;
-  }
-
-  public void setPayloadFromResponse(JsonNode node) {
-    Map<String, String> nodePayload = new HashMap<>();
-    JsonNode entityNode = node.get("entity");
-    if (suggestableAttr != null) {
-      for (String attribute : suggestableAttr) {
-        if (entityNode.get(attribute) != null && !entityNode.get(attribute).asText().trim().isEmpty()) {
-          nodePayload.put(attribute, entityNode.get(attribute).asText());
-          this.statusPermutations.add(entityNode.get(attribute).asText());
-        }
-      }
-      this.setPayload(nodePayload);
-    }
-  }
-
-  public void setPayload(Map<String, String> payload) {
-    this.payload = payload;
-  }
-
-  public JSONObject getPayloadJsonNode() {
-    return payloadJsonNode;
-  }
-
-  public void setPayloadJsonNode(JSONObject payloadJsonNode) {
-    this.payloadJsonNode = payloadJsonNode;
+  public JSONObject getFilterPayload() {
+    return filterPayload;
   }
 
   public List<String> getStatusPermutations() {
@@ -256,11 +314,35 @@ public class SuggestionSearchEntity implements DocumentStoreDataEntity, Serializ
     return this.suggestionInputPermutations;
   }
 
+  public void setId(String id) {
+    this.id = id;
+  }
+  
+  public void setInputOutputData(Map<String, String> inputOutputData) {
+    this.inputOutputData = inputOutputData;
+  }
+
+  public Map<String, String> getInputOutputData() {
+    return inputOutputData;
+  }
+
+  public void setSearchSuggestionDisplayString(StringBuffer searchSuggestionDisplayString) {
+    this.searchSuggestionDisplayString = searchSuggestionDisplayString;
+  }
+
+  public void setFilterPayload(JSONObject filterPayload) {
+    this.filterPayload = filterPayload;
+  }
+  
+  public void setFiltersSchemaUtility(UiFiltersSchemaUtility filtersSchemaUtility) {
+    this.filtersSchemaUtility = filtersSchemaUtility;
+  }
+
   public void setStatusPermutations(List<String> statusPermutations) {
     this.statusPermutations = statusPermutations;
   }
 
-  public void setSuggestableAttr(ArrayList<String> attributes) {
+  public void setSuggestableAttr(List<String> attributes) {
     for (String attribute : attributes) {
       this.suggestableAttr.add(attribute);
     }
@@ -275,7 +357,9 @@ public class SuggestionSearchEntity implements DocumentStoreDataEntity, Serializ
     return "SuggestionSearchEntity [id=" + id + ", entityType=" + entityType
         + ", entityTypeAliases=" + entityTypeAliases + ", suggestionInputPermutations="
         + suggestionInputPermutations + ", statusPermutations=" + statusPermutations
-        + ", suggestableAttr=" + suggestableAttr + ", payload=" + payload + ", payloadJsonNode="
-        + payloadJsonNode + ", outputString=" + outputString + "]";
+        + ", suggestableAttr=" + suggestableAttr + ", inputOutputData=" + inputOutputData
+        + ", filters=" + filters + ", filterPayload=" + filterPayload
+        + ", searchSuggestionDisplayString=" + searchSuggestionDisplayString + ", payloadFilters="
+        + payloadFilters + "]";
   }
 }
