@@ -24,13 +24,6 @@
  */
 package org.openecomp.datarouter.policy;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -71,6 +64,7 @@ import org.openecomp.datarouter.util.CrossEntityReference;
 import org.openecomp.datarouter.util.DataRouterConstants;
 import org.openecomp.datarouter.util.EntityOxmReferenceHelper;
 import org.openecomp.datarouter.util.ExternalOxmModelProcessor;
+import org.openecomp.datarouter.util.NodeUtils;
 import org.openecomp.datarouter.util.OxmModelLoader;
 import org.openecomp.datarouter.util.RouterServiceUtil;
 import org.openecomp.datarouter.util.SearchServiceAgent;
@@ -80,9 +74,16 @@ import org.openecomp.datarouter.util.VersionedOxmEntities;
 import org.openecomp.restclient.client.Headers;
 import org.openecomp.restclient.client.OperationResult;
 import org.openecomp.restclient.client.RestClient;
+import org.openecomp.restclient.enums.RestAuthenticationMode;
 import org.openecomp.restclient.rest.HttpUtil;
-import org.openecomp.datarouter.util.NodeUtils;
 import org.slf4j.MDC;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 public class EntityEventPolicy implements Processor {
 
@@ -255,9 +256,15 @@ public class EntityEventPolicy implements Processor {
     }
 
     // Load the UEB payload data, any errors will result in a failure and discard
-    JSONObject uebObjHeader = getUebHeaderAsJson(uebPayload);
+    JSONObject uebObjHeader = getUebContentAsJson(uebPayload, EVENT_HEADER);
     if (uebObjHeader == null) {
-      returnWithError(exchange, uebPayload, "Payload is missing event-header");
+      returnWithError(exchange, uebPayload, "Payload is missing " + EVENT_HEADER);
+      return;
+    }
+    
+    JSONObject uebObjEntity = getUebContentAsJson(uebPayload, ENTITY_HEADER);
+    if (uebObjEntity == null) {
+      returnWithError(exchange, uebPayload, "Payload is missing " + ENTITY_HEADER);
       return;
     }
 
@@ -561,9 +568,17 @@ public class EntityEventPolicy implements Processor {
       Map<String, OxmEntityDescriptor> rootDescriptor =
           oxmEntities.getSuggestableEntityDescriptors();
       if (!rootDescriptor.isEmpty()) {
-        List<String> suggestibleAttributes = extractSuggestableAttr(oxmEntities, entityType);
+        List<String> suggestibleAttrInPayload = new ArrayList<String>();
+        List<String> suggestibleAttrInOxm = extractSuggestableAttr(oxmEntities, entityType);
+        if (suggestibleAttrInOxm != null) {
+          for (String attr: suggestibleAttrInOxm){
+            if ( uebObjEntity.has(attr) ){
+              suggestibleAttrInPayload.add(attr);
+            }
+          }
+        }
 
-        if (suggestibleAttributes == null) {
+        if (suggestibleAttrInPayload.isEmpty()) {
           return;
         }
 
@@ -572,39 +587,38 @@ public class EntityEventPolicy implements Processor {
         ae.setLink(entityLink);
         ae.deriveFields(uebAsJson);
 
-        handleSuggestiveSearchData(ae, action, this.aggregationSearchVnfTarget);
+        handleSearchServiceOperation(ae, action, this.aggregationSearchVnfTarget);
 
         /*
          * It was decided to silently ignore DELETE requests for resources we don't allow to be
          * deleted. e.g. auto-suggestion deletion is not allowed while aggregation deletion is.
          */
         if (!ACTION_DELETE.equalsIgnoreCase(action)) {
-          SearchSuggestionPermutation searchSuggestionPermutation =
-              new SearchSuggestionPermutation();
-          List<ArrayList<String>> permutationsOfStatuses =
-              searchSuggestionPermutation.getSuggestionsPermutation(suggestibleAttributes);
+          List<ArrayList<String>> listOfValidPowerSetElements =
+              SearchSuggestionPermutation.getNonEmptyUniqueLists(suggestibleAttrInPayload);
 
-          // Now we have a list of all possible permutations for the status that are
-          // defined for this entity type. Try inserting a document for every combination.
-          for (ArrayList<String> permutation : permutationsOfStatuses) {
+          // Now we have a list containing the power-set (minus empty element) for the status that are
+          // available in the payload. Try inserting a document for every combination.
+          for (ArrayList<String> list : listOfValidPowerSetElements) {
             SuggestionSearchEntity suggestionSearchEntity = new SuggestionSearchEntity();
             suggestionSearchEntity.setEntityType(entityType);
-            suggestionSearchEntity.setSuggestableAttr(permutation);
-            suggestionSearchEntity.setPayloadFromResponse(uebAsJson);
+            suggestionSearchEntity.setSuggestableAttr(list);
             suggestionSearchEntity.setEntityTypeAliases(suggestionAliases);
+            suggestionSearchEntity.setFilterBasedPayloadFromResponse(uebAsJson.get("entity"),
+                suggestibleAttrInOxm, list);
             suggestionSearchEntity.setSuggestionInputPermutations(
                 suggestionSearchEntity.generateSuggestionInputPermutations());
 
             if (suggestionSearchEntity.isSuggestableDoc()) {
               try {
-                suggestionSearchEntity.deriveFields();
+                suggestionSearchEntity.generateSearchSuggestionDisplayStringAndId();
               } catch (NoSuchAlgorithmException e) {
                 logger.error(EntityEventPolicyMsgs.DISCARD_UPDATING_SEARCH_SUGGESTION_DATA,
                     "Cannot create unique SHA digest for search suggestion data. Exception: "
                         + e.getLocalizedMessage());
               }
 
-              handleSuggestiveSearchData(suggestionSearchEntity, action,
+              handleSearchServiceOperation(suggestionSearchEntity, action,
                   this.autoSuggestSearchTarget);
             }
           }
@@ -676,10 +690,10 @@ public class EntityEventPolicy implements Processor {
   /*
    * Load the UEB JSON payload, any errors would result to a failure case response.
    */
-  private JSONObject getUebHeaderAsJson(String payload) {
+  private JSONObject getUebContentAsJson(String payload, String contentKey) {
 
     JSONObject uebJsonObj;
-    JSONObject uebObjHeader;
+    JSONObject uebObjContent;
 
     try {
       uebJsonObj = new JSONObject(payload);
@@ -689,15 +703,15 @@ public class EntityEventPolicy implements Processor {
       return null;
     }
 
-    if (uebJsonObj.has(EVENT_HEADER)) {
-      uebObjHeader = uebJsonObj.getJSONObject(EVENT_HEADER);
+    if (uebJsonObj.has(contentKey)) {
+      uebObjContent = uebJsonObj.getJSONObject(contentKey);
     } else {
-      logger.debug(EntityEventPolicyMsgs.UEB_FAILED_TO_PARSE_PAYLOAD, EVENT_HEADER);
-      logger.error(EntityEventPolicyMsgs.UEB_FAILED_TO_PARSE_PAYLOAD, EVENT_HEADER);
+      logger.debug(EntityEventPolicyMsgs.UEB_FAILED_TO_PARSE_PAYLOAD, contentKey);
+      logger.error(EntityEventPolicyMsgs.UEB_FAILED_TO_PARSE_PAYLOAD, contentKey);
       return null;
     }
 
-    return uebObjHeader;
+    return uebObjContent;
   }
 
 
@@ -973,76 +987,6 @@ public class EntityEventPolicy implements Processor {
    * @param target Resource to perform the operation on
    * @param allowDeleteEvent Allow delete operation to be performed on resource
    */
-  private void handleSuggestiveSearchData(DocumentStoreDataEntity eventEntity, String action,
-      String target) {
-    try {
-      Map<String, List<String>> headers = new HashMap<>();
-      headers.put(Headers.FROM_APP_ID, Arrays.asList("DataLayer"));
-      headers.put(Headers.TRANSACTION_ID, Arrays.asList(MDC.get(MdcContext.MDC_REQUEST_ID)));
-
-      String entityId = eventEntity.getId();
-
-      if ((action.equalsIgnoreCase(ACTION_CREATE) && entityId != null)
-          || action.equalsIgnoreCase(ACTION_UPDATE)) {
-        // Run the GET to retrieve the ETAG from the search service
-        OperationResult storedEntity = searchAgent.getDocument(aggregateGenericVnfIndex, entityId);
-
-        if (HttpUtil.isHttpResponseClassSuccess(storedEntity.getResultCode())) {
-          List<String> etag = storedEntity.getHeaders().get(Headers.ETAG);
-
-          if (etag != null && etag.size() > 0) {
-            headers.put(Headers.IF_MATCH, etag);
-          } else {
-            logger.error(EntityEventPolicyMsgs.NO_ETAG_AVAILABLE_FAILURE, target + entityId,
-                entityId);
-          }
-        }
-
-        String eventEntityStr = eventEntity.getAsJson();
-
-        if (eventEntityStr != null) {
-          List<String> createIndex = new ArrayList<String>();
-          createIndex.add("true");
-          headers.put("X-CreateIndex", createIndex);
-          searchAgent.putDocument(aggregateGenericVnfIndex, entityId, eventEntity.getAsJson(), headers);
-        }
-      } else if (action.equalsIgnoreCase(ACTION_CREATE)) {
-        String eventEntityStr = eventEntity.getAsJson();
-
-        if (eventEntityStr != null) {
-          List<String> createIndex = new ArrayList<String>();
-          createIndex.add("true");
-          headers.put("X-CreateIndex", createIndex);
-          searchAgent.postDocument(aggregateGenericVnfIndex, eventEntityStr, headers);
-        }
-      } else if (action.equalsIgnoreCase(ACTION_DELETE)) {
-        // Run the GET to retrieve the ETAG from the search service
-        OperationResult storedEntity = searchAgent.getDocument(aggregateGenericVnfIndex, entityId);
-
-        if (HttpUtil.isHttpResponseClassSuccess(storedEntity.getResultCode())) {
-          List<String> etag = storedEntity.getHeaders().get(Headers.ETAG);
-
-          if (etag != null && etag.size() > 0) {
-            headers.put(Headers.IF_MATCH, etag);
-          } else {
-            logger.error(EntityEventPolicyMsgs.NO_ETAG_AVAILABLE_FAILURE, target + entityId,
-                entityId);
-          }
-
-          searchAgent.deleteDocument(aggregateGenericVnfIndex, eventEntity.getId(), headers);
-        } else {
-          logger.error(EntityEventPolicyMsgs.NO_ETAG_AVAILABLE_FAILURE, target + entityId,
-              entityId);
-        }
-      } else {
-        logger.error(EntityEventPolicyMsgs.ENTITY_OPERATION_NOT_SUPPORTED, action);
-      }
-    } catch (IOException e) {
-      logger.error(EntityEventPolicyMsgs.FAILED_TO_UPDATE_ENTITY_IN_DOCSTORE, eventEntity.getId(),
-          action);
-    }
-  }
-
   private void handleSearchServiceOperation(DocumentStoreDataEntity eventEntity, 
                                             String                  action,
                                             String                  index) {
@@ -1076,7 +1020,6 @@ public class EntityEventPolicy implements Processor {
         // Write the entity to the search service.
         // PUT
         searchAgent.putDocument(index, entityId, eventEntity.getAsJson(), headers);
-        
       } else if (action.equalsIgnoreCase(ACTION_CREATE)) {
         // Write the entry to the search service.
         searchAgent.postDocument(index, eventEntity.getAsJson(), headers);

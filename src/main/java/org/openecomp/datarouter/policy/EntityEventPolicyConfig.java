@@ -118,12 +118,12 @@ public class EntityEventPolicyConfig {
   public void setSearchKeystorePwd(String searchKeystorePwd) {
     this.searchKeystorePwd = searchKeystorePwd;
   }
-
-public String getSearchAggregationVnfIndex() {
-    return searchAggregationVnfIndex;
-}
-
-public void setSearchAggregationVnfIndex(String searchAggregationVnfIndex) {
-    this.searchAggregationVnfIndex = searchAggregationVnfIndex;
-}
+  
+  public String getSearchAggregationVnfIndex() {
+      return searchAggregationVnfIndex;
+  }
+  
+  public void setSearchAggregationVnfIndex(String searchAggregationVnfIndex) {
+      this.searchAggregationVnfIndex = searchAggregationVnfIndex;
+  }
 }

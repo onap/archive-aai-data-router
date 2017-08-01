@@ -38,52 +38,63 @@ public class SearchSuggestionPermutation {
    * @param list The list of statuses to create permutations of
    * @return     A list which contains a array list of all possible combinations
    */
-  @SuppressWarnings("serial")
-  public List<ArrayList<String>> getSuggestionsPermutation(List<String> list) {
-    List<String> statusList = new ArrayList<>(list);
-    List<String> dupStatusList;
-    ArrayList<ArrayList<String>> uniqueList = new ArrayList<>();
-    int mainLoopIndexCounter = 0;
+  public static ArrayList<ArrayList<String>> getUniqueListForSuggestions(
+      List<String> originalList) {
+    ArrayList<ArrayList<String>> lists = new ArrayList<ArrayList<String>>();
+    if (originalList.isEmpty()) {
+      lists.add(new ArrayList<String>());
+      return lists;
+    }
+    List<String> list = new ArrayList<String>(originalList);
+    String head = list.get(0);
+    ArrayList<String> rest = new ArrayList<String>(list.subList(1, list.size()));
+    
+    for (ArrayList<String> activeList : getUniqueListForSuggestions(rest)) {
+      ArrayList<String> newList = new ArrayList<String>();
+      newList.add(head);
+      newList.addAll(activeList);
+      lists.add(newList);
+      lists.add(activeList);
+    }
+    return lists;
+  }
+  
+  public static ArrayList<ArrayList<String>> getNonEmptyUniqueLists(List<String> list){
+    ArrayList<ArrayList<String>> lists = getUniqueListForSuggestions(list);
+    // remove empty list from the power set 
+    for (ArrayList<String> emptyList : lists ){
+      if ( emptyList.isEmpty() ) {
+        lists.remove(emptyList);
+        break;
+      }
+    }
+    return lists;
+  }
 
-    for (String status : statusList) {
-      // Add the single entity subset
-      //This will add the unique single values eg [A],[B],[C],[D]
-      uniqueList.add(new ArrayList<String>() {
-        {
-          add(status);
-        }
-      });
+  public static List<List<String>> getListPermutations(List<String> list) {
+    List<String> inputList = new ArrayList<String>();
+    inputList.addAll(list);
+    if (inputList.size() == 0) {
+      List<List<String>> result = new ArrayList<List<String>>();
+      result.add(new ArrayList<String>());
+      return result;
+    }
 
-      // Remove all the elements to left till the current index
-      dupStatusList = truncateListUntill(statusList, mainLoopIndexCounter);
+    List<List<String>> listOfLists = new ArrayList<List<String>>();
 
-      while (!dupStatusList.isEmpty()) {
-        ArrayList<String> suggListInIterate= new ArrayList<>();
-        suggListInIterate.add(status);
+    String firstElement = inputList.remove(0);
 
-        for (String dupStatus : dupStatusList) {
-          suggListInIterate.add(dupStatus);
-        }
+    List<List<String>> recursiveReturn = getListPermutations(inputList);
+    for (List<String> li : recursiveReturn) {
 
-        uniqueList.add(suggListInIterate);
-        dupStatusList.remove(0);
+      for (int index = 0; index <= li.size(); index++) {
+        List<String> temp = new ArrayList<String>(li);
+        temp.add(index, firstElement);
+        listOfLists.add(temp);
       }
 
-      mainLoopIndexCounter++;
     }
-
-    return uniqueList;
+    return listOfLists;
   }
 
-  private List<String> truncateListUntill(List<String> lists, int index) {
-    List<String> truncatedList = new ArrayList<>(lists);
-    int counter = 0;
-
-    while (counter <= index) {
-      truncatedList.remove(0);
-      counter++;
-    }
-
-    return truncatedList;
-  }
 }

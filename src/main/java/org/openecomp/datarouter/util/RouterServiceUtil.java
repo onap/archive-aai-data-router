@@ -26,16 +26,40 @@ package org.openecomp.datarouter.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import org.apache.camel.Exchange;
+import org.apache.camel.component.cxf.common.message.CxfConstants;
+import org.apache.cxf.message.Message;
 import org.json.JSONObject;
+import org.openecomp.cl.mdc.MdcContext;
+import org.openecomp.restclient.client.Headers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+
+import javax.servlet.ServletRequest;
 
 public class RouterServiceUtil {
+  
+  public static void setMdcContext(Exchange exchange){
+    String txnID = exchange.getIn().getHeader(Headers.TRANSACTION_ID, 
+        Arrays.asList(UUID.randomUUID())).toString();
+    String remote = exchange.getIn().getHeader(Headers.FROM_APP_ID, "").toString();
+    String remoteAddress = "";
+    Message cxfMessage = exchange.getIn().getHeader(CxfConstants.CAMEL_CXF_MESSAGE, Message.class);
+    if (cxfMessage != null) {
+      ServletRequest request = (ServletRequest) cxfMessage.get("HTTP.REQUEST");
+      if ( request != null)
+        remoteAddress = request.getRemoteAddr();
+    }
+    
+    MdcContext.initialize(txnID, "Synapse", "", remote, remoteAddress);
+  }
 
   public static Map<String, String> parseJsonPayloadIntoMap(String jsonPayload) {
 
@@ -222,5 +246,28 @@ public class RouterServiceUtil {
     JSONObject jsonObject = new JSONObject(obj);
     String json = jsonObject.toString();
     return json;
+  }
+
+  /**
+   * Helper utility to concatenate substrings of a URI together to form a proper URI.
+   * 
+   * @param suburis the list of substrings to concatenate together
+   * @return the concatenated list of substrings
+   */
+  public static String concatSubUri(String... suburis) {
+    String finalUri = "";
+  
+    for (String suburi : suburis) {
+  
+      if (suburi != null) {
+        // Remove any leading / since we only want to append /
+        suburi = suburi.replaceFirst("^/*", "");
+  
+        // Add a trailing / if one isn't already there
+        finalUri += suburi.endsWith("/") ? suburi : suburi + "/";
+      }
+    }
+  
+    return finalUri;
   }
 }
