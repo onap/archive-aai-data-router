@@ -27,16 +27,18 @@ package org.openecomp.datarouter.util;
 public class DataRouterConstants {
   public static final String DR_FILESEP = (System.getProperty("file.separator") == null) ? "/"
       : System.getProperty("file.separator");
+  
+  public static final String DR_AJSC_HOME = System.getProperty("AJSC_HOME");
 
   public static final String DR_SPECIFIC_CONFIG = System.getProperty("CONFIG_HOME") + DR_FILESEP;
   
   public static final String DR_BUNDLECONFIG_NAME = (System.getProperty("BUNDLECONFIG_DIR") == null)
       ? "bundleconfig" : System.getProperty("BUNDLECONFIG_DIR");
 
-  public static final String DR_HOME_BUNDLECONFIG = (System.getProperty("AJSC_HOME") == null)
+  public static final String DR_HOME_BUNDLECONFIG = (DR_AJSC_HOME == null)
       ? DR_FILESEP + "opt" + DR_FILESEP + "app" + DR_FILESEP 
           + "datalayer" + DR_FILESEP + DR_BUNDLECONFIG_NAME
-      : System.getProperty("AJSC_HOME") + DR_FILESEP + DR_BUNDLECONFIG_NAME;
+      : DR_AJSC_HOME + DR_FILESEP + DR_BUNDLECONFIG_NAME;
 
   /** This is the etc directory, relative to AAI_HOME. */
   public static final String DR_HOME_ETC = DR_HOME_BUNDLECONFIG + DR_FILESEP + "etc" + DR_FILESEP;
@@ -48,6 +50,8 @@ public class DataRouterConstants {
 
   public static final String DR_HOME_ETC_OXM = DR_HOME_ETC + "oxm" + DR_FILESEP;
   
+  public static final String UI_FILTER_LIST_FILE =
+      DR_SPECIFIC_CONFIG + DR_FILESEP + "filters" + DR_FILESEP + "aaiui_filters.json";
 
   // AAI Related
   public static final String AAI_ECHO_SERVICE = "/util/echo";

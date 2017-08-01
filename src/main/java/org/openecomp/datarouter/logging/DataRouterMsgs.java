@@ -158,14 +158,40 @@ public enum DataRouterMsgs implements LogMessageEnum {
   INVALID_OXM_DIR,
   
   /**
+   * Arguments: {0} = origin payload
+   */
+  INVALID_ORIGIN_PAYLOAD,
+  
+  /**
+   * Arguments: {0} = Origin URL {1} = Target outbound URL
+   */
+  ROUTING_FROM_TO,
+  
+  /**
+   * Arguments: {0} = Target outbound URL, {1} = Response
+   */
+  ROUTING_RESPONSE,
+
+  /**
    * Failed to create or update document in index {0}.  Cause: {1}
    * 
    * Arguments:
    *    {0} = Index name
    *    {1} = Failure cause
    */
-  FAIL_TO_CREATE_UPDATE_DOC;
+  FAIL_TO_CREATE_UPDATE_DOC,
+  
+  /**
+   * Arguments: {0} = Operation, {1} = Time in ms
+   */
+  OP_TIME,
 
+  /** Arguments: {0} = Schema file location */
+  READING_JSON_SCHEMA_ERROR,
+  
+  /** Arguments: {0} = Error message */
+  JSON_CONVERSION_ERROR;
+  
   /**
    * Static initializer to ensure the resource bundles for this class are loaded...
    */
