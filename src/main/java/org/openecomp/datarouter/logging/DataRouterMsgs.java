@@ -156,6 +156,14 @@ public enum DataRouterMsgs implements LogMessageEnum {
   INVALID_OXM_FILE,
   
   INVALID_OXM_DIR,
+  LOAD_OXM_ERROR,
+  /**
+   * Successfully loaded schema: {0}
+   *
+   * <p>Arguments:
+   * {0} = oxm filename
+   */
+  LOADED_OXM_FILE,
   
   /**
    * Arguments: {0} = origin payload
