@@ -1,0 +1,8 @@
+Verified+1: ONAP Jobbuilder <onap-jobbuilder@jenkins.onap.org>
+Code-Review+1: Steven Blimkie <Steven.Blimkie@amdocs.com>
+Code-Review+2: Manisha Aggarwal <ma9181@att.com>
+Submitted-by: Manisha Aggarwal <ma9181@att.com>
+Submitted-at: Thu, 03 Aug 2017 05:35:56 +0000
+Reviewed-on: http://gerrit.onap.org/r/6557
+Project: aai/data-router
+Branch: refs/heads/master
