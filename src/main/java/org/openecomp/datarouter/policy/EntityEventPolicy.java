@@ -23,6 +23,7 @@
 package org.openecomp.datarouter.policy;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -132,7 +133,7 @@ public class EntityEventPolicy implements Processor {
     SUCCESS, PARTIAL_SUCCESS, FAILURE;
   };
 
-  public EntityEventPolicy(EntityEventPolicyConfig config) {
+  public EntityEventPolicy(EntityEventPolicyConfig config) throws FileNotFoundException {
     LoggerFactory loggerFactoryInstance = LoggerFactory.getInstance();
     logger = loggerFactoryInstance.getLogger(EntityEventPolicy.class.getName());
     metricsLogger = loggerFactoryInstance.getMetricsLogger(EntityEventPolicy.class.getName());

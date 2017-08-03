@@ -22,18 +22,14 @@
  */
 package org.openecomp.datarouter.util;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -48,11 +44,13 @@ import org.openecomp.cl.eelf.LoggerFactory;
 import org.openecomp.datarouter.logging.DataRouterMsgs;
 
 import org.openecomp.datarouter.util.ExternalOxmModelProcessor;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
 
 public class OxmModelLoader {
 
-	private static Map<String, DynamicJAXBContext> versionContextMap = new ConcurrentHashMap<String, DynamicJAXBContext>();
-	private static Map<String, Timer> timers = new ConcurrentHashMap<String, Timer>();
+	private static Map<String, DynamicJAXBContext> versionContextMap = new ConcurrentHashMap<String, DynamicJAXBContext>();	
 	private static List<ExternalOxmModelProcessor> oxmModelProcessorRegistry = new ArrayList<ExternalOxmModelProcessor>();
 	final static Pattern p = Pattern.compile("aai_oxm_(.*).xml");
 	
@@ -61,62 +59,44 @@ public class OxmModelLoader {
 	private static org.openecomp.cl.api.Logger logger = LoggerFactory.getInstance()
 			.getLogger(OxmModelLoader.class.getName());
 
-	public synchronized static void loadModels() {
+	public synchronized static void loadModels() throws FileNotFoundException {
+	  
+    ClassLoader cl = OxmModelLoader.class.getClassLoader();
+    ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver(cl);
+    Resource[] resources;
+    try {
+      resources = resolver.getResources("classpath*:/oxm/aai_oxm*.xml");
+    } catch (IOException ex) {
+      logger.error(DataRouterMsgs.LOAD_OXM_ERROR, ex.getMessage());  
+      throw new FileNotFoundException("Unable to load OXM models from schema path : /oxm/aai_oxm*.xml");
+    }
+
+    if (resources.length == 0) {
+      logger.error(DataRouterMsgs.LOAD_OXM_ERROR, "No OXM schema files found on classpath"); 
+      throw new FileNotFoundException("Unable to load OXM models from schema path : /oxm/aai_oxm*.xml");
+    }
+
+    for (Resource resource : resources) {
+      Matcher matcher = p.matcher(resource.getFilename());
+
+      if (matcher.matches()) {
+        try {
+          OxmModelLoader.loadModel(matcher.group(1), resource.getFilename(),resource.getInputStream());
+        } catch (Exception e) {
+          logger.error(DataRouterMsgs.LOAD_OXM_ERROR, "Failed to load " + resource.getFilename()
+              + ": " + e.getMessage());          
+        }
+      }
+    }
 		
-		File[] listOfFiles = new File(DataRouterConstants.DR_HOME_MODEL).listFiles();
-
-		if (listOfFiles != null) {
-			for (File file : listOfFiles) {
-				if (file.isFile()) {
-					Matcher m = p.matcher(file.getName());
-					if (m.matches()) {
-						try {
-							OxmModelLoader.loadModel(m.group(1), file);
-						} catch (Exception e) {
-							logger.error(DataRouterMsgs.INVALID_OXM_FILE, file.getName(), e.getMessage());
-						}
-					}
-
-				}
-			}
-		} else {
-			logger.error(DataRouterMsgs.INVALID_OXM_DIR, DataRouterConstants.DR_HOME_MODEL);
-		}
-
-
+		
 	}
 	
-	private static void addtimer(String version,File file){
-		TimerTask task = null;
-		task = new FileWatcher(
-				file) {
-			protected void onChange(File file) {
-				// here we implement the onChange
-				logger.info(DataRouterMsgs.FILE_CHANGED, file.getName());
+	
 
-				try {
-					OxmModelLoader.loadModel(version,file);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-
-			}
-		};
-
-		if (!timers.containsKey(version)) {
-			Timer timer = new Timer("oxm-"+version);
-			timer.schedule(task, new Date(), 10000);
-			timers.put(version, timer);
-
-		}
-	}
-
-	private synchronized static void loadModel(String version,File file) throws JAXBException, FileNotFoundException {
-
-		
-		InputStream iStream = new FileInputStream(file);
+	private synchronized static void loadModel(String version,String resourceName,InputStream inputStream) throws JAXBException, FileNotFoundException {
 		Map<String, Object> properties = new HashMap<String, Object>();
-		properties.put(JAXBContextProperties.OXM_METADATA_SOURCE, iStream);
+		properties.put(JAXBContextProperties.OXM_METADATA_SOURCE, inputStream);
 		final DynamicJAXBContext jaxbContext = DynamicJAXBContextFactory
 				.createContextFromOXM(Thread.currentThread().getContextClassLoader(), properties);
 		versionContextMap.put(version, jaxbContext);
@@ -124,20 +104,16 @@ public class OxmModelLoader {
           for ( ExternalOxmModelProcessor processor : oxmModelProcessorRegistry ) {
              processor.onOxmVersionChange(Version.valueOf(version),  jaxbContext );
           }
-         }
-		addtimer(version,file);
-
+         }		
+		logger.info(DataRouterMsgs.LOADED_OXM_FILE, resourceName);
 	}
 
 	public static DynamicJAXBContext getContextForVersion(String version) throws Exception {
 		if (versionContextMap == null || versionContextMap.isEmpty()) {
 			loadModels();
-		} else if (!versionContextMap.containsKey(version)) {
-			try {
-				loadModel(version,new File (DataRouterConstants.DR_HOME_MODEL + "aai_oxm_" + version + ".xml"));
-			} catch (Exception e) {
+		} else if (!versionContextMap.containsKey(version)) {			
 				throw new Exception(Status.NOT_FOUND.toString());
-			}
+			
 		}
 
 		return versionContextMap.get(version);
