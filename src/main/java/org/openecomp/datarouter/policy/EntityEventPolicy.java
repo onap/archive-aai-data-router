@@ -22,11 +22,8 @@
  */
 package org.openecomp.datarouter.policy;
 
-import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,14 +32,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import org.eclipse.jetty.util.security.Password;
 import org.eclipse.persistence.dynamic.DynamicType;
 import org.eclipse.persistence.internal.helper.DatabaseField;
 import org.eclipse.persistence.jaxb.dynamic.DynamicJAXBContext;
@@ -60,7 +52,6 @@ import org.openecomp.datarouter.entity.TopographicalEntity;
 import org.openecomp.datarouter.entity.UebEventHeader;
 import org.openecomp.datarouter.logging.EntityEventPolicyMsgs;
 import org.openecomp.datarouter.util.CrossEntityReference;
-import org.openecomp.datarouter.util.DataRouterConstants;
 import org.openecomp.datarouter.util.EntityOxmReferenceHelper;
 import org.openecomp.datarouter.util.ExternalOxmModelProcessor;
 import org.openecomp.datarouter.util.NodeUtils;
@@ -72,8 +63,6 @@ import org.openecomp.datarouter.util.Version;
 import org.openecomp.datarouter.util.VersionedOxmEntities;
 import org.openecomp.restclient.client.Headers;
 import org.openecomp.restclient.client.OperationResult;
-import org.openecomp.restclient.client.RestClient;
-import org.openecomp.restclient.enums.RestAuthenticationMode;
 import org.openecomp.restclient.rest.HttpUtil;
 import org.slf4j.MDC;
 
@@ -82,7 +71,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 public class EntityEventPolicy implements Processor {
 
@@ -118,10 +106,7 @@ public class EntityEventPolicy implements Processor {
   /** Search index name for suggestive search data. */
   private String aggregateGenericVnfIndex;
   
-  private String entitySearchTarget = null;
-  private String topographicalSearchTarget = null;
-  private String autoSuggestSearchTarget = null;
-  private String aggregationSearchVnfTarget = null;
+  private String autosuggestIndex;
 
   private String srcDomain;
 
@@ -154,21 +139,6 @@ public class EntityEventPolicy implements Processor {
                                                                         config.getSearchEndpoint()),
                                          config.getSearchEndpointDocuments(),
                                          logger);
-
-    entitySearchTarget =
-        EntityEventPolicy.concatSubUri(config.getSearchBaseUrl(), config.getSearchEndpoint(),
-            config.getSearchEntitySearchIndex(), config.getSearchEndpointDocuments());
-
-    topographicalSearchTarget = EntityEventPolicy.concatSubUri(config.getSearchBaseUrl(),
-        config.getSearchEndpoint(), config.getSearchTopographySearchIndex());
-
-    autoSuggestSearchTarget =
-        EntityEventPolicy.concatSubUri(config.getSearchBaseUrl(), config.getSearchEndpoint(),
-            config.getSearchEntityAutoSuggestIndex(), config.getSearchEndpointDocuments());
-
-    aggregationSearchVnfTarget =
-        EntityEventPolicy.concatSubUri(config.getSearchBaseUrl(), config.getSearchEndpoint(),
-            config.getSearchAggregationVnfIndex(), config.getSearchEndpointDocuments());
 
     this.externalOxmModelProcessors = new ArrayList<ExternalOxmModelProcessor>();
     this.externalOxmModelProcessors.add(EntityOxmReferenceHelper.getInstance());
@@ -586,7 +556,7 @@ public class EntityEventPolicy implements Processor {
         ae.setLink(entityLink);
         ae.deriveFields(uebAsJson);
 
-        handleSearchServiceOperation(ae, action, this.aggregationSearchVnfTarget);
+        handleSearchServiceOperation(ae, action, aggregateGenericVnfIndex);
 
         /*
          * It was decided to silently ignore DELETE requests for resources we don't allow to be
@@ -617,8 +587,7 @@ public class EntityEventPolicy implements Processor {
                         + e.getLocalizedMessage());
               }
 
-              handleSearchServiceOperation(suggestionSearchEntity, action,
-                  this.autoSuggestSearchTarget);
+              handleSearchServiceOperation(suggestionSearchEntity, action, autosuggestIndex);
             }
           }
         }
@@ -932,7 +901,7 @@ public class EntityEventPolicy implements Processor {
           headers.put(Headers.IF_MATCH, etag);
         } else {
           logger.error(EntityEventPolicyMsgs.NO_ETAG_AVAILABLE_FAILURE,
-              entitySearchTarget + entityId, entityId);
+        		  entitySearchIndex, entityId);
         }
         
         ArrayList<JsonNode> sourceObject = new ArrayList<JsonNode>();
@@ -1094,7 +1063,7 @@ public class EntityEventPolicy implements Processor {
           "Cannot create unique SHA digest for topographical data.");
     }
 
-    this.handleSearchServiceOperation(topoEntity, action, this.topographicalSearchTarget);
+    this.handleSearchServiceOperation(topoEntity, action, topographicalSearchIndex);
   }
 
 
