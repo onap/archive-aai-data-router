@@ -955,7 +955,7 @@ public class EntityEventPolicy implements Processor {
    * @param target Resource to perform the operation on
    * @param allowDeleteEvent Allow delete operation to be performed on resource
    */
-  private void handleSearchServiceOperation(DocumentStoreDataEntity eventEntity, 
+  protected void handleSearchServiceOperation(DocumentStoreDataEntity eventEntity, 
                                             String                  action,
                                             String                  index) {
     try {

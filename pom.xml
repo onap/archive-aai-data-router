@@ -41,10 +41,43 @@
         <testEnv>DEV</testEnv>
         <checkstyle.config.location>google_checks.xml</checkstyle.config.location>
         <nexusproxy>https://nexus.onap.org</nexusproxy>
+                      <!-- Sonar Properties -->
+              <sonar.language>java</sonar.language>
+              <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+              <sonar.surefire.reportsPath>${project.build.directory}/surefire-reports</sonar.surefire.reportsPath>
+              <sonar.jacoco.reportPath>${project.build.directory}/code-coverage/jacoco-ut.exec</sonar.jacoco.reportPath>
+              <sonar.jacoco.reportMissing.force.zero>false</sonar.jacoco.reportMissing.force.zero>
+              <sonar.projectVersion>${project.version}</sonar.projectVersion>
     </properties>
 
     <dependencies>
-
+<dependency>
+			<groupId>org.powermock</groupId>
+			<artifactId>powermock-module-junit4</artifactId>
+			<version>1.6.2</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.powermock</groupId>
+			<artifactId>powermock-api-mockito</artifactId>
+			<version>1.6.2</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.powermock</groupId>
+			<artifactId>powermock-module-javaagent</artifactId>
+			<version>1.6.2</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.powermock</groupId>
+			<artifactId>powermock-module-junit4-rule-agent</artifactId>
+			<version>1.6.2</version>
+			<scope>test</scope>
+		</dependency>	
         <dependency>
             <groupId>dom4j</groupId>
             <artifactId>dom4j</artifactId>
@@ -239,6 +272,7 @@
                     </execution>
                 </executions>
             </plugin>
+            
         </plugins>
     </build>
 
@@ -353,6 +387,7 @@
                             </dependency>
                         </dependencies>
                     </plugin>
+                   
                 </plugins>
             </build>
         </profile>
