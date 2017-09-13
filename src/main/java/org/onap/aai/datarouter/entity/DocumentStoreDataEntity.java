@@ -20,51 +20,14 @@
  *
  * ECOMP is a trademark and service mark of AT&T Intellectual Property.
  */
-package org.openecomp.datarouter.entity;
+package org.onap.aai.datarouter.entity;
 
-/**
- * Provides information about the level of success of a policy execution against a routed query.
- */
-public class PolicyResponse {
+import java.io.IOException;
 
-  private ResponseType responseType;
+public interface DocumentStoreDataEntity {
 
-  private String responseData;
+  public String getId();
 
-  private int httpResponseCode;
+  public String getAsJson() throws IOException;
 
-  public PolicyResponse(ResponseType responseType, String responseData) {
-    super();
-    this.responseType = responseType;
-    this.responseData = responseData;
-  }
-
-  public ResponseType getResponseType() {
-    return responseType;
-  }
-
-  public String getResponseData() {
-    return responseData;
-  }
-
-
-  public int getHttpResponseCode() {
-    return httpResponseCode;
-  }
-
-  public void setHttpResponseCode(int httpResponseCode) {
-    this.httpResponseCode = httpResponseCode;
-  }
-
-  @Override
-  public String toString() {
-    return "PolicyResponse [responseType=" + responseType + ", responseData=" + responseData
-        + ", httpResponseCode=" + httpResponseCode + "]";
-  }
-
-
-
-  public enum ResponseType {
-    SUCCESS, PARTIAL_SUCCESS, FAILURE;
-  }
 }

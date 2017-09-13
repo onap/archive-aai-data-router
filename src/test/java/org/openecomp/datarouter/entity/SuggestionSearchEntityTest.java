@@ -39,6 +39,7 @@ import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.onap.aai.datarouter.entity.SuggestionSearchEntity;
 import org.openecomp.datarouter.search.filters.config.UiFiltersSchemaUtility;
 
 public class SuggestionSearchEntityTest {

@@ -45,7 +45,7 @@
 * and service marks of AT&T Intellectual Property.
 */
 
-package org.openecomp.datarouter.entity;
+package org.onap.aai.datarouter.entity;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -146,7 +146,7 @@ public class AaiEventEntity implements DocumentStoreDataEntity, Serializable {
   /*
    * (non-Javadoc)
    * 
-   * @see org.openecomp.datarouter.entity.AAIEventEntity#getAsJson()
+   * @see org.onap.aai.datarouter.entity.AAIEventEntity#getAsJson()
    */
   @Override
   public String getAsJson() throws IOException {
@@ -187,7 +187,7 @@ public class AaiEventEntity implements DocumentStoreDataEntity, Serializable {
   /*
    * (non-Javadoc)
    * 
-   * @see org.openecomp.datarouter.entity.AAIEventEntity#getId()
+   * @see org.onap.aai.datarouter.entity.AAIEventEntity#getId()
    */
   @Override
   public String getId() {

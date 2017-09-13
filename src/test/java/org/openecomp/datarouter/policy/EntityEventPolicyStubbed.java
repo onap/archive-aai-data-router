@@ -2,7 +2,7 @@ package org.openecomp.datarouter.policy;
 
 import java.io.FileNotFoundException;
 
-import org.openecomp.datarouter.entity.DocumentStoreDataEntity;
+import org.onap.aai.datarouter.entity.DocumentStoreDataEntity;
 
 public class EntityEventPolicyStubbed extends EntityEventPolicy {
 	

@@ -20,7 +20,7 @@
  *
  * ECOMP is a trademark and service mark of AT&T Intellectual Property.
  */
-package org.openecomp.datarouter.entity;
+package org.onap.aai.datarouter.entity;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -101,7 +101,7 @@ public class TopographicalEntity implements DocumentStoreDataEntity, Serializabl
   /*
    * (non-Javadoc)
    * 
-   * @see org.openecomp.datarouter.entity.TopographicalEntity#getAsJson()
+   * @see org.onap.aai.datarouter.entity.TopographicalEntity#getAsJson()
    */
   public String getAsJson() throws IOException {
 

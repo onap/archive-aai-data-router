@@ -40,7 +40,7 @@ import org.eclipse.persistence.internal.oxm.mappings.Descriptor;
 import org.eclipse.persistence.jaxb.dynamic.DynamicJAXBContext;
 import org.eclipse.persistence.mappings.DatabaseMapping;
 import org.eclipse.persistence.oxm.XMLField;
-import org.openecomp.datarouter.entity.OxmEntityDescriptor;
+import org.onap.aai.datarouter.entity.OxmEntityDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
