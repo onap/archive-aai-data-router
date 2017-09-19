@@ -22,7 +22,7 @@
  */
 package org.openecomp.datarouter.util.client;
 
-import org.openecomp.restclient.client.RestClient;
+import org.onap.aai.restclient.client.RestClient;
 
 import com.fasterxml.jackson.databind.JsonNode;
 

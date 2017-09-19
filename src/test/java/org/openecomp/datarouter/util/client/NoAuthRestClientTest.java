@@ -37,8 +37,8 @@ import org.apache.camel.impl.DefaultExchange;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.openecomp.restclient.client.OperationResult;
-import org.openecomp.restclient.client.RestClient;
+import org.onap.aai.restclient.client.OperationResult;
+import org.onap.aai.restclient.client.RestClient;
 
 public class NoAuthRestClientTest {
 
