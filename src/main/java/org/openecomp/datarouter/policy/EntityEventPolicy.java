@@ -61,9 +61,9 @@ import org.openecomp.datarouter.util.SearchServiceAgent;
 import org.openecomp.datarouter.util.SearchSuggestionPermutation;
 import org.openecomp.datarouter.util.Version;
 import org.openecomp.datarouter.util.VersionedOxmEntities;
-import org.openecomp.restclient.client.Headers;
-import org.openecomp.restclient.client.OperationResult;
-import org.openecomp.restclient.rest.HttpUtil;
+import org.onap.aai.restclient.client.Headers;
+import org.onap.aai.restclient.client.OperationResult;
+import org.onap.aai.restclient.rest.HttpUtil;
 import org.slf4j.MDC;
 
 import com.fasterxml.jackson.core.JsonProcessingException;

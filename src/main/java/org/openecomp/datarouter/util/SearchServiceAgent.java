@@ -40,11 +40,11 @@ import org.openecomp.cl.api.Logger;
 import org.openecomp.cl.mdc.MdcContext;
 import org.openecomp.datarouter.logging.DataRouterMsgs;
 import org.openecomp.datarouter.policy.EntityEventPolicy;
-import org.openecomp.restclient.client.Headers;
-import org.openecomp.restclient.client.OperationResult;
-import org.openecomp.restclient.client.RestClient;
-import org.openecomp.restclient.enums.RestAuthenticationMode;
-import org.openecomp.restclient.rest.HttpUtil;
+import org.onap.aai.restclient.client.Headers;
+import org.onap.aai.restclient.client.OperationResult;
+import org.onap.aai.restclient.client.RestClient;
+import org.onap.aai.restclient.enums.RestAuthenticationMode;
+import org.onap.aai.restclient.rest.HttpUtil;
 import org.slf4j.MDC;
 
 import com.sun.jersey.core.util.MultivaluedMapImpl;

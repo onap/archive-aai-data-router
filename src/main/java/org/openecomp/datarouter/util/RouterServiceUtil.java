@@ -29,7 +29,7 @@ import org.apache.camel.component.cxf.common.message.CxfConstants;
 import org.apache.cxf.message.Message;
 import org.json.JSONObject;
 import org.openecomp.cl.mdc.MdcContext;
-import org.openecomp.restclient.client.Headers;
+import org.onap.aai.restclient.client.Headers;
 
 import java.util.ArrayList;
 import java.util.Arrays;

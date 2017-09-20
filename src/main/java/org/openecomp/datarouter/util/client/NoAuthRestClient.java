@@ -39,15 +39,15 @@ import org.openecomp.datarouter.logging.DataRouterMsgs;
 import org.openecomp.datarouter.util.AaiUiSvcPolicyUtil;
 import org.openecomp.datarouter.util.NodeUtils;
 import org.openecomp.datarouter.util.RouterServiceUtil;
-import org.openecomp.restclient.client.Headers;
-import org.openecomp.restclient.client.OperationResult;
-import org.openecomp.restclient.client.RestClient;
-import org.openecomp.restclient.enums.RestAuthenticationMode;
+import org.onap.aai.restclient.client.Headers;
+import org.onap.aai.restclient.client.OperationResult;
+import org.onap.aai.restclient.client.RestClient;
+import org.onap.aai.restclient.enums.RestAuthenticationMode;
 import org.slf4j.MDC;
 
 import org.springframework.http.HttpStatus;
 
-import org.openecomp.restclient.rest.HttpUtil;
+import org.onap.aai.restclient.rest.HttpUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public class NoAuthRestClient implements SvcRoutingRestClient {
