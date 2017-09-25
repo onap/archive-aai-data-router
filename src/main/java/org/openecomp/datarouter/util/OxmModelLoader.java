@@ -40,7 +40,7 @@ import javax.xml.bind.JAXBException;
 import org.eclipse.persistence.jaxb.JAXBContextProperties;
 import org.eclipse.persistence.jaxb.dynamic.DynamicJAXBContext;
 import org.eclipse.persistence.jaxb.dynamic.DynamicJAXBContextFactory;
-import org.openecomp.cl.eelf.LoggerFactory;
+import org.onap.aai.cl.eelf.LoggerFactory;
 import org.openecomp.datarouter.logging.DataRouterMsgs;
 
 import org.openecomp.datarouter.util.ExternalOxmModelProcessor;
@@ -56,7 +56,7 @@ public class OxmModelLoader {
 	
 	
 
-	private static org.openecomp.cl.api.Logger logger = LoggerFactory.getInstance()
+	private static org.onap.aai.cl.api.Logger logger = LoggerFactory.getInstance()
 			.getLogger(OxmModelLoader.class.getName());
 
 	public synchronized static void loadModels() throws FileNotFoundException {

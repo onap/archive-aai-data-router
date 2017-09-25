@@ -36,8 +36,8 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
 
 import org.eclipse.jetty.util.security.Password;
-import org.openecomp.cl.api.Logger;
-import org.openecomp.cl.mdc.MdcContext;
+import org.onap.aai.cl.api.Logger;
+import org.onap.aai.cl.mdc.MdcContext;
 import org.openecomp.datarouter.logging.DataRouterMsgs;
 import org.openecomp.datarouter.policy.EntityEventPolicy;
 import org.onap.aai.restclient.client.Headers;

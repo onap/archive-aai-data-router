@@ -25,8 +25,8 @@ package org.openecomp.datarouter.search.filters.config;
 import java.io.File;
 import java.io.IOException;
 
-import org.openecomp.cl.api.Logger;
-import org.openecomp.cl.eelf.LoggerFactory;
+import org.onap.aai.cl.api.Logger;
+import org.onap.aai.cl.eelf.LoggerFactory;
 import org.openecomp.datarouter.logging.DataRouterMsgs;
 import org.openecomp.datarouter.util.DataRouterConstants;
 
