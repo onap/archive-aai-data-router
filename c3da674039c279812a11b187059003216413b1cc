@@ -1,0 +1,8 @@
+Code-Review+1: Adrian Batos-Parac <adrian.batos-parac@amdocs.com>
+Verified+1: ONAP Jobbuilder <onap-jobbuilder@jenkins.onap.org>
+Code-Review+2: James Forsyth <jf2512@att.com>
+Submitted-by: James Forsyth <jf2512@att.com>
+Submitted-at: Wed, 27 Sep 2017 10:50:01 +0000
+Reviewed-on: http://gerrit.onap.org/r/15691
+Project: aai/data-router
+Branch: refs/heads/master
