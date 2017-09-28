@@ -57,7 +57,7 @@ public class SuggestionSearchEntity implements DocumentStoreDataEntity, Serializ
   private Map<String, String> inputOutputData = new HashMap<>();
   private Map<String, UiFilterConfig> filters = new HashMap<>();
   private JSONObject filterPayload = new JSONObject();
-  private StringBuffer searchSuggestionDisplayString = new StringBuffer();
+  private StringBuilder searchSuggestionDisplayString = new StringBuilder();
   private JSONArray payloadFilters = new JSONArray();
   private UiFiltersSchemaUtility filtersSchemaUtility = new UiFiltersSchemaUtility();
 
@@ -124,7 +124,7 @@ public class SuggestionSearchEntity implements DocumentStoreDataEntity, Serializ
       }
     }
 
-    ArrayList<String> listOfSearchSuggestionPermutations = new ArrayList<String>();
+    ArrayList<String> listOfSearchSuggestionPermutations = new ArrayList<>();
     ArrayList<String> listToPermutate = 
         new ArrayList<>(this.getInputOutputData().values());
 
@@ -152,7 +152,7 @@ public class SuggestionSearchEntity implements DocumentStoreDataEntity, Serializ
     JSONObject rootNode = new JSONObject();
     JSONArray inputArray = new JSONArray();
     JSONObject payloadNode = new JSONObject();
-    StringBuffer outputString = new StringBuffer();
+    StringBuilder outputString = new StringBuilder();
 
     int payloadEntryCounter = 1;
 
@@ -240,10 +240,10 @@ public class SuggestionSearchEntity implements DocumentStoreDataEntity, Serializ
           inputOutputData.put(attribute, entityFromUebEvent.get(attribute).asText());
 
           if(filterConfig != null) {
-            JSONObject filterPayload = new JSONObject();
-            filterPayload.put(FILTER_ID, filterConfig.getFilterId());
-            filterPayload.put(FILTER_VALUE, entityFromUebEvent.get(attribute).asText());
-            this.payloadFilters.put(filterPayload);
+            JSONObject jsonFilterPayload = new JSONObject();
+            jsonFilterPayload.put(FILTER_ID, filterConfig.getFilterId());
+            jsonFilterPayload.put(FILTER_VALUE, entityFromUebEvent.get(attribute).asText());
+            this.payloadFilters.put(jsonFilterPayload);
           } else {
             this.filterPayload.put(attribute, entityFromUebEvent.get(attribute).asText()); 
           }
@@ -292,7 +292,7 @@ public class SuggestionSearchEntity implements DocumentStoreDataEntity, Serializ
     return id;
   }
 
-  public StringBuffer getSearchSuggestionDisplayString() {
+  public StringBuilder getSearchSuggestionDisplayString() {
     return searchSuggestionDisplayString;
   }
 
@@ -324,7 +324,7 @@ public class SuggestionSearchEntity implements DocumentStoreDataEntity, Serializ
     return inputOutputData;
   }
 
-  public void setSearchSuggestionDisplayString(StringBuffer searchSuggestionDisplayString) {
+  public void setSearchSuggestionDisplayString(StringBuilder searchSuggestionDisplayString) {
     this.searchSuggestionDisplayString = searchSuggestionDisplayString;
   }
 
