@@ -51,15 +51,14 @@ import org.slf4j.LoggerFactory;
  */
 public class VersionedOxmEntities {
 
-   private static final Logger logger = LoggerFactory.getLogger(VersionedOxmEntities.class);
    private static final String REST_ROOT_ENTITY = "inventory";
 
-   private HashMap<String,Boolean> crossEntityReferenceContainerLookup = new HashMap<String,Boolean>();
-   private HashMap<String,CrossEntityReference> crossEntityReferenceLookup = new HashMap<String,CrossEntityReference>();
-   private Map<String,DynamicType> entityTypeLookup = new LinkedHashMap<String,DynamicType>();
-   private Map<String, OxmEntityDescriptor> searchableEntityDescriptors = new HashMap<String, OxmEntityDescriptor>();
-   private Map<String, OxmEntityDescriptor> suggestableEntityDescriptors = new HashMap<String, OxmEntityDescriptor>();
-   private Map<String, OxmEntityDescriptor> entityAliasDescriptors = new HashMap<String, OxmEntityDescriptor>();
+   private HashMap<String,Boolean> crossEntityReferenceContainerLookup = new HashMap<>();
+   private HashMap<String,CrossEntityReference> crossEntityReferenceLookup = new HashMap<>();
+   private Map<String,DynamicType> entityTypeLookup = new LinkedHashMap<>();
+   private Map<String, OxmEntityDescriptor> searchableEntityDescriptors = new HashMap<>();
+   private Map<String, OxmEntityDescriptor> suggestableEntityDescriptors = new HashMap<>();
+   private Map<String, OxmEntityDescriptor> entityAliasDescriptors = new HashMap<>();
 
    
    public void initialize(DynamicJAXBContext context) {
@@ -118,7 +117,7 @@ public class VersionedOxmEntities {
       }
 
       DynamicType parentType = entityTypeLookup.get(entityType);
-      DynamicType childType = null;
+      DynamicType childType;
       boolean returnValue = false;
 
       if(parentType == null) {
@@ -134,7 +133,7 @@ public class VersionedOxmEntities {
       Map<String, String> properties = parentType.getDescriptor().getProperties();
       if(properties != null) {
          for(Map.Entry<String, String> entry : properties.entrySet()) {
-            if(entry.getKey().equalsIgnoreCase("crossEntityReference")) {
+            if("crossEntityReference".equalsIgnoreCase(entry.getKey())) {
                returnValue = true;
                CrossEntityReference cer = new CrossEntityReference();
                cer.initialize(entry.getValue());
@@ -149,7 +148,7 @@ public class VersionedOxmEntities {
 
       if(fields != null) {
 
-         XMLField xmlField = null;
+         XMLField xmlField;
          for(DatabaseField f : fields) {
 
             if(f instanceof XMLField) {
@@ -185,7 +184,7 @@ public class VersionedOxmEntities {
    
    private void populateSearchableDescriptors(DynamicJAXBContext oxmContext) {
       List<Descriptor> descriptorsList = oxmContext.getXMLContext().getDescriptors();
-      OxmEntityDescriptor newOxmEntity = null;
+      OxmEntityDescriptor newOxmEntity;
       
       for (Descriptor desc: descriptorsList) {
          
@@ -204,7 +203,7 @@ public class VersionedOxmEntities {
          Map<String, String> properties = entity.getDescriptor().getProperties();
          if (properties != null) {
             for (Map.Entry<String, String> entry : properties.entrySet()) {
-               if (entry.getKey().equalsIgnoreCase("searchable")) {
+               if ("searchable".equalsIgnoreCase(entry.getKey())) {
                   
                   /*
                    * we can do all the work here, we don't have a create additional collections for 
@@ -215,12 +214,12 @@ public class VersionedOxmEntities {
                   newOxmEntity.setPrimaryKeyAttributeName(Arrays.asList(primaryKeyAttributeNames.split(",")));
                   newOxmEntity.setSearchableAttributes(Arrays.asList(entry.getValue().split(",")));
                   searchableEntityDescriptors.put(entityName, newOxmEntity);
-               } else if (entry.getKey().equalsIgnoreCase("containsSuggestibleProps")) {
+               } else if ("containsSuggestibleProps".equalsIgnoreCase(entry.getKey())) {
                  newOxmEntity = new OxmEntityDescriptor();
                  newOxmEntity.setEntityName(entityName);
                  newOxmEntity.setSuggestableEntity(true);
                  Vector<DatabaseMapping> descriptorMaps = entity.getDescriptor().getMappings();
-                 List<String> listOfSuggestableAttributes = new ArrayList<String>();
+                 List<String> listOfSuggestableAttributes = new ArrayList<>();
                  
                  for (DatabaseMapping descMap : descriptorMaps) {
                    if (descMap.isAbstractDirectMapping()) {
@@ -242,7 +241,7 @@ public class VersionedOxmEntities {
                  }
                  newOxmEntity.setSuggestableAttributes(listOfSuggestableAttributes);
                  suggestableEntityDescriptors.put(entityName, newOxmEntity);
-               } else if (entry.getKey().equalsIgnoreCase("suggestionAliases")) {
+               } else if ("suggestionAliases".equalsIgnoreCase(entry.getKey())) {
                  newOxmEntity = new OxmEntityDescriptor();
                  newOxmEntity.setEntityName(entityName);
                  newOxmEntity.setAlias(Arrays.asList(entry.getValue().split(",")));
@@ -299,7 +298,7 @@ public class VersionedOxmEntities {
    }
    
    public boolean entityContainsCrossEntityReference(String entityType) {
-      return (crossEntityReferenceLookup.get(entityType) != null);
+      return crossEntityReferenceLookup.get(entityType) != null;
    }   
 
    public CrossEntityReference getCrossEntityReference(String entityType) {
