@@ -106,11 +106,11 @@ public class NoAuthRestClient implements SvcRoutingRestClient {
 
     result = this.getResults(targetUrl, targetPayload);
 
-    long targetMsOpTime = (System.currentTimeMillis() - startTimeInMs);
+    long targetMsOpTime = System.currentTimeMillis() - startTimeInMs;
     auditLogger.info(DataRouterMsgs.OP_TIME, "Target service at "+ targetUrl, String.valueOf(targetMsOpTime));
     
     int rc = result.getResultCode();
-    String resultStr = "";
+    String resultStr;
     if (HttpUtil.isHttpResponseClassSuccess(rc)) {
       resultStr = result.getResult();
     } else {
