@@ -112,7 +112,6 @@ public class EntityEventPolicy implements Processor {
 
   private Logger logger;
   private Logger metricsLogger;
-  private Logger auditLogger;
 
   public enum ResponseType {
     SUCCESS, PARTIAL_SUCCESS, FAILURE;
@@ -122,7 +121,7 @@ public class EntityEventPolicy implements Processor {
     LoggerFactory loggerFactoryInstance = LoggerFactory.getInstance();
     logger = loggerFactoryInstance.getLogger(EntityEventPolicy.class.getName());
     metricsLogger = loggerFactoryInstance.getMetricsLogger(EntityEventPolicy.class.getName());
-    auditLogger = loggerFactoryInstance.getAuditLogger(EntityEventPolicy.class.getName());
+
 
     srcDomain = config.getSourceDomain();
 
@@ -140,7 +139,7 @@ public class EntityEventPolicy implements Processor {
                                          config.getSearchEndpointDocuments(),
                                          logger);
 
-    this.externalOxmModelProcessors = new ArrayList<ExternalOxmModelProcessor>();
+    this.externalOxmModelProcessors = new ArrayList<>();
     this.externalOxmModelProcessors.add(EntityOxmReferenceHelper.getInstance());
     OxmModelLoader.registerExternalOxmModelProcessors(externalOxmModelProcessors);
     OxmModelLoader.loadModels();
@@ -190,7 +189,7 @@ public class EntityEventPolicy implements Processor {
    */
   public static String convertObjectToJson(Object object, boolean pretty)
       throws JsonProcessingException {
-    ObjectWriter ow = null;
+    ObjectWriter ow;
 
     if (pretty) {
       ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
@@ -237,7 +236,7 @@ public class EntityEventPolicy implements Processor {
       return;
     }
 
-    UebEventHeader eventHeader = null;
+    UebEventHeader eventHeader;
     eventHeader = initializeUebEventHeader(uebObjHeader.toString());
 
     // Get src domain from header; discard event if not originated from same domain
@@ -419,23 +418,24 @@ public class EntityEventPolicy implements Processor {
       
       String targetEntityUrl = entityLink;
 
-      for (String key : crossEntityRefMap.keySet()) {
+      for (Map.Entry<String, CrossEntityReference> entry : crossEntityRefMap.entrySet()) {
 
         /*
          * if we know service-subscription is in the tree, then we can pull our all instances and
          * process from there.
          */
 
-        CrossEntityReference cerDescriptor = crossEntityRefMap.get(key);
+        String key = entry.getKey();
+        CrossEntityReference cerDescriptor = entry.getValue();
 
-        ArrayList<JsonNode> foundNodes = new ArrayList<JsonNode>();
+        ArrayList<JsonNode> foundNodes = new ArrayList<>();
 
         RouterServiceUtil.extractObjectsByKey(entityJsonNode, key, foundNodes);
 
-        if (foundNodes.size() > 0) {
+        if (!foundNodes.isEmpty()) {
 
           for (JsonNode n : foundNodes) {
-            if (parentEntityType.equalsIgnoreCase("customer")){  
+            if ("customer".equalsIgnoreCase(parentEntityType)){  
               /*
                * NOTES:
                * 1. prepare to hand-create url for service-instance
@@ -449,12 +449,12 @@ public class EntityEventPolicy implements Processor {
               
             }
 
-            List<String> extractedParentEntityAttributeValues = new ArrayList<String>();
+            List<String> extractedParentEntityAttributeValues = new ArrayList<>();
 
             RouterServiceUtil.extractFieldValuesFromObject(n, cerDescriptor.getAttributeNames(),
                 extractedParentEntityAttributeValues);
 
-            List<JsonNode> nestedTargetEntityInstances = new ArrayList<JsonNode>();
+            List<JsonNode> nestedTargetEntityInstances = new ArrayList<>();
             RouterServiceUtil.extractObjectsByKey(n, cerDescriptor.getTargetEntityType(),
                 nestedTargetEntityInstances);
 
@@ -472,7 +472,7 @@ public class EntityEventPolicy implements Processor {
               if (targetEntityInstance.has("link")) {   // nested SI has url mentioned
                 targetEntityUrl = RouterServiceUtil.getNodeFieldAsText(targetEntityInstance, 
                     "link");
-              } else if (parentEntityType.equalsIgnoreCase("customer") && 
+              } else if ("customer".equalsIgnoreCase(parentEntityType) && 
                   targetEntityInstance.has("service-instance-id")){
                 targetEntityUrl += "/" + RouterServiceUtil.getNodeFieldAsText(targetEntityInstance, 
                     "service-instance-id");
@@ -537,7 +537,7 @@ public class EntityEventPolicy implements Processor {
       Map<String, OxmEntityDescriptor> rootDescriptor =
           oxmEntities.getSuggestableEntityDescriptors();
       if (!rootDescriptor.isEmpty()) {
-        List<String> suggestibleAttrInPayload = new ArrayList<String>();
+        List<String> suggestibleAttrInPayload = new ArrayList<>();
         List<String> suggestibleAttrInOxm = extractSuggestableAttr(oxmEntities, entityType);
         if (suggestibleAttrInOxm != null) {
           for (String attr: suggestibleAttrInOxm){
@@ -608,13 +608,13 @@ public class EntityEventPolicy implements Processor {
     Map<String, OxmEntityDescriptor> rootDescriptor = oxmEntities.getSuggestableEntityDescriptors();
 
     if (rootDescriptor == null) {
-      return null;
+      return Collections.emptyList();
     }
 
     OxmEntityDescriptor desc = rootDescriptor.get(entityType);
     
     if (desc == null) {
-      return null;
+      return Collections.emptyList();
     }
 
     return desc.getSuggestableAttributes();
@@ -627,7 +627,7 @@ public class EntityEventPolicy implements Processor {
     Map<String, OxmEntityDescriptor> rootDescriptor = oxmEntities.getEntityAliasDescriptors();
 
     if (rootDescriptor == null) {
-      return null;
+      return Collections.emptyList();
     }
 
     OxmEntityDescriptor desc = rootDescriptor.get(entityType);
@@ -744,7 +744,7 @@ public class EntityEventPolicy implements Processor {
       jsonNode = mapper.readTree(mapper.getJsonFactory().createJsonParser(payload));
     } catch (IOException e) {
       logger.debug(EntityEventPolicyMsgs.FAILED_TO_PARSE_UEB_PAYLOAD, ENTITY_HEADER + " missing",
-          payload.toString());
+          payload);
       logger.error(EntityEventPolicyMsgs.FAILED_TO_PARSE_UEB_PAYLOAD, ENTITY_HEADER + " missing",
           "");
     }
@@ -755,9 +755,9 @@ public class EntityEventPolicy implements Processor {
   private boolean getSearchTags(AaiEventEntity aaiEventEntity, List<String> searchableAttr,
       String payload, String action) {
 
-    boolean hasSearchableAttr = false;
+    boolean hasSearchableAttr;
     for (String searchTagField : searchableAttr) {
-      String searchTagValue = null;
+      String searchTagValue;
       if (searchTagField.equalsIgnoreCase(aaiEventEntity.getEntityPrimaryKeyName())) {
         searchTagValue = aaiEventEntity.getEntityPrimaryKeyValue();
       } else {
@@ -836,9 +836,9 @@ public class EntityEventPolicy implements Processor {
 
     d.setEntityType(resultDescriptor.getEntityName());
 
-    List<String> primaryKeyValues = new ArrayList<String>();
-    List<String> primaryKeyNames = new ArrayList<String>();
-    String pkeyValue = null;
+    List<String> primaryKeyValues = new ArrayList<>();
+    List<String> primaryKeyNames = new ArrayList<>();
+    String pkeyValue;
 
     for (String keyName : resultDescriptor.getPrimaryKeyAttributeName()) {
       pkeyValue = RouterServiceUtil.getNodeFieldAsText(entityNode, keyName);
@@ -883,7 +883,7 @@ public class EntityEventPolicy implements Processor {
       headers.put(Headers.TRANSACTION_ID, Arrays.asList(MDC.get(MdcContext.MDC_REQUEST_ID)));
 
       String entityId = aaiEventEntity.getId();
-      String jsonPayload = aaiEventEntity.getAsJson();
+      String jsonPayload;
 
       // Run the GET to retrieve the ETAG from the search service
       OperationResult storedEntity = searchAgent.getDocument(entitySearchIndex, entityId);
@@ -897,14 +897,14 @@ public class EntityEventPolicy implements Processor {
         
         List<String> etag = storedEntity.getHeaders().get(Headers.ETAG);
 
-        if (etag != null && etag.size() > 0) {
+        if (etag != null && !etag.isEmpty()) {
           headers.put(Headers.IF_MATCH, etag);
         } else {
           logger.error(EntityEventPolicyMsgs.NO_ETAG_AVAILABLE_FAILURE,
         		  entitySearchIndex, entityId);
         }
         
-        ArrayList<JsonNode> sourceObject = new ArrayList<JsonNode>();
+        ArrayList<JsonNode> sourceObject = new ArrayList<>();
         NodeUtils.extractObjectsByKey(
             NodeUtils.convertJsonStrToJsonNode(storedEntity.getResult()),
             "content", sourceObject);
@@ -977,7 +977,7 @@ public class EntityEventPolicy implements Processor {
         if (HttpUtil.isHttpResponseClassSuccess(storedEntity.getResultCode())) {
           List<String> etag = storedEntity.getHeaders().get(Headers.ETAG);
 
-          if (etag != null && etag.size() > 0) {
+          if (etag != null && !etag.isEmpty()) {
             headers.put(Headers.IF_MATCH, etag);
           } else {
             logger.error(EntityEventPolicyMsgs.NO_ETAG_AVAILABLE_FAILURE, index,
@@ -999,7 +999,7 @@ public class EntityEventPolicy implements Processor {
         if (HttpUtil.isHttpResponseClassSuccess(storedEntity.getResultCode())) {
           List<String> etag = storedEntity.getHeaders().get(Headers.ETAG);
 
-          if (etag != null && etag.size() > 0) {
+          if (etag != null && !etag.isEmpty()) {
             headers.put(Headers.IF_MATCH, etag);
           } else {
             logger.error(EntityEventPolicyMsgs.NO_ETAG_AVAILABLE_FAILURE, index,
@@ -1025,7 +1025,7 @@ public class EntityEventPolicy implements Processor {
       String entityPrimaryKeyFieldValue) {
 
     Map<String, String> topoData = new HashMap<>();
-    String entityLink = "";
+    String entityLink =;
     List<String> topographicalAttr =
         getOxmAttributes(payload, oxmJaxbContext, oxmEntityType, entityType, "geoProps");
     if (topographicalAttr == null) {
@@ -1033,7 +1033,7 @@ public class EntityEventPolicy implements Processor {
           "Topograhical attribute not found for payload entity type '" + entityType + "'");
       logger.debug(EntityEventPolicyMsgs.DISCARD_UPDATING_TOPOGRAPHY_DATA_VERBOSE,
           "Topograhical attribute not found for payload entity type '" + entityType + "'",
-          payload.toString());
+          payload);
     } else {
       entityLink = lookupValueUsingKey(payload, "entity-link");
       for (String topoAttr : topographicalAttr) {
