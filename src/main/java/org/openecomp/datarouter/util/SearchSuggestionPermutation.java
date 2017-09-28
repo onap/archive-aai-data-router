@@ -38,17 +38,17 @@ public class SearchSuggestionPermutation {
    */
   public static ArrayList<ArrayList<String>> getUniqueListForSuggestions(
       List<String> originalList) {
-    ArrayList<ArrayList<String>> lists = new ArrayList<ArrayList<String>>();
+    ArrayList<ArrayList<String>> lists = new ArrayList<>();
     if (originalList.isEmpty()) {
       lists.add(new ArrayList<String>());
       return lists;
     }
-    List<String> list = new ArrayList<String>(originalList);
+    List<String> list = new ArrayList<>(originalList);
     String head = list.get(0);
-    ArrayList<String> rest = new ArrayList<String>(list.subList(1, list.size()));
+    ArrayList<String> rest = new ArrayList<>(list.subList(1, list.size()));
     
     for (ArrayList<String> activeList : getUniqueListForSuggestions(rest)) {
-      ArrayList<String> newList = new ArrayList<String>();
+      ArrayList<String> newList = new ArrayList<>();
       newList.add(head);
       newList.addAll(activeList);
       lists.add(newList);
@@ -70,15 +70,15 @@ public class SearchSuggestionPermutation {
   }
 
   public static List<List<String>> getListPermutations(List<String> list) {
-    List<String> inputList = new ArrayList<String>();
+    List<String> inputList = new ArrayList<>();
     inputList.addAll(list);
-    if (inputList.size() == 0) {
-      List<List<String>> result = new ArrayList<List<String>>();
+    if (inputList.isEmpty()) {
+      List<List<String>> result = new ArrayList<>();
       result.add(new ArrayList<String>());
       return result;
     }
 
-    List<List<String>> listOfLists = new ArrayList<List<String>>();
+    List<List<String>> listOfLists = new ArrayList<>();
 
     String firstElement = inputList.remove(0);
 
@@ -86,7 +86,7 @@ public class SearchSuggestionPermutation {
     for (List<String> li : recursiveReturn) {
 
       for (int index = 0; index <= li.size(); index++) {
-        List<String> temp = new ArrayList<String>(li);
+        List<String> temp = new ArrayList<>(li);
         temp.add(index, firstElement);
         listOfLists.add(temp);
       }
