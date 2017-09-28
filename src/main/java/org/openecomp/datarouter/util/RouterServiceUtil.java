@@ -62,7 +62,7 @@ public class RouterServiceUtil {
   public static Map<String, String> parseJsonPayloadIntoMap(String jsonPayload) {
 
     JSONObject jsonObject = new JSONObject(jsonPayload);
-    Map<String, String> map = new HashMap<String, String>();
+    Map<String, String> map = new HashMap<>();
     Iterator iter = jsonObject.keys();
     while (iter.hasNext()) {
       String key = (String) iter.next();
@@ -91,7 +91,7 @@ public class RouterServiceUtil {
 
   public static String concatArray(List<String> list, String delimiter) {
 
-    if (list == null || list.size() == 0) {
+    if (list == null || !list.isEmpty()) {
       return "";
     }
 
@@ -223,7 +223,7 @@ public class RouterServiceUtil {
 
     if (node.isObject()) {
 
-      JsonNode valueNode = null;
+      JsonNode valueNode;
 
       for (String attrToExtract : attributesToExtract) {
 

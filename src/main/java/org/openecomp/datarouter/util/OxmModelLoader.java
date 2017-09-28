@@ -50,8 +50,8 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 
 public class OxmModelLoader {
 
-	private static Map<String, DynamicJAXBContext> versionContextMap = new ConcurrentHashMap<String, DynamicJAXBContext>();	
-	private static List<ExternalOxmModelProcessor> oxmModelProcessorRegistry = new ArrayList<ExternalOxmModelProcessor>();
+	private static Map<String, DynamicJAXBContext> versionContextMap = new ConcurrentHashMap<>();	
+	private static List<ExternalOxmModelProcessor> oxmModelProcessorRegistry = new ArrayList<>();
 	final static Pattern p = Pattern.compile("aai_oxm_(.*).xml");
 	
 	
@@ -95,7 +95,7 @@ public class OxmModelLoader {
 	
 
 	private synchronized static void loadModel(String version,String resourceName,InputStream inputStream) throws JAXBException, FileNotFoundException {
-		Map<String, Object> properties = new HashMap<String, Object>();
+		Map<String, Object> properties = new HashMap<>();
 		properties.put(JAXBContextProperties.OXM_METADATA_SOURCE, inputStream);
 		final DynamicJAXBContext jaxbContext = DynamicJAXBContextFactory
 				.createContextFromOXM(Thread.currentThread().getContextClassLoader(), properties);

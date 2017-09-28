@@ -54,7 +54,7 @@ public class SearchServiceAgent {
   private Logger logger;
   
   private RestClient searchClient = null;
-  private Map<String, String> indexSchemaMapping = new HashMap<String, String>();
+  private Map<String, String> indexSchemaMapping = new HashMap<>();
   
   private String searchUrl = null;
   private String documentEndpoint = null;
