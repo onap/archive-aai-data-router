@@ -34,11 +34,12 @@ public abstract class FileWatcher extends TimerTask {
     this.timeStamp = file.lastModified();
   }
 
+  @Override
   public final void run() {
-    long timeStamp = file.lastModified();
+    long newTimeStamp = file.lastModified();
 
-    if ((timeStamp - this.timeStamp) > 500) {
-      this.timeStamp = timeStamp;
+    if ((newTimeStamp - this.timeStamp) > 500) {
+      this.timeStamp = newTimeStamp;
       onChange(file);
     }
   }
