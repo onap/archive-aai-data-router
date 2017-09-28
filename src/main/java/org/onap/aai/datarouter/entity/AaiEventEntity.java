@@ -72,9 +72,9 @@ public class AaiEventEntity implements DocumentStoreDataEntity, Serializable {
   protected String entityType;
   protected String entityPrimaryKeyName;
   protected String entityPrimaryKeyValue;
-  protected ArrayList<String> searchTagCollection = new ArrayList<String>();
-  protected ArrayList<String> searchTagIdCollection = new ArrayList<String>();
-  protected ArrayList<String> crossEntityReferenceCollection = new ArrayList<String>();
+  protected ArrayList<String> searchTagCollection = new ArrayList<>();
+  protected ArrayList<String> searchTagIdCollection = new ArrayList<>();
+  protected ArrayList<String> crossEntityReferenceCollection = new ArrayList<>();
   protected String lastmodTimestamp;
   protected String link;
 
@@ -95,7 +95,7 @@ public class AaiEventEntity implements DocumentStoreDataEntity, Serializable {
 
 
   private static String convertBytesToHexString(byte[] bytesToConvert) {
-    StringBuffer hexString = new StringBuffer();
+    StringBuilder hexString = new StringBuilder();
     for (int i = 0; i < bytesToConvert.length; i++) {
       hexString.append(Integer.toHexString(0xFF & bytesToConvert[i]));
     }
@@ -104,13 +104,12 @@ public class AaiEventEntity implements DocumentStoreDataEntity, Serializable {
 
   private static String concatArray(List<String> list, char delimiter) {
 
-    if (list == null || list.size() == 0) {
+    if (list == null || list.isEmpty()) {
       return "";
     }
 
     StringBuilder result = new StringBuilder(64);
 
-    int listSize = list.size();
     boolean firstValue = true;
 
     for (String item : list) {
