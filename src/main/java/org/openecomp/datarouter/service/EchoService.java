@@ -55,7 +55,7 @@ public class EchoService {
 
 	String fromIp = req.getRemoteAddr();
     String fromAppId = "";
-    String transId = null;
+    String transId;
 
     if (headers.getRequestHeaders().getFirst("X-FromAppId") != null) {
       fromAppId = headers.getRequestHeaders().getFirst("X-FromAppId");
