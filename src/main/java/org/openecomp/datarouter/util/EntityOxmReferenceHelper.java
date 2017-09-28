@@ -33,7 +33,7 @@ public class EntityOxmReferenceHelper implements ExternalOxmModelProcessor {
    private HashMap<Version, VersionedOxmEntities> versionedModels;
    
    protected EntityOxmReferenceHelper() {
-      this.versionedModels = new HashMap<Version,VersionedOxmEntities>();
+      this.versionedModels = new HashMap<>();
    }
    
    public static EntityOxmReferenceHelper getInstance() {
