@@ -49,6 +49,8 @@ public class AggregationEntity implements DocumentStoreDataEntity, Serializable 
   public void setLink(String link) {
     this.link = link;
   }
+
+  @Override
   public String getId() {
     // make sure that deliveFields() is called before getting the id
     return id;
@@ -66,7 +68,7 @@ public class AggregationEntity implements DocumentStoreDataEntity, Serializable 
   }
 
 
-  Map<String, String> attributes = new HashMap<String, String>();
+  Map<String, String> attributes = new HashMap<>();
   ObjectMapper mapper = new ObjectMapper();
   
   /**
@@ -86,20 +88,23 @@ public class AggregationEntity implements DocumentStoreDataEntity, Serializable 
 
     while (nodes.hasNext()) {
       Map.Entry<String, JsonNode> entry = (Map.Entry<String, JsonNode>) nodes.next();
-      if (!entry.getKey().equalsIgnoreCase("relationship-list")){
+      if (!"relationship-list".equalsIgnoreCase(entry.getKey())){
         attributes.put(entry.getKey(), entry.getValue().asText());
       }
     }
   }
   
   public void copyAttributeKeyValuePair(Map<String, Object> map){
-    for(String key: map.keySet()){
-      if (!key.equalsIgnoreCase("relationship-list")){   // ignore relationship data which is not required in aggregation
-        this.attributes.put(key, map.get(key).toString());    // not sure if entity attribute can contain an object as value
+    for(Map.Entry<String, Object> entry: map.entrySet()){
+      String key = entry.getKey();
+      Object value = entry.getValue();
+      if (!"relationship-list".equalsIgnoreCase(key)){   // ignore relationship data which is not required in aggregation
+        this.attributes.put(key, value.toString());    // not sure if entity attribute can contain an object as value
       }
     }
   }
-  
+
+  @Override  
   public void addAttributeKeyValuePair(String key, String value){
     this.attributes.put(key, value);
   }
@@ -108,8 +113,10 @@ public class AggregationEntity implements DocumentStoreDataEntity, Serializable 
     ObjectNode rootNode = mapper.createObjectNode();
     rootNode.put("link", this.getLink());
     rootNode.put("lastmodTimestamp", lastmodTimestamp);
-    for (String key: this.attributes.keySet()){
-      rootNode.put(key, this.attributes.get(key));
+    for (Map.Entry<String, String> entry: this.attributes.entrySet()){
+      String key = entry.getKey();
+      String value = entry.getValue();
+      rootNode.put(key, value);
     }
     return rootNode.toString();
   }
