@@ -46,7 +46,7 @@ public class TopographicalEntity implements DocumentStoreDataEntity, Serializabl
   protected String id;
 
   private static String convertBytesToHexString(byte[] bytesToConvert) {
-    StringBuffer hexString = new StringBuffer();
+    StringBuilder hexString = new StringBuilder();
     for (int i = 0; i < bytesToConvert.length; i++) {
       hexString.append(Integer.toHexString(0xFF & bytesToConvert[i]));
     }
@@ -55,13 +55,12 @@ public class TopographicalEntity implements DocumentStoreDataEntity, Serializabl
 
   private static String concatArray(List<String> list, char delimiter) {
 
-    if (list == null || list.size() == 0) {
+    if (list == null || list.isEmpty()) {
       return "";
     }
 
     StringBuilder result = new StringBuilder(64);
 
-    int listSize = list.size();
     boolean firstValue = true;
 
     for (String item : list) {
@@ -103,6 +102,7 @@ public class TopographicalEntity implements DocumentStoreDataEntity, Serializabl
    * 
    * @see org.onap.aai.datarouter.entity.TopographicalEntity#getAsJson()
    */
+  @Override
   public String getAsJson() throws IOException {
 
     JsonObject obj =
