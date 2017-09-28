@@ -159,7 +159,7 @@ public class NodeUtils {
    */
   public static String convertObjectToJson(Object object, boolean pretty)
       throws JsonProcessingException {
-    ObjectWriter ow = null;
+    ObjectWriter ow;
 
     ObjectMapper mapper = new ObjectMapper();
     mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
