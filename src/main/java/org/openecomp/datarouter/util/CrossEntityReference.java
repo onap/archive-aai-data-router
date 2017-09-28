@@ -38,7 +38,7 @@ public class CrossEntityReference {
 
   public CrossEntityReference() {
     this.targetEntityType = null;
-    this.attributeNames = new ArrayList<String>();
+    this.attributeNames = new ArrayList<>();
   }
 
   public String getTargetEntityType() {
