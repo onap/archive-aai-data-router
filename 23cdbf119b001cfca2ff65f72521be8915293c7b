@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a437d4f_daad999c",
+        "filename": "src/main/java/org/openecomp/datarouter/util/SearchSuggestionPermutation.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 703
+      },
+      "writtenOn": "2017-10-02T15:43:53Z",
+      "side": 1,
+      "message": "The new logic here is the inverse of the previous logic!",
+      "revId": "23cdbf119b001cfca2ff65f72521be8915293c7b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
