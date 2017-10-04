@@ -28,7 +28,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class DataRouterProperties {
+
+  private static final Logger logger = LoggerFactory.getLogger(VersionedOxmEntities.class);
 
   private static Properties properties;
 
@@ -38,9 +43,9 @@ public class DataRouterProperties {
     try {
       properties.load(new FileInputStream(file));
     } catch (FileNotFoundException e) {
-      e.printStackTrace();
+      logger.error("FileNotFoundException: ", e);
     } catch (IOException e) {
-      e.printStackTrace();
+      logger.error("IOException: ", e);
     }
   }
 
