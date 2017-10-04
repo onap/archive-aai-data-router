@@ -73,7 +73,7 @@ public class OxmEntityDescriptor {
 	      return false;
 	   }
 	   
-	   if ( this.searchableAttributes.size() > 0 ) {
+	   if ( !this.searchableAttributes.isEmpty() ) {
 	      return true;
 	   }
 	   
