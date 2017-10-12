@@ -179,7 +179,7 @@
   <logger name="com.att.ajsc.csi.logging" level="WARN" />
   <logger name="com.att.ajsc.filemonitor" level="WARN" />
 
-  <logger name="org.openecomp.datarouter" level="INFO" />
+  <logger name="org.onap.aai.datarouter" level="INFO" />
 
   <!-- Other Loggers that may help troubleshoot -->
   <logger name="net.sf" level="WARN" />

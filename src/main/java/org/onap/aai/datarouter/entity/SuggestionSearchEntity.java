@@ -32,11 +32,11 @@ import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.openecomp.datarouter.search.filters.config.UiFilterConfig;
-import org.openecomp.datarouter.search.filters.config.UiFiltersConfig;
-import org.openecomp.datarouter.search.filters.config.UiFiltersSchemaUtility;
-import org.openecomp.datarouter.util.NodeUtils;
-import org.openecomp.datarouter.util.SearchSuggestionPermutation;
+import org.onap.aai.datarouter.search.filters.config.UiFilterConfig;
+import org.onap.aai.datarouter.search.filters.config.UiFiltersConfig;
+import org.onap.aai.datarouter.search.filters.config.UiFiltersSchemaUtility;
+import org.onap.aai.datarouter.util.NodeUtils;
+import org.onap.aai.datarouter.util.SearchSuggestionPermutation;
 
 import com.fasterxml.jackson.databind.JsonNode;
 

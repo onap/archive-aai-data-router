@@ -24,7 +24,7 @@ package org.onap.aai.datarouter.entity;
 
 import java.util.List;
 
-import org.openecomp.datarouter.util.CrossEntityReference;
+import org.onap.aai.datarouter.util.CrossEntityReference;
 
 
 public class OxmEntityDescriptor {

@@ -3,7 +3,7 @@ beans{
 	xmlns jaxrs: "http://cxf.apache.org/jaxrs"
 	xmlns util: "http://www.springframework.org/schema/util"
 	
-	echoService(org.openecomp.datarouter.service.EchoService)
+	echoService(org.onap.aai.datarouter.service.EchoService)
 
 	
 	util.list(id: 'echoServices') {	
