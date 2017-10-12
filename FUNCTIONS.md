@@ -19,7 +19,7 @@ In order to take advantage of the entity change event functionality the followin
                         http://www.springframework.org/schema/beans
                         http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-        <bean id="eepConfig" class="org.openecomp.datarouter.policy.EntityEventPolicyConfig" >
+        <bean id="eepConfig" class="org.onap.aai.datarouter.policy.EntityEventPolicyConfig" >
         	<property name="sourceDomain" value="{domain-origin}" />
            <property name="searchBaseUrl" value="https://{search-service-host}:{search-service-port}" />
            <property name="searchEndpoint" value="services/search-data-service/v1/search/indexes/" />
@@ -33,7 +33,7 @@ In order to take advantage of the entity change event functionality the followin
            <property name="searchKeystore" value="{keystore-name}" />
         </bean>
 
-        <bean id="entityEventPolicy" class="org.openecomp.datarouter.policy.EntityEventPolicy" init-method="startup" >
+        <bean id="entityEventPolicy" class="org.onap.aai.datarouter.policy.EntityEventPolicy" init-method="startup" >
             <constructor-arg ref="eepConfig"/>
         </bean>
 	</beans>

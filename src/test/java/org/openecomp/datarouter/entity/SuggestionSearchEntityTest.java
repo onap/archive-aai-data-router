@@ -40,7 +40,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.onap.aai.datarouter.entity.SuggestionSearchEntity;
-import org.openecomp.datarouter.search.filters.config.UiFiltersSchemaUtility;
+import org.onap.aai.datarouter.search.filters.config.UiFiltersSchemaUtility;
 
 public class SuggestionSearchEntityTest {
   private static SuggestionSearchEntity suggestionSearchEntity;

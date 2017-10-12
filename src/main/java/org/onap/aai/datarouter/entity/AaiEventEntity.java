@@ -59,7 +59,7 @@ import java.util.List;
 import javax.json.Json;
 import javax.json.JsonObject;
 
-import org.openecomp.datarouter.util.NodeUtils;
+import org.onap.aai.datarouter.util.NodeUtils;
 
 /**
  * Note: AAIEventEntity is a port forward of IndexDocument Has been renamed here to move forward
