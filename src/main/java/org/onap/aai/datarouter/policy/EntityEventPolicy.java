@@ -1,4 +1,4 @@
-/**
+	/**
  * ﻿============LICENSE_START=======================================================
  * org.onap.aai
  * ================================================================================
@@ -80,7 +80,7 @@ public class EntityEventPolicy implements Processor {
   private static final String topographicalSearchSchema   = "topographysearch_schema.json";
   private Collection<ExternalOxmModelProcessor> externalOxmModelProcessors;
 
-  private final String EVENT_HEADER = "event-header";
+  private static final String EVENT_HEADER = "event-header";
   private final String ENTITY_HEADER = "entity";
   private final String ACTION_CREATE = "create";
   private final String ACTION_DELETE = "delete";
