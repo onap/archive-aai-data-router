@@ -475,7 +475,7 @@ public class EntityEventPolicy implements Processor {
                     "link");
               } else if ("customer".equalsIgnoreCase(parentEntityType) && 
                   targetEntityInstance.has("service-instance-id")){
-                targetEntityUrl += "/" + RouterServiceUtil.getNodeFieldAsText(targetEntityInstance, 
+                targetEntityUrl += RouterServiceUtil.getNodeFieldAsText(targetEntityInstance, 
                     "service-instance-id");
               }
                     
