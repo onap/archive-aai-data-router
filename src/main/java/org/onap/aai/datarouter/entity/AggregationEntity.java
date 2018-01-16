@@ -107,7 +107,7 @@ public class AggregationEntity implements DocumentStoreDataEntity, Serializable 
   public void addAttributeKeyValuePair(String key, String value){
     this.attributes.put(key, value);
   }
-
+  @Override
   public String getAsJson() {
     ObjectNode rootNode = mapper.createObjectNode();
     rootNode.put("link", this.getLink());
