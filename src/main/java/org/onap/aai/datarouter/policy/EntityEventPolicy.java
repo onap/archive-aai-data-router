@@ -83,7 +83,7 @@ public class EntityEventPolicy implements Processor {
   private final String EVENT_HEADER = "event-header";
   private final String ENTITY_HEADER = "entity";
   private final String ACTION_CREATE = "create";
-  private final String ACTION_DELETE = "delete";
+  private final static String ACTION_DELETE = "delete";
   private final String ACTION_UPDATE = "update";
   private final String PROCESS_AAI_EVENT = "Process AAI Event";
   private final String TOPO_LAT = "latitude";
