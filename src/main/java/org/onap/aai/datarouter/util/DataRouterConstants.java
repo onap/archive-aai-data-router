@@ -49,7 +49,7 @@ public class DataRouterConstants {
   public static final String DR_HOME_ETC_OXM = DR_HOME_ETC + "oxm" + DR_FILESEP;
   
   public static final String UI_FILTER_LIST_FILE =
-      DR_SPECIFIC_CONFIG + DR_FILESEP + "filters" + DR_FILESEP + "aaiui_filters.json";
+      DR_SPECIFIC_CONFIG + "filters" + DR_FILESEP + "aaiui_filters.json";
 
   // AAI Related
   public static final String AAI_ECHO_SERVICE = "/util/echo";
