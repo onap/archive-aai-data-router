@@ -130,6 +130,7 @@ public class EntityEventPolicy implements Processor {
     entitySearchIndex        = config.getSearchEntitySearchIndex();
     topographicalSearchIndex = config.getSearchTopographySearchIndex();
     aggregateGenericVnfIndex = config.getSearchAggregationVnfIndex();
+    autosuggestIndex		 = config.getSearchEntityAutoSuggestIndex();
        
     // Instantiate the agent that we will use for interacting with the Search Service.
     searchAgent = new SearchServiceAgent(config.getSearchCertName(),
