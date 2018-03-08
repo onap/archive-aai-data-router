@@ -35,14 +35,14 @@ public enum EntityEventPolicyMsgs implements LogMessageEnum {
    *    {0} = reason
    *    {1} = Payload:
    */
-  DISCARD_AAI_EVENT_VERBOSE,    
+  DISCARD_EVENT_VERBOSE,    
     
   /**
    * Discarding event. 
    * Arguments:
    *    {0} = Reason
    */
-  DISCARD_AAI_EVENT_NONVERBOSE,
+  DISCARD_EVENT_NONVERBOSE,
   
   /**
    * OXM version: {0} is not supported. 
@@ -135,7 +135,7 @@ public enum EntityEventPolicyMsgs implements LogMessageEnum {
    *    {1} = Entity Type
    *    {2} = Payload
    */
-  PROCESS_AAI_ENTITY_EVENT_POLICY_VERBOSE,
+  PROCESS_ENTITY_EVENT_POLICY_VERBOSE,
 
   /**
    * Processing AAI Entity Event Policy: 
@@ -143,7 +143,7 @@ public enum EntityEventPolicyMsgs implements LogMessageEnum {
    *     {0} = Action
    *     {1} = Entity Type 
    */
-  PROCESS_AAI_ENTITY_EVENT_POLICY_NONVERBOSE,
+  PROCESS_ENTITY_EVENT_POLICY_NONVERBOSE,
   
   /**
    * Cross Entity Reference synchronization {0}
