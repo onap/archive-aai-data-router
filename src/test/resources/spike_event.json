@@ -1,0 +1,23 @@
+{"operation": "$ACTION",
+  "transaction-id": "ae83cf91-b73f-4759-b973-58c4192cea4c",
+  "timestamp": 1499460851548,
+  "vertex": {
+    "key": "$KEY",
+    "schema-version": "v10",
+    "type": "$TYPE",
+    "properties": {
+      "vnf-id": "GenericVNFIdBpCNtULbEw9",
+      "in-maint": "false",
+      "heat-stack-id": "GenericVNFIdBpCNtULbEw1-12345-678-",
+      "prov-status": "junk",
+      "equipment-role": "ASBG",
+      "ipv4-oam-address": "5.6.7.8",
+      "vnf-name": "GenericVNFIdBpCNtULbEw9",
+      "vnf-type": "asbg",
+      "is-closed-loop-disabled": "false",
+      "orchestration-status": "Running",
+      "aai-node-type": "generic-vnf"
+    }
+  },
+  "result": "SUCCESS"
+}

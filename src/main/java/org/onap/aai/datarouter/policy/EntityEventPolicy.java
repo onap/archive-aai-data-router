@@ -204,8 +204,8 @@ public class EntityEventPolicy implements Processor {
   }
 
   public void returnWithError(Exchange exchange, String payload, String errorMsg){
-    logger.error(EntityEventPolicyMsgs.DISCARD_AAI_EVENT_NONVERBOSE, errorMsg);
-    logger.debug(EntityEventPolicyMsgs.DISCARD_AAI_EVENT_VERBOSE, errorMsg, payload);
+    logger.error(EntityEventPolicyMsgs.DISCARD_EVENT_NONVERBOSE, errorMsg);
+    logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE, errorMsg, payload);
     setResponse(exchange, ResponseType.FAILURE, additionalInfo);
   }
   
@@ -244,9 +244,9 @@ public class EntityEventPolicy implements Processor {
     // Get src domain from header; discard event if not originated from same domain
     String payloadSrcDomain = eventHeader.getDomain();
     if (payloadSrcDomain == null || !payloadSrcDomain.equalsIgnoreCase(this.srcDomain)) {
-      logger.debug(EntityEventPolicyMsgs.DISCARD_AAI_EVENT_VERBOSE,
+      logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE,
           "Unrecognized source domain '" + payloadSrcDomain + "'", uebPayload);
-      logger.error(EntityEventPolicyMsgs.DISCARD_AAI_EVENT_NONVERBOSE,
+      logger.error(EntityEventPolicyMsgs.DISCARD_EVENT_NONVERBOSE,
           "Unrecognized source domain '" + payloadSrcDomain + "'");
 
       setResponse(exchange, ResponseType.SUCCESS, additionalInfo);
@@ -256,7 +256,7 @@ public class EntityEventPolicy implements Processor {
     DynamicJAXBContext oxmJaxbContext = loadOxmContext(oxmVersion.toLowerCase());
     if (oxmJaxbContext == null) {
       logger.error(EntityEventPolicyMsgs.OXM_VERSION_NOT_SUPPORTED, oxmVersion);
-      logger.debug(EntityEventPolicyMsgs.DISCARD_AAI_EVENT_VERBOSE, "OXM version mismatch",
+      logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE, "OXM version mismatch",
           uebPayload);
 
       setResponse(exchange, ResponseType.FAILURE, additionalInfo);
@@ -265,9 +265,9 @@ public class EntityEventPolicy implements Processor {
 
     String action = eventHeader.getAction();
     if (action == null || !SUPPORTED_ACTIONS.contains(action.toLowerCase())) {
-      logger.debug(EntityEventPolicyMsgs.DISCARD_AAI_EVENT_VERBOSE,
+      logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE,
           "Unrecognized action '" + action + "'", uebPayload);
-      logger.error(EntityEventPolicyMsgs.DISCARD_AAI_EVENT_NONVERBOSE,
+      logger.error(EntityEventPolicyMsgs.DISCARD_EVENT_NONVERBOSE,
           "Unrecognized action '" + action + "'");
 
       setResponse(exchange, ResponseType.FAILURE, additionalInfo);
@@ -276,9 +276,9 @@ public class EntityEventPolicy implements Processor {
 
     String entityType = eventHeader.getEntityType();
     if (entityType == null) {
-      logger.debug(EntityEventPolicyMsgs.DISCARD_AAI_EVENT_VERBOSE,
+      logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE,
           "Payload header missing entity type", uebPayload);
-      logger.error(EntityEventPolicyMsgs.DISCARD_AAI_EVENT_NONVERBOSE,
+      logger.error(EntityEventPolicyMsgs.DISCARD_EVENT_NONVERBOSE,
           "Payload header missing entity type");
 
       setResponse(exchange, ResponseType.FAILURE, additionalInfo);
@@ -287,9 +287,9 @@ public class EntityEventPolicy implements Processor {
 
     String topEntityType = eventHeader.getTopEntityType();
     if (topEntityType == null) {
-      logger.debug(EntityEventPolicyMsgs.DISCARD_AAI_EVENT_VERBOSE,
+      logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE,
           "Payload header missing top entity type", uebPayload);
-      logger.error(EntityEventPolicyMsgs.DISCARD_AAI_EVENT_NONVERBOSE,
+      logger.error(EntityEventPolicyMsgs.DISCARD_EVENT_NONVERBOSE,
           "Payload header top missing entity type");
 
       setResponse(exchange, ResponseType.FAILURE, additionalInfo);
@@ -298,9 +298,9 @@ public class EntityEventPolicy implements Processor {
 
     String entityLink = eventHeader.getEntityLink();
     if (entityLink == null) {
-      logger.debug(EntityEventPolicyMsgs.DISCARD_AAI_EVENT_VERBOSE,
+      logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE,
           "Payload header missing entity link", uebPayload);
-      logger.error(EntityEventPolicyMsgs.DISCARD_AAI_EVENT_NONVERBOSE,
+      logger.error(EntityEventPolicyMsgs.DISCARD_EVENT_NONVERBOSE,
           "Payload header missing entity link");
 
       setResponse(exchange, ResponseType.FAILURE, additionalInfo);
@@ -308,9 +308,9 @@ public class EntityEventPolicy implements Processor {
     }
 
     // log the fact that all data are in good shape
-    logger.info(EntityEventPolicyMsgs.PROCESS_AAI_ENTITY_EVENT_POLICY_NONVERBOSE, action,
+    logger.info(EntityEventPolicyMsgs.PROCESS_ENTITY_EVENT_POLICY_NONVERBOSE, action,
         entityType);
-    logger.debug(EntityEventPolicyMsgs.PROCESS_AAI_ENTITY_EVENT_POLICY_VERBOSE, action, entityType,
+    logger.debug(EntityEventPolicyMsgs.PROCESS_ENTITY_EVENT_POLICY_VERBOSE, action, entityType,
         uebPayload);
 
 
@@ -324,9 +324,9 @@ public class EntityEventPolicy implements Processor {
     List<String> searchableAttr =
         getOxmAttributes(uebPayload, oxmJaxbContext, oxmEntityType, entityType, "searchable");
     if (searchableAttr == null) {
-      logger.error(EntityEventPolicyMsgs.DISCARD_AAI_EVENT_NONVERBOSE,
+      logger.error(EntityEventPolicyMsgs.DISCARD_EVENT_NONVERBOSE,
           "Searchable attribute not found for payload entity type '" + entityType + "'");
-      logger.debug(EntityEventPolicyMsgs.DISCARD_AAI_EVENT_VERBOSE,
+      logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE,
           "Searchable attribute not found for payload entity type '" + entityType + "'",
           uebPayload);
 
@@ -338,9 +338,9 @@ public class EntityEventPolicy implements Processor {
         getEntityPrimaryKeyFieldName(oxmJaxbContext, uebPayload, oxmEntityType, entityType);
     String entityPrimaryKeyFieldValue = lookupValueUsingKey(uebPayload, entityPrimaryKeyFieldName);
     if (entityPrimaryKeyFieldValue == null || entityPrimaryKeyFieldValue.isEmpty()) {
-      logger.error(EntityEventPolicyMsgs.DISCARD_AAI_EVENT_NONVERBOSE,
+      logger.error(EntityEventPolicyMsgs.DISCARD_EVENT_NONVERBOSE,
           "Payload missing primary key attribute");
-      logger.debug(EntityEventPolicyMsgs.DISCARD_AAI_EVENT_VERBOSE,
+      logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE,
           "Payload missing primary key attribute", uebPayload);
 
       setResponse(exchange, ResponseType.FAILURE, additionalInfo);
@@ -359,9 +359,9 @@ public class EntityEventPolicy implements Processor {
     aaiEventEntity.setLink(entityLink);
 
     if (!getSearchTags(aaiEventEntity, searchableAttr, uebPayload, action)) {
-      logger.error(EntityEventPolicyMsgs.DISCARD_AAI_EVENT_NONVERBOSE,
+      logger.error(EntityEventPolicyMsgs.DISCARD_EVENT_NONVERBOSE,
           "Payload missing searchable attribute for entity type '" + entityType + "'");
-      logger.debug(EntityEventPolicyMsgs.DISCARD_AAI_EVENT_VERBOSE,
+      logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE,
           "Payload missing searchable attribute for entity type '" + entityType + "'", uebPayload);
 
       setResponse(exchange, ResponseType.FAILURE, additionalInfo);
@@ -373,9 +373,9 @@ public class EntityEventPolicy implements Processor {
       aaiEventEntity.deriveFields();
 
     } catch (NoSuchAlgorithmException e) {
-      logger.error(EntityEventPolicyMsgs.DISCARD_AAI_EVENT_VERBOSE,
+      logger.error(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE,
           "Cannot create unique SHA digest");
-      logger.debug(EntityEventPolicyMsgs.DISCARD_AAI_EVENT_VERBOSE,
+      logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE,
           "Cannot create unique SHA digest", uebPayload);
 
       setResponse(exchange, ResponseType.FAILURE, additionalInfo);
@@ -815,9 +815,9 @@ public class EntityEventPolicy implements Processor {
     try {
       uebJsonObj = new JSONObject(payload);
     } catch (JSONException e) {
-      logger.debug(EntityEventPolicyMsgs.DISCARD_AAI_EVENT_VERBOSE,
+      logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE,
           "Payload has invalid JSON Format", payload.toString());
-      logger.error(EntityEventPolicyMsgs.DISCARD_AAI_EVENT_NONVERBOSE,
+      logger.error(EntityEventPolicyMsgs.DISCARD_EVENT_NONVERBOSE,
           "Payload has invalid JSON Format");
       return null;
     }
