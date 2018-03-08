@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a93c517_52714f0a",
+        "filename": "src/main/java/org/onap/aai/datarouter/entity/SpikeEventEntity.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1061
+      },
+      "writtenOn": "2018-03-08T17:25:41Z",
+      "side": 1,
+      "message": "Double license header on this file.",
+      "revId": "779919dca387d6693c9bf050013e953489abeaa2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
