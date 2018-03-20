@@ -901,7 +901,7 @@ public class EntityEventPolicy implements Processor {
           headers.put(Headers.IF_MATCH, etag);
         } else {
           logger.error(EntityEventPolicyMsgs.NO_ETAG_AVAILABLE_FAILURE,
-        		  entitySearchIndex, entityId);
+                  entitySearchIndex, entityId);
         }
         
         ArrayList<JsonNode> sourceObject = new ArrayList<>();

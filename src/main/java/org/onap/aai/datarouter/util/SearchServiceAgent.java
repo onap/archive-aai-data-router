@@ -127,6 +127,14 @@ public class SearchServiceAgent {
     createIndex(index, schemaLocation);
   }
   
+  public void createSearchIndex(String index, String schemaLocation, String endUrl) {
+    
+    // Create a mapping of the index name to schema location 
+    indexSchemaMapping.put(index, schemaLocation);
+    
+    // Now, create the index.
+    createIndex(index, schemaLocation, endUrl);
+  }
   
   /**
    * This method performs the actual work of creating a search index.
@@ -160,6 +168,30 @@ public class SearchServiceAgent {
     }
   }
   
+  private void createIndex(String index, String schemaLocation, String endUrl) {
+    
+    logger.debug("Creating search index, index name: = " + index + ", schemaLocation = " + schemaLocation);
+    
+    MultivaluedMap<String, String> headers = new MultivaluedMapImpl();
+    headers.put("Accept", Arrays.asList("application/json"));
+    headers.put(Headers.FROM_APP_ID, Arrays.asList("DL"));
+    headers.put(Headers.TRANSACTION_ID, Arrays.asList(UUID.randomUUID().toString()));
+      
+    String url = concatSubUri(searchUrl, endUrl, index);
+    try {
+
+      OperationResult result = searchClient.put(url, loadFileData(schemaLocation), headers,
+                                                MediaType.APPLICATION_JSON_TYPE, null);
+      if (!HttpUtil.isHttpResponseClassSuccess(result.getResultCode())) {
+        logger.error(DataRouterMsgs.FAIL_TO_CREATE_SEARCH_INDEX, index, result.getFailureCause());
+      } else {
+        logger.info(DataRouterMsgs.SEARCH_INDEX_CREATE_SUCCESS, index);
+      }
+
+    } catch (Exception e) {
+      logger.error(DataRouterMsgs.FAIL_TO_CREATE_SEARCH_INDEX, index, e.getLocalizedMessage());
+    }
+  }
   
   /**
    * Retrieves a document from the search service.
