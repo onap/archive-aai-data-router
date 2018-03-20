@@ -1,0 +1,31 @@
+{
+	"settings": {
+		"analysis": {
+			"filter": {
+				"eng_stop": {
+					"type": "stop",
+					"stopwords": "_english_"
+				}
+			},
+			"analyzer": {
+				"custom_analyzer": {
+					"type": "custom",
+					"tokenizer": "standard",
+					"filter": ["lowercase", "asciifolding", "eng_stop"]
+				}
+			}
+		}
+	},
+	"mappings": {
+		"default": {
+			"properties": {
+				"entity_suggest": {
+					"type": "completion",
+					"payloads": true,
+					"analyzer": "custom_analyzer",
+					"preserve_position_increments": false
+				}
+			}
+		}
+	}
+}

@@ -21,6 +21,13 @@ COPY *.sh $BIN_HOME
 RUN chmod 755 $BIN_HOME/*
 RUN ln -s /logs $MICRO_HOME/logs
 
+# Create the aai user
+RUN mkdir /opt/aaihome && \
+     groupadd -g 492381 aaiadmin && \
+     useradd -r -u 341790 -g 492381 -ms /bin/bash -d /opt/aaihome/aaiadmin aaiadmin && \
+     chown -R aaiadmin:aaiadmin $MICRO_HOME
+USER aaiadmin
+
 EXPOSE 9502 9502
 
 CMD ["/opt/app/data-router/bin/start.sh"]
