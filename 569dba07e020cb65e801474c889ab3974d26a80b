@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a93c517_3a6468e4",
+        "filename": "src/main/docker/Dockerfile",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1157
+      },
+      "writtenOn": "2018-03-20T14:58:02Z",
+      "side": 1,
+      "message": "This shouldn\u0027t be in ONAP I don\u0027t think.",
+      "revId": "569dba07e020cb65e801474c889ab3974d26a80b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
