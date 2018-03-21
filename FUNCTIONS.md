@@ -4,6 +4,15 @@ The _Synapse_ data router comes packaged with a set of functionality that needs 
 
 ## Entity Change Event
 
+### Interfaces
+
+_Synapse_ pulls from message bus 
+Purpose:
+- Get every create/update/delete events coming from _AAI Resources_
+
+_Synapse_ -> Search data Service port 9509 (REST)
+Purposes: 
+ - Update secondary database with information pulled from the message bus
 
 ### Configuration
 
