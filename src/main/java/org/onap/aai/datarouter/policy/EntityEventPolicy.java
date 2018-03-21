@@ -74,20 +74,20 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class EntityEventPolicy implements Processor {
 
   public static final String additionalInfo = "Response of AAIEntityEventPolicy";
-  private static final String entitySearchSchema = "entitysearch_schema.json";
-  private static final String topographicalSearchSchema   = "topographysearch_schema.json";
+  private static final String ENTITY_SEARCH_SCHEMA = "entitysearch_schema.json";
+  private static final String TOPOGRAPHICAL_SEARCH_SCHEMA = "topographysearch_schema.json";
   private Collection<ExternalOxmModelProcessor> externalOxmModelProcessors;
 
-  private final String EVENT_HEADER = "event-header";
-  private final String ENTITY_HEADER = "entity";
-  private final String ACTION_CREATE = "create";
-  private final static String ACTION_DELETE = "delete";
-  private final String ACTION_UPDATE = "update";
-  private final String PROCESS_AAI_EVENT = "Process AAI Event";
-  private final String TOPO_LAT = "latitude";
-  private final String TOPO_LONG = "longitude";
+  private static final String EVENT_HEADER = "event-header";
+  private static final String ENTITY_HEADER = "entity";
+  private static final String ACTION_CREATE = "create";
+  private static final String ACTION_DELETE = "delete";
+  private static final String ACTION_UPDATE = "update";
+  private static final String PROCESS_AAI_EVENT = "Process AAI Event";
+  private static final String TOPO_LAT = "latitude";
+  private static final String TOPO_LONG = "longitude";
 
-  private final List<String> SUPPORTED_ACTIONS =
+  private static final List<String> SUPPORTED_ACTIONS =
       Arrays.asList(ACTION_CREATE, ACTION_UPDATE, ACTION_DELETE);
 
   Map<String, DynamicJAXBContext> oxmVersionContextMap = new HashMap<>();
@@ -172,8 +172,8 @@ public class EntityEventPolicy implements Processor {
   public void startup() {
     
     // Create the indexes in the search service if they do not already exist.
-    searchAgent.createSearchIndex(entitySearchIndex, entitySearchSchema);
-    searchAgent.createSearchIndex(topographicalSearchIndex, topographicalSearchSchema);
+    searchAgent.createSearchIndex(entitySearchIndex, ENTITY_SEARCH_SCHEMA);
+    searchAgent.createSearchIndex(topographicalSearchIndex, TOPOGRAPHICAL_SEARCH_SCHEMA);
     
     logger.info(EntityEventPolicyMsgs.ENTITY_EVENT_POLICY_REGISTERED);
   }
@@ -506,7 +506,7 @@ public class EntityEventPolicy implements Processor {
                     updateCerInEntity(entityToSync);
 
                   } catch (NoSuchAlgorithmException e) {
-                    e.printStackTrace();
+                    logger.debug(e.getMessage());
                   }
                 }
               } else {
@@ -814,7 +814,7 @@ public class EntityEventPolicy implements Processor {
       uebJsonObj = new JSONObject(payload);
     } catch (JSONException e) {
       logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE,
-          "Payload has invalid JSON Format", payload.toString());
+          "Payload has invalid JSON Format", payload);
       logger.error(EntityEventPolicyMsgs.DISCARD_EVENT_NONVERBOSE,
           "Payload has invalid JSON Format");
       return null;
@@ -823,8 +823,7 @@ public class EntityEventPolicy implements Processor {
     if (uebJsonObj.has(ENTITY_HEADER)) {
       return uebJsonObj.getJSONObject(ENTITY_HEADER);
     } else {
-      logger.debug(EntityEventPolicyMsgs.FAILED_TO_PARSE_UEB_PAYLOAD, ENTITY_HEADER + " missing",
-          payload.toString());
+      logger.debug(EntityEventPolicyMsgs.FAILED_TO_PARSE_UEB_PAYLOAD, ENTITY_HEADER + " missing", payload);
       logger.error(EntityEventPolicyMsgs.FAILED_TO_PARSE_UEB_PAYLOAD, ENTITY_HEADER + " missing");
       return null;
     }
@@ -846,8 +845,6 @@ public class EntityEventPolicy implements Processor {
         primaryKeyValues.add(pkeyValue);
         primaryKeyNames.add(keyName);
       } else {
-        // logger.warn("getPopulatedDocument(), pKeyValue is null for entityType = " +
-        // resultDescriptor.getEntityName());
         logger.error(EntityEventPolicyMsgs.PRIMARY_KEY_NULL_FOR_ENTITY_TYPE,
             resultDescriptor.getEntityName());
       }
@@ -965,8 +962,6 @@ public class EntityEventPolicy implements Processor {
       headers.put(Headers.TRANSACTION_ID, Arrays.asList(MDC.get(MdcContext.MDC_REQUEST_ID)));
 
       String entityId = eventEntity.getId();
-
-      // System.out.println("aaiEventEntity as json = " + aaiEventEntity.getAsJson());
 
       if ((action.equalsIgnoreCase(ACTION_CREATE) && entityId != null)
           || action.equalsIgnoreCase(ACTION_UPDATE)) {
