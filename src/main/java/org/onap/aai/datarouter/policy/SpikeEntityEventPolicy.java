@@ -64,20 +64,20 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 public class SpikeEntityEventPolicy implements Processor {
 
   public static final String additionalInfo = "Response of SpikeEntityEventPolicy";
-  private static final String entitySearchSchema = "entitysearch_schema.json";
+  private static final String ENTITY_SEARCH_SCHEMA = "entitysearch_schema.json";
 
   private Collection<ExternalOxmModelProcessor> externalOxmModelProcessors;
 
 
-  private final String ACTION_CREATE = "create";
-  private final String EVENT_VERTEX = "vertex";
-  private final static String ACTION_DELETE = "delete";
-  private final String ACTION_UPDATE = "update";
-  private final String PROCESS_SPIKE_EVENT = "Process Spike Event";
-  private final String OPERATION_KEY = "operation";
+  private static final String ACTION_CREATE = "create";
+  private static final String EVENT_VERTEX = "vertex";
+  private static final String ACTION_DELETE = "delete";
+  private static final String ACTION_UPDATE = "update";
+  private static final String PROCESS_SPIKE_EVENT = "Process Spike Event";
+  private static final String OPERATION_KEY = "operation";
 
 
-  private final List<String> SUPPORTED_ACTIONS =
+  private static final List<String> SUPPORTED_ACTIONS =
       Arrays.asList(ACTION_CREATE, ACTION_UPDATE, ACTION_DELETE);
 
   Map<String, DynamicJAXBContext> oxmVersionContextMap = new HashMap<>();
@@ -86,7 +86,6 @@ public class SpikeEntityEventPolicy implements Processor {
   /** Agent for communicating with the Search Service. */
   private SearchServiceAgent searchAgent = null;
   private String entitySearchIndex;
-  private String srcDomain;
 
   private Logger logger;
   private Logger metricsLogger;
@@ -101,7 +100,7 @@ public class SpikeEntityEventPolicy implements Processor {
     metricsLogger = loggerFactoryInstance.getMetricsLogger(SpikeEntityEventPolicy.class.getName());
 
 
-    srcDomain = config.getSourceDomain();
+    //srcDomain = config.getSourceDomain();
 
     // Populate the index names.
     entitySearchIndex = config.getSearchEntitySearchIndex();
@@ -145,7 +144,7 @@ public class SpikeEntityEventPolicy implements Processor {
   public void startup() {
 
     // Create the indexes in the search service if they do not already exist.
-    searchAgent.createSearchIndex(entitySearchIndex, entitySearchSchema);
+    searchAgent.createSearchIndex(entitySearchIndex, ENTITY_SEARCH_SCHEMA);
     logger.info(EntityEventPolicyMsgs.ENTITY_EVENT_POLICY_REGISTERED);
   }
 
@@ -441,7 +440,7 @@ public class SpikeEntityEventPolicy implements Processor {
     return "";
   }
 
-  private String lookupValueUsingKey(String payload, String key) throws JSONException {
+  private String lookupValueUsingKey(String payload, String key) {
     JsonNode jsonNode = convertToJsonNode(payload);
     return RouterServiceUtil.recursivelyLookupJsonPayload(jsonNode, key);
   }
@@ -537,8 +536,6 @@ public class SpikeEntityEventPolicy implements Processor {
         primaryKeyValues.add(pkeyValue);
         primaryKeyNames.add(keyName);
       } else {
-        // logger.warn("getPopulatedDocument(), pKeyValue is null for entityType = " +
-        // resultDescriptor.getEntityName());
         logger.error(EntityEventPolicyMsgs.PRIMARY_KEY_NULL_FOR_ENTITY_TYPE,
             resultDescriptor.getEntityName());
       }
