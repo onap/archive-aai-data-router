@@ -16,6 +16,24 @@
       "revId": "9580da6c3f52bb97026d7322cea105992f29c39d",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a93c517_b7164554",
+        "filename": "src/main/java/org/onap/aai/datarouter/util/OxmModelLoader.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 3541
+      },
+      "writtenOn": "2018-03-22T11:28:41Z",
+      "side": 1,
+      "message": "Onap uses google code style:\nhttps://wiki.onap.org/display/DW/Java+code+style\n\nThere is point about imports:\nhttps://google.github.io/styleguide/javaguide.html#s3.3-import-statements",
+      "parentUuid": "5a93c517_172e19a6",
+      "revId": "9580da6c3f52bb97026d7322cea105992f29c39d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }
