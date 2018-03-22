@@ -24,10 +24,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Collection;
+import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -40,23 +41,20 @@ import org.eclipse.persistence.jaxb.dynamic.DynamicJAXBContext;
 import org.eclipse.persistence.jaxb.dynamic.DynamicJAXBContextFactory;
 import org.onap.aai.cl.eelf.LoggerFactory;
 import org.onap.aai.datarouter.logging.DataRouterMsgs;
-import org.onap.aai.datarouter.util.ExternalOxmModelProcessor;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
 public class OxmModelLoader {
 
-	private static Map<String, DynamicJAXBContext> versionContextMap = new ConcurrentHashMap<>();	
+	private static Map<String, DynamicJAXBContext> versionContextMap = new ConcurrentHashMap<>();
 	private static List<ExternalOxmModelProcessor> oxmModelProcessorRegistry = new ArrayList<>();
-	final static Pattern p = Pattern.compile("aai_oxm_(.*).xml");
-	
-	
+	static final Pattern p = Pattern.compile("aai_oxm_(.*).xml");
 
 	private static org.onap.aai.cl.api.Logger logger = LoggerFactory.getInstance()
 			.getLogger(OxmModelLoader.class.getName());
 
-	public synchronized static void loadModels() throws FileNotFoundException {
+	public static synchronized void loadModels() throws FileNotFoundException {
 	  
     ClassLoader cl = OxmModelLoader.class.getClassLoader();
     ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver(cl);
@@ -89,9 +87,8 @@ public class OxmModelLoader {
 		
 	}
 	
-	
 
-	private synchronized static void loadModel(String version,String resourceName,InputStream inputStream) throws JAXBException, FileNotFoundException {
+	private static synchronized void loadModel(String version,String resourceName,InputStream inputStream) throws JAXBException {
 		Map<String, Object> properties = new HashMap<>();
 		properties.put(JAXBContextProperties.OXM_METADATA_SOURCE, inputStream);
 		final DynamicJAXBContext jaxbContext = DynamicJAXBContextFactory
@@ -105,11 +102,11 @@ public class OxmModelLoader {
 		logger.info(DataRouterMsgs.LOADED_OXM_FILE, resourceName);
 	}
 
-	public static DynamicJAXBContext getContextForVersion(String version) throws Exception {
+	public static DynamicJAXBContext getContextForVersion(String version) throws NoSuchElementException, FileNotFoundException {
 		if (versionContextMap == null || versionContextMap.isEmpty()) {
 			loadModels();
 		} else if (!versionContextMap.containsKey(version)) {			
-				throw new Exception(Status.NOT_FOUND.toString());
+				throw new NoSuchElementException(Status.NOT_FOUND.toString());
 			
 		}
 
@@ -124,7 +121,7 @@ public class OxmModelLoader {
 		OxmModelLoader.versionContextMap = versionContextMap;
 	}
 	
-	public synchronized static void registerExternalOxmModelProcessors(Collection<ExternalOxmModelProcessor> processors) {
+	public static synchronized void registerExternalOxmModelProcessors(Collection<ExternalOxmModelProcessor> processors) {
       if(processors != null) {
          for(ExternalOxmModelProcessor processor : processors) {
             if(!oxmModelProcessorRegistry.contains(processor)) {
