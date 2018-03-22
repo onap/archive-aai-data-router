@@ -44,6 +44,8 @@ public class EchoService {
   private static Logger logger = LoggerFactory.getInstance().getLogger(EchoService.class.getName());
   private static Logger auditLogger =
       LoggerFactory.getInstance().getAuditLogger(EchoService.class.getName());
+  private static final String XFROMAPPID = "X-FromAppId";
+  private static final String XTRANSACTIONID = "X-TransactionId";
 
   @GET
   @Path("echo/{input}")
@@ -55,15 +57,15 @@ public class EchoService {
     String fromAppId = "";
     String transId;
 
-    if (headers.getRequestHeaders().getFirst("X-FromAppId") != null) {
-      fromAppId = headers.getRequestHeaders().getFirst("X-FromAppId");
+    if (headers.getRequestHeaders().getFirst(XFROMAPPID) != null) {
+      fromAppId = headers.getRequestHeaders().getFirst(XFROMAPPID);
     }
 
-    if ((headers.getRequestHeaders().getFirst("X-TransactionId") == null)
-        || headers.getRequestHeaders().getFirst("X-TransactionId").isEmpty()) {
+    if ((headers.getRequestHeaders().getFirst(XTRANSACTIONID) == null)
+        || headers.getRequestHeaders().getFirst(XTRANSACTIONID).isEmpty()) {
       transId = java.util.UUID.randomUUID().toString();
     } else {
-      transId = headers.getRequestHeaders().getFirst("X-TransactionId");
+      transId = headers.getRequestHeaders().getFirst(XTRANSACTIONID);
     }
 
     MdcContext.initialize(transId, DataRouterConstants.DATA_ROUTER_SERVICE_NAME, "", fromAppId,
@@ -83,9 +85,7 @@ public class EchoService {
     auditLogger.info(DataRouterMsgs.PROCESS_REST_REQUEST,
         new LogFields().setField(LogLine.DefinedFields.RESPONSE_CODE, status)
             .setField(LogLine.DefinedFields.RESPONSE_DESCRIPTION, respStatusString),
-        (req != null) ? req.getMethod() : "Unknown",
-        (req != null) ? req.getRequestURL().toString() : "Unknown",
-        (req != null) ? req.getRemoteHost() : "Unknown", Integer.toString(status));
+        req.getMethod(), req.getRequestURL().toString(), req.getRemoteHost(), Integer.toString(status));
     MDC.clear();
 
     return "Hello, " + input + ".";
