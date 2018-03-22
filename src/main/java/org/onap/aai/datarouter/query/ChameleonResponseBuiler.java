@@ -32,32 +32,33 @@ import com.google.gson.JsonParser;
 
 public class ChameleonResponseBuiler  {
 
-  public static void buildEntity(Exchange exchange, String ID){
+  private static final String SOURCE = "source";
+  private static final String TARGET = "target";
+  private static final String TYPE = "type";
+
+  public static void buildEntity(Exchange exchange, String id){
     String response = exchange.getIn().getBody().toString();
     JsonParser parser = new JsonParser();
     JsonObject root = parser.parse(response).getAsJsonObject();
     JsonObject champResponse = new JsonObject();
-    if (!root.has("type")) {
+    if (!root.has(TYPE)) {
       exchange.getIn().setHeader(Exchange.HTTP_RESPONSE_CODE, 400);
       return ;
     }
-    champResponse.addProperty("key", ID);
-    champResponse.addProperty("type", root.get("type").getAsString());
-    if (root.has("source")) {
-      champResponse.add("source", root.get("source"));
+    champResponse.addProperty("key", id);
+    champResponse.addProperty(TYPE, root.get(TYPE).getAsString());
+    if (root.has(SOURCE)) {
+      champResponse.add(SOURCE, root.get(SOURCE));
     }
-    if (root.has("target")) {
-      champResponse.add("target", root.get("target"));
+    if (root.has(TARGET)) {
+      champResponse.add(TARGET, root.get(TARGET));
     }
 
     JsonObject props = new JsonObject();
     List<Map.Entry<String, JsonElement>> entries = new ArrayList<Map.Entry<String, JsonElement>>(
         root.getAsJsonObject().entrySet());
     for (Map.Entry<String, JsonElement> e : entries) {
-      if (!e.getKey().equals("type") && !e.getKey().equals("source") && !e.getKey().equals("target")) {
-        if (e.getKey().equals("source")) {
-
-        }
+      if (!TYPE.equals(e.getKey()) && !SOURCE.equals(e.getKey()) && !TARGET.equals(e.getKey())) {
         props.addProperty(e.getKey(), e.getValue().getAsString());
       }
 
@@ -70,7 +71,7 @@ public class ChameleonResponseBuiler  {
   }
   
  
-  public static void buildObjectRelationship(Exchange exchange, String ID){
+  public static void buildObjectRelationship(Exchange exchange, String id){
     //TODO: implement when chameleon supports this query     
   }
   public static void buildCollection(Exchange exchange){
