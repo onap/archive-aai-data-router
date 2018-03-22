@@ -29,7 +29,6 @@ import org.json.JSONObject;
 import org.onap.aai.cl.mdc.MdcContext;
 import org.onap.aai.restclient.client.Headers;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -138,24 +137,8 @@ public class RouterServiceUtil {
 
   public static String recursivelyLookupJsonPayload(JsonNode node, String key) {
     String value = null;
-    if (node.isObject()) {
-      Iterator<Map.Entry<String, JsonNode>> nodeIterator = node.fields();
 
-      while (nodeIterator.hasNext()) {
-        Map.Entry<String, JsonNode> entry = (Map.Entry<String, JsonNode>) nodeIterator.next();
-        if (!entry.getValue().isValueNode()) {
-          value = recursivelyLookupJsonPayload(entry.getValue(), key);
-          if (value != null) {
-            return value;
-          }
-        }
-
-        String name = entry.getKey();
-        if (name.equalsIgnoreCase(key)) {
-          return entry.getValue().asText();
-        }
-      }
-    } else if (node.isArray()) {
+    if (node.isArray()) {
       Iterator<JsonNode> arrayItemsIterator = node.elements();
       while (arrayItemsIterator.hasNext()) {
         value = recursivelyLookupJsonPayload(arrayItemsIterator.next(), key);
@@ -163,43 +146,74 @@ public class RouterServiceUtil {
           return value;
         }
       }
+
+      return value;
     }
+
+    if (!node.isObject()) {
+      return value;
+    }
+
+    Iterator<Map.Entry<String, JsonNode>> nodeIterator = node.fields();
+
+    while (nodeIterator.hasNext()) {
+      Map.Entry<String, JsonNode> entry = nodeIterator.next();
+      if (!entry.getValue().isValueNode()) {
+        value = recursivelyLookupJsonPayload(entry.getValue(), key);
+        if (value != null) {
+          return value;
+        }
+      }
+
+      String name = entry.getKey();
+      if (name.equalsIgnoreCase(key)) {
+        return entry.getValue().asText();
+      }
+    }
+
     return value;
   }
 
   public static void extractObjectsByKey(JsonNode node, String searchKey,
       Collection<JsonNode> foundObjects) {
 
-    if (node.isObject()) {
-      Iterator<Map.Entry<String, JsonNode>> nodeIterator = node.fields();
-
-      while (nodeIterator.hasNext()) {
-        Map.Entry<String, JsonNode> entry = (Map.Entry<String, JsonNode>) nodeIterator.next();
-        if (!entry.getValue().isValueNode()) {
-          extractObjectsByKey(entry.getValue(), searchKey, foundObjects);
-        }
-
-        String name = entry.getKey();
-        if (name.equalsIgnoreCase(searchKey)) {
-
-          JsonNode entryValue = entry.getValue();
-
-          if (entryValue.isArray()) {
-
-            Iterator<JsonNode> arrayItemsIterator = entryValue.elements();
-            while (arrayItemsIterator.hasNext()) {
-              foundObjects.add(arrayItemsIterator.next());
-            }
-
-          } else {
-            foundObjects.add(entry.getValue());
-          }
-        }
-      }
-    } else if (node.isArray()) {
+    if (node.isArray()) {
       Iterator<JsonNode> arrayItemsIterator = node.elements();
       while (arrayItemsIterator.hasNext()) {
         extractObjectsByKey(arrayItemsIterator.next(), searchKey, foundObjects);
+      }
+
+      return;
+    }
+
+    if (!node.isObject()) {
+      return;
+    }
+
+   Iterator<Map.Entry<String, JsonNode>> nodeIterator = node.fields();
+
+    while (nodeIterator.hasNext()) {
+      Map.Entry<String, JsonNode> entry = nodeIterator.next();
+      if (!entry.getValue().isValueNode()) {
+        extractObjectsByKey(entry.getValue(), searchKey, foundObjects);
+      }
+
+      String name = entry.getKey();
+      if (!name.equalsIgnoreCase(searchKey)) {
+        continue;
+      }
+
+      JsonNode entryValue = entry.getValue();
+
+      if (entryValue.isArray()) {
+
+        Iterator<JsonNode> arrayItemsIterator = entryValue.elements();
+        while (arrayItemsIterator.hasNext()) {
+          foundObjects.add(arrayItemsIterator.next());
+        }
+
+      } else {
+        foundObjects.add(entry.getValue());
       }
     }
   }
@@ -219,29 +233,25 @@ public class RouterServiceUtil {
   public static void extractFieldValuesFromObject(JsonNode node,
       Collection<String> attributesToExtract, Collection<String> fieldValues) {
 
-    if (node.isObject()) {
+    if (node==null || !node.isObject()) {
+      return;
+    }
 
-      JsonNode valueNode;
+    JsonNode valueNode;
 
-      for (String attrToExtract : attributesToExtract) {
+    for (String attrToExtract : attributesToExtract) {
 
-        valueNode = node.get(attrToExtract);
+      valueNode = node.get(attrToExtract);
 
-        if (valueNode != null) {
-
-          if (valueNode.isValueNode()) {
-            fieldValues.add(valueNode.asText());
-          }
-        }
+      if (valueNode != null && valueNode.isValueNode()) {
+        fieldValues.add(valueNode.asText());
       }
     }
   }
 
-
   public static String objToJson(Object obj) {
     JSONObject jsonObject = new JSONObject(obj);
-    String json = jsonObject.toString();
-    return json;
+    return jsonObject.toString();
   }
 
   /**
