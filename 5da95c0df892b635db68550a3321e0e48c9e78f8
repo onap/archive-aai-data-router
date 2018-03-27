@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a93c517_d580848d",
+        "filename": "pom.xml",
+        "patchSetId": 3
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 453
+      },
+      "writtenOn": "2018-03-27T23:26:50Z",
+      "side": 1,
+      "message": "I\u0027m pretty sure we\u0027ll need to upgrade to the latest common logging library to get rid of a security issue with logback.  But we can tackle that as part of second commit",
+      "revId": "5da95c0df892b635db68550a3321e0e48c9e78f8",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a93c517_b54db89b",
+        "filename": "pom.xml",
+        "patchSetId": 3
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 453
+      },
+      "writtenOn": "2018-03-27T23:26:50Z",
+      "side": 1,
+      "message": "I think we can get rid of this dependency, and just make use of the logback pulled in by the common-logging library.  This was put in originally to override the version of logback included with AJSC",
+      "revId": "5da95c0df892b635db68550a3321e0e48c9e78f8",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
