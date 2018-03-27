@@ -132,18 +132,7 @@
     <appender-ref ref="asyncEELFDebug" />
   </logger>
 
-  <logger name="com.att.eelf.security" level="info" additivity="false">
-    <appender-ref ref="asyncEELFSecurity" /> 
-  </logger>
-  <logger name="com.att.eelf.perf" level="info" additivity="false">
-    <appender-ref ref="asyncEELFPerformance" />
-  </logger>
-  <logger name="com.att.eelf.server" level="info" additivity="false">
-    <appender-ref ref="asyncEELFServer" />
-  </logger>
-  <logger name="com.att.eelf.policy" level="info" additivity="false">
-    <appender-ref ref="asyncEELFPolicy" />
-  </logger>
+ 
   <logger name="com.att.eelf.audit" level="info" additivity="false">
     <appender-ref ref="asyncEELFAudit" />
   </logger>
