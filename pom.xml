@@ -66,9 +66,25 @@ limitations under the License.
       <sonar.jacoco.reportPath>${project.build.directory}/coverage-reports/jacoco.exec</sonar.jacoco.reportPath>
       <sonar.jacoco.reportMissing.force.zero>false</sonar.jacoco.reportMissing.force.zero>
       <sonar.projectVersion>${project.version}</sonar.projectVersion>
+      <logback.version>1.2.3</logback.version>
    </properties>
 
    <dependencies>
+    <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-access</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
       <dependency>
          <groupId>org.apache.camel</groupId>
          <artifactId>camel-spring-boot-starter</artifactId>
@@ -177,7 +193,7 @@ limitations under the License.
       <dependency>
          <groupId>org.onap.aai.logging-service</groupId>
          <artifactId>common-logging</artifactId>
-         <version>1.1.0</version>
+         <version>1.2.2</version>
       </dependency>
 
       <dependency>
@@ -192,11 +208,7 @@ limitations under the License.
          <version>1.1.0</version>
       </dependency>
 
-      <dependency>
-         <groupId>ch.qos.logback</groupId>
-         <artifactId>logback-core</artifactId>
-         <version>1.1.7</version>
-      </dependency>
+
 
    </dependencies>
 
