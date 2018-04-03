@@ -26,6 +26,12 @@ import org.onap.aai.cl.eelf.LogMessageEnum;
 
 public enum DataRouterMsgs implements LogMessageEnum {
 
+ 
+  /**
+   * Arguments: {0}  = HTTP request type, {1} = time to process in milliseconds
+   */
+  PROCESSED_REQUEST,
+
   /** Data Layer Service started. */
   SERVICE_STARTED,
 
