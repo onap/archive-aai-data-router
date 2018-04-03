@@ -1,0 +1,16 @@
+{
+   "key": "364d646e-c947-4010-a66a-adf06aa306fb",
+   "type": "pserver",
+   "properties":    {
+      "ptnii-equip-name": "mtanj119snd-updated-now",      
+      "equip-type": "phone",
+      "equip-vendor": "Samsung",
+      "fqdn": "mtanjrsv119.mtanj.sbcglobal.net",
+      "purpose": "",      
+      "ipv4-oam-address": "135.182.138.60",      
+      "hostname": "phonehost",
+      "equip-model": "DL380p-nd",
+      "aai-uuid": "364d646e-c947-4010-a66a-adf06aa306fb",
+      "resource-version": "1477013499"
+   }
+}

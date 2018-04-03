@@ -18,24 +18,24 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
-package org.onap.aai.datarouter.query;
+package org.onap.aai.datarouter;
 
-import java.util.List;
-import java.util.Map;
+import javax.ws.rs.ApplicationPath;
 
-import org.onap.aai.cl.api.Logger;
-import org.onap.aai.cl.eelf.LoggerFactory;
-import org.onap.aai.datarouter.exception.DataRouterException;
-
-public interface QueryRouter {
-  Logger logger = LoggerFactory.getInstance().getLogger(QueryRouter.class.getName());
+import org.glassfish.jersey.server.ResourceConfig;
+import org.onap.aai.datarouter.service.EchoService;
+import org.onap.aai.datarouter.service.HistoricalQueryService;
+import org.springframework.stereotype.Component;
 
 
-
-  /** HTTP header containing the calling host details */
-  static final String DATA_ROUTER_PORT = "9502";
-
-  public String process(String urlContext, String queryParams, Map<String, List<String>> headers)
-      throws DataRouterException;
-
+@Component
+@ApplicationPath("/")
+public class JerseyConfiguration extends ResourceConfig
+{
+   public JerseyConfiguration()
+   {
+       register(EchoService.class);
+       register(HistoricalQueryService.class);
+      
+   }
 }

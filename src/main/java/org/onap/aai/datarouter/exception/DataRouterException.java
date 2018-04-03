@@ -18,24 +18,42 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
-package org.onap.aai.datarouter.query;
+package org.onap.aai.datarouter.exception;
 
-import java.util.List;
-import java.util.Map;
+import javax.ws.rs.core.Response.Status;
 
-import org.onap.aai.cl.api.Logger;
-import org.onap.aai.cl.eelf.LoggerFactory;
-import org.onap.aai.datarouter.exception.DataRouterException;
+public class DataRouterException extends Exception {
 
-public interface QueryRouter {
-  Logger logger = LoggerFactory.getInstance().getLogger(QueryRouter.class.getName());
+  private static final long serialVersionUID = 8162385108397238865L;
 
+  private Status httpStatus;
 
+  public DataRouterException() {
+  }
 
-  /** HTTP header containing the calling host details */
-  static final String DATA_ROUTER_PORT = "9502";
+  public DataRouterException(String message, Status httpStatus) {
+    super(message);
+    this.setHttpStatus(httpStatus);
+  }
 
-  public String process(String urlContext, String queryParams, Map<String, List<String>> headers)
-      throws DataRouterException;
+  public DataRouterException(Throwable cause) {
+    super(cause);
+  }
 
+  public DataRouterException(String message, Throwable cause) {
+    super(message, cause);
+  }
+
+  public DataRouterException(String message, Throwable cause, boolean enableSuppression,
+                       boolean writableStackTrace) {
+    super(message, cause, enableSuppression, writableStackTrace);
+  }
+
+  public Status getHttpStatus() {
+    return httpStatus;
+  }
+
+  public void setHttpStatus(Status httpStatus) {
+    this.httpStatus = httpStatus;
+  }
 }
