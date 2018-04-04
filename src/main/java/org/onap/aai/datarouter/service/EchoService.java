@@ -20,6 +20,15 @@
  */
 package org.onap.aai.datarouter.service;
 
+import org.onap.aai.cl.api.LogFields;
+import org.onap.aai.cl.api.LogLine;
+import org.onap.aai.cl.api.Logger;
+import org.onap.aai.cl.eelf.LoggerFactory;
+import org.onap.aai.cl.mdc.MdcContext;
+import org.onap.aai.datarouter.logging.DataRouterMsgs;
+import org.onap.aai.datarouter.util.DataRouterConstants;
+import org.slf4j.MDC;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -30,18 +39,6 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.onap.aai.cl.api.LogFields;
-import org.onap.aai.cl.api.LogLine;
-import org.onap.aai.cl.api.Logger;
-import org.onap.aai.cl.eelf.LoggerFactory;
-import org.onap.aai.cl.mdc.MdcContext;
-import org.onap.aai.datarouter.logging.DataRouterMsgs;
-import org.onap.aai.datarouter.util.DataRouterConstants;
-import org.slf4j.MDC;
-import org.springframework.stereotype.Component;
-
-@Component
-@Path("/data-router/v1")
 public class EchoService {
 
   private static Logger logger = LoggerFactory.getInstance().getLogger(EchoService.class.getName());
@@ -51,7 +48,7 @@ public class EchoService {
   private static final String XTRANSACTIONID = "X-TransactionId";
 
   @GET
-  @Path("/echo/{input}")
+  @Path("echo/{input}")
   @Produces("text/plain")
   public String ping(@PathParam("input") String input, @Context HttpHeaders headers,
       @Context UriInfo info, @Context HttpServletRequest req) {

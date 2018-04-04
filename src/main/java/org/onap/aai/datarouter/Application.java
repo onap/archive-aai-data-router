@@ -22,14 +22,20 @@ package org.onap.aai.datarouter;
 
 import java.util.HashMap;
 
+import org.apache.camel.component.servlet.CamelHttpTransportServlet;
 import org.eclipse.jetty.util.security.Password;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.boot.web.support.SpringBootServletInitializer;
+import org.springframework.context.annotation.Bean;
 
 
 @SpringBootApplication
 public class Application extends SpringBootServletInitializer{
+  
+  private static final String CAMEL_URL_MAPPING = "/*";
+  private static final String CAMEL_SERVLET_NAME = "CamelServlet";
 
     public static void main(String[] args) {
       String keyStorePassword = System.getenv("KEY_STORE_PASSWORD");
@@ -42,5 +48,13 @@ public class Application extends SpringBootServletInitializer{
       
        
     }
+    
+    @Bean
+    public ServletRegistrationBean getServletRegistrationBean() {
+        ServletRegistrationBean registration = new ServletRegistrationBean(new CamelHttpTransportServlet(), CAMEL_URL_MAPPING);
+        registration.setName(CAMEL_SERVLET_NAME);
+        return registration;
+    }
 
+   
 }

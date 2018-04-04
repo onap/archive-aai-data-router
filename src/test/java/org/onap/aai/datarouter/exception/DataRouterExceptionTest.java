@@ -18,24 +18,32 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
-package org.onap.aai.datarouter;
+package org.onap.aai.datarouter.exception;
 
-import javax.ws.rs.ApplicationPath;
+import org.junit.Assert;
+import org.junit.Test;
 
-import org.glassfish.jersey.server.ResourceConfig;
-import org.onap.aai.datarouter.service.EchoService;
-import org.onap.aai.datarouter.service.HistoricalQueryService;
-import org.springframework.stereotype.Component;
+import javax.ws.rs.core.Response;
 
+public class DataRouterExceptionTest {
 
-@Component
-@ApplicationPath("/")
-public class JerseyConfiguration extends ResourceConfig
-{
-   public JerseyConfiguration()
-   {
-       register(EchoService.class);
-       register(HistoricalQueryService.class);
-      
-   }
+    @Test
+    public void testDataRouterError(){
+        DataRouterError error1 = DataRouterError.DL_PARSE_100;
+        Assert.assertEquals("DL-100", error1.getId());
+        Assert.assertNotNull(error1.getMessage());
+        Assert.assertEquals(Response.Status.BAD_REQUEST, error1.getHttpStatus());
+    }
+
+    @Test
+    public void testBaseDataRouterException(){
+        BaseDataRouterException exp1 = new BaseDataRouterException("id-1");
+        Assert.assertEquals(exp1.getId(), "id-1");
+
+        BaseDataRouterException exp2 = new BaseDataRouterException("id-1", "test-error");
+        Assert.assertEquals(exp2.getId(), "id-1");
+
+        BaseDataRouterException exp3 = new BaseDataRouterException("id-1", "test-error", new Throwable());
+        Assert.assertEquals(exp3.getId(), "id-1");
+    }
 }
