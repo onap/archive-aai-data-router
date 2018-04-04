@@ -21,87 +21,50 @@
 package org.onap.aai.datarouter.query;
 
 import java.security.InvalidParameterException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-import javax.annotation.PostConstruct;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response.Status;
-
-import org.eclipse.jetty.util.security.Password;
+import org.apache.camel.Exchange;
+import org.onap.aai.rest.RestClientEndpoint;
 import org.onap.aai.cl.api.Logger;
 import org.onap.aai.cl.eelf.LoggerFactory;
-import org.onap.aai.datarouter.exception.DataRouterException;
-import org.onap.aai.datarouter.util.DataRouterConstants;
-import org.onap.aai.restclient.client.OperationResult;
-import org.onap.aai.restclient.client.RestClient;
-import org.onap.aai.restclient.rest.HttpUtil;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
 
-
-@Component
-@Qualifier("champ")
-public class ChampRouter implements QueryRouter {
+public class ChampRouter extends QueryRouter {
   Logger logger = LoggerFactory.getInstance().getLogger(ChampRouter.class.getName());
 
   private String champBaseURL;
-
-  private RestClient restClient ;
   
-  public ChampRouter(){}
 
-  public ChampRouter(String champBaseURL, RestClientConfig config) {   
-    this.champBaseURL = champBaseURL;
-    this.restClient = new RestClient().validateServerHostname(false).validateServerCertChain(true)
-        .clientCertFile(config.getCertPath())
-        .clientCertPassword(Password.deobfuscate(config.getCertPassword()))
-        .trustStore(config.getTrustStorePath())
-        .connectTimeoutMs(config.getConnectionTimeout())
-        .readTimeoutMs(config.getReadTimeout());
-    validate();
-  }
-
- 
-  public void validate(){
-    String baseURL = champBaseURL.endsWith("/") ? champBaseURL.substring(0, champBaseURL.length() - 1) : champBaseURL;
-    if (baseURL.contains(DATA_ROUTER_PORT)) {
-      logger.info(QueryMsgs.QUERY_INFO, "Invalid champBaseURL : Can't re-route back to DataRouter " + champBaseURL);
-      throw new InvalidParameterException("Invalid champBaseURL : Can't re-route back to DataRouter " + champBaseURL);
+  public ChampRouter(String champBaseURL) {
+    String baseURL = champBaseURL.endsWith("/") ? champBaseURL.substring(0, champBaseURL.length() - 1)
+        : champBaseURL;
+    if(checkRecursion(baseURL)){
+      logger.info(QueryMsgs.QUERY_INFO, "Invalid champBaseURL : Can't re-route back to DataRouter "+ champBaseURL);
+      throw new InvalidParameterException("Invalid champBaseURL : Can't re-route back to DataRouter "+ champBaseURL);
     }
-    this.champBaseURL = baseURL;
+    this.champBaseURL = baseURL;    
   }
 
-  @Override
-  public String process(String urlContext, String queryParams, Map<String, List<String>> headers)
-      throws DataRouterException {
-    String champURL;
-    String response;
+  public void setQueryRequest(Exchange exchange) {
+    setMDC(exchange);
+    String path = exchange.getIn().getHeader(Exchange.HTTP_PATH, String.class);
+    String queryParams = exchange.getIn().getHeader(Exchange.HTTP_QUERY, String.class);
+    String ecompUrl;
     if (queryParams != null && !queryParams.isEmpty()) {
-      champURL = champBaseURL + urlContext + "?" + queryParams;
+      ecompUrl = champBaseURL + path + "?" + queryParams;
     } else {
-      champURL = champBaseURL + urlContext;
+      ecompUrl = champBaseURL + path;
     }
 
-    logger.info(QueryMsgs.QUERY_INFO, "Routing request to Champ service URL: " + champURL);
+    logger.info(QueryMsgs.QUERY_INFO, "Routing request to Champ service URL: " + ecompUrl);
+    exchange.getIn().setHeader(RestClientEndpoint.IN_HEADER_URL, ecompUrl);
+    exchange.getIn().setHeader("X-FromAppId", SERVICE_NAME);
+    exchange.getIn().setHeader("X-TransactionId", getTxId(exchange));
 
-    headers = headers == null ? new HashMap<String, List<String>>() : headers;
-    headers.put("X-FromAppId", Arrays.asList(DataRouterConstants.DATA_ROUTER_SERVICE_NAME));
-    OperationResult result = restClient.get(champURL, headers, MediaType.APPLICATION_JSON_TYPE);
+  }
 
-    if (HttpUtil.isHttpResponseClassSuccess(result.getResultCode())) {
-      response = result.getResult();
-    } else {
-      logger.info(QueryMsgs.QUERY_ERROR,
-          "Error while calling Champ service URL: " + champURL + " failure cause: " + result.getFailureCause());
-      throw new DataRouterException(
-          "Error while calling Champ service URL: " + champURL + " failure cause: " + result.getFailureCause(),
-          Status.fromStatusCode(result.getResultCode()));
-    }
-
-    return response;
+  public void setQueryResponse(Exchange exchange) {
+    Integer httpResponseCode = exchange.getIn().getHeader(RestClientEndpoint.OUT_HEADER_RESPONSE_CODE, Integer.class);
+    // Object httpBody = exchange.getIn().getBody();
+    exchange.getIn().setHeader(Exchange.HTTP_RESPONSE_CODE, httpResponseCode);
 
   }
 

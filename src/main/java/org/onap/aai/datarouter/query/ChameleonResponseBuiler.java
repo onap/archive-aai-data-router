@@ -24,10 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.core.Response.Status;
-
 import org.apache.camel.Exchange;
-import org.onap.aai.datarouter.exception.DataRouterException;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -39,13 +36,14 @@ public class ChameleonResponseBuiler  {
   private static final String TARGET = "target";
   private static final String TYPE = "type";
 
-  public static String buildEntity(String chameleonResponse, String id) throws DataRouterException{
-    
+  public static void buildEntity(Exchange exchange, String id){
+    String response = exchange.getIn().getBody().toString();
     JsonParser parser = new JsonParser();
-    JsonObject root = parser.parse(chameleonResponse).getAsJsonObject();
+    JsonObject root = parser.parse(response).getAsJsonObject();
     JsonObject champResponse = new JsonObject();
     if (!root.has(TYPE)) {
-      throw new DataRouterException("Chameloen response does not have type : "+chameleonResponse , Status.BAD_REQUEST);
+      exchange.getIn().setHeader(Exchange.HTTP_RESPONSE_CODE, 400);
+      return ;
     }
     champResponse.addProperty("key", id);
     champResponse.addProperty(TYPE, root.get(TYPE).getAsString());
@@ -68,19 +66,16 @@ public class ChameleonResponseBuiler  {
     
     champResponse.add("properties", props);
 
-    return champResponse.toString();
+    exchange.getIn().setBody(champResponse.toString());
     
   }
   
  
-  public static String buildObjectRelationship(String chameleonResponse, String id){
+  public static void buildObjectRelationship(Exchange exchange, String id){
     //TODO: implement when chameleon supports this query     
-    return "[]";
   }
-  public static String buildCollection(String chameleonResponse){
+  public static void buildCollection(Exchange exchange){
     //TODO: implement when chameleon supports this query   
-    return "[]";
-    
   }
   
  
