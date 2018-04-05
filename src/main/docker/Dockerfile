@@ -28,12 +28,6 @@ COPY data-router.jar $MICRO_HOME/
 COPY bundleconfig-local $MICRO_HOME/bundleconfig
 COPY bundleconfig-local/etc/logback.xml $MICRO_HOME/bundleconfig/etc
 
-# Create the aai user
-RUN mkdir /opt/aaihome && \
-     groupadd -g 492381 aaiadmin && \
-     useradd -r -u 341790 -g 492381 -ms /bin/bash -d /opt/aaihome/aaiadmin aaiadmin && \
-     chown -R aaiadmin:aaiadmin $MICRO_HOME
-USER aaiadmin
 
 EXPOSE 9502 9502
 
