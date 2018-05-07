@@ -170,7 +170,7 @@ limitations under the License.
       <dependency>
          <groupId>org.onap.aai.router-core</groupId>
          <artifactId>router-core</artifactId>
-         <version>1.2.0</version>
+         <version>1.2.1</version>
       </dependency>
 
       <dependency>
@@ -365,7 +365,7 @@ limitations under the License.
          <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.5</version>
+            <version>4.5.5</version>
          </dependency>
          <dependency>
             <groupId>org.apache.httpcomponents</groupId>
