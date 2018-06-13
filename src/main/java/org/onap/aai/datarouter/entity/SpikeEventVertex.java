@@ -20,31 +20,29 @@
  */
 package org.onap.aai.datarouter.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 /**
  * A convenience POJO for mapping the Vertex from a Spike Event.
  * 
- * @author salmaA
  */
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class SpikeEventVertex {
 
-  private String key;
+  private final String key;
 
   private String schemaVersion;
 
-  private String type;  
+  private final String type;
 
+  private final String entityLink;
 
- 
-  public String getKey() {
-    return key;
+  public SpikeEventVertex(String type, String key) {
+    this.type = type;
+    this.key = key;
+    this.entityLink = type + "/" + key;
   }
 
-  public void setKey(String key) {
-    this.key = key;
+  public String getKey() {
+    return key;
   }
 
   public String getSchemaVersion() {
@@ -59,12 +57,8 @@ public class SpikeEventVertex {
     return type;
   }
 
-  public void setType(String type) {
-    this.type = type;
-  }
-  
   public String getEntityLink() {
-    return this.type + "/" + this.key; 
+    return entityLink;
   }
- 
+
 }

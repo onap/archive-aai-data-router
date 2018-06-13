@@ -28,6 +28,7 @@ import java.util.Map.Entry;
 
 import org.onap.aai.datarouter.util.NodeUtils;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -36,6 +37,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * The Class SpikeAggregationEntity. Mimics functionality of SPIKEUI's AggregationEntity
  */
 public class SpikeAggregationEntity implements DocumentStoreDataEntity, Serializable {
+  
+  private Map<String, String> attributes = new HashMap<>();
+  
+  @JsonIgnore
+  private ObjectMapper mapper = new ObjectMapper();
+  
+  
   private String id;
   private String link;
   private String lastmodTimestamp;
@@ -68,27 +76,22 @@ public class SpikeAggregationEntity implements DocumentStoreDataEntity, Serializ
   }
 
 
-  Map<String, String> attributes = new HashMap<>();
-  ObjectMapper mapper = new ObjectMapper();
 
   /**
    * Instantiates a new aggregation entity.
    */
   public SpikeAggregationEntity() {}
 
-  public void deriveFields(JsonNode uebPayload) {
+  public void deriveFields(JsonNode entityProperties) {
 
     this.setId(NodeUtils.generateUniqueShaDigest(link));
     this.setLastmodTimestamp(Long.toString(System.currentTimeMillis()));
-    JsonNode entityNode = uebPayload.get("vertex").get("properties");
-    Iterator<Entry<String, JsonNode>> nodes = entityNode.fields();
+    Iterator<Entry<String, JsonNode>> nodes = entityProperties.fields();
     while (nodes.hasNext()) {
       Map.Entry<String, JsonNode> entry = (Map.Entry<String, JsonNode>) nodes.next();
       attributes.put(entry.getKey(), entry.getValue().asText());
     }
   }
-
- 
 
   @Override
   public String getAsJson() {
@@ -105,7 +108,12 @@ public class SpikeAggregationEntity implements DocumentStoreDataEntity, Serializ
 
   @Override
   public String toString() {
-    return "AggregationEntity [id=" + id + ", link=" + link + ", attributes=" + attributes
-        + ", mapper=" + mapper + "]";
+    return "SpikeAggregationEntity ["
+        + (attributes != null ? "attributes=" + attributes + ", " : "")
+        + (id != null ? "id=" + id + ", " : "") + (link != null ? "link=" + link + ", " : "")
+        + (lastmodTimestamp != null ? "lastmodTimestamp=" + lastmodTimestamp : "") + "]";
   }
+  
+  
+
 }

@@ -41,8 +41,9 @@ import org.powermock.api.mockito.PowerMockito;
 
 
 public class EntityEventPolicyTest {
-	EntityEventPolicy policy;
-	String eventJson;
+	private EntityEventPolicy policy;
+	private String eventJson;
+	private InMemorySearchDatastore searchDb;
 	
 	@SuppressWarnings("unchecked")
     @Before
@@ -51,13 +52,9 @@ public class EntityEventPolicyTest {
 		PowerMockito.when(config.getSearchKeystorePwd()).thenReturn("password");
 		PowerMockito.when(config.getSourceDomain()).thenReturn("JUNIT");
 		
+		searchDb = new InMemorySearchDatastore();
+		policy = new EntityEventPolicyStubbed(config).withSearchDb(searchDb);
 		
-		SearchServiceAgent searchServiceAgent = PowerMockito.mock(SearchServiceAgent.class); 
-		
-		PowerMockito.whenNew(SearchServiceAgent.class).withAnyArguments().thenReturn(searchServiceAgent);
-		
-		
-		policy = new EntityEventPolicyStubbed(config);
 		FileInputStream event = new FileInputStream( new File("src/test/resources/aai_event.json"));
 		eventJson = IOUtils.toString(event, "UTF-8");
 
@@ -68,16 +65,16 @@ public class EntityEventPolicyTest {
 		policy.process(getExchangeEvent("event1","create"));
 		policy.process(getExchangeEvent("event2","create"));
 		
-		assertNotNull(InMemorySearchDatastore.get(NodeUtils.generateUniqueShaDigest("event1")));
-		assertNotNull(InMemorySearchDatastore.get(NodeUtils.generateUniqueShaDigest("event2")));
+		assertNotNull(searchDb.get(NodeUtils.generateUniqueShaDigest("event1")));
+		assertNotNull(searchDb.get(NodeUtils.generateUniqueShaDigest("event2")));
 		
 		policy.process(getExchangeEvent("event1","update"));
 		policy.process(getExchangeEvent("event2","update"));
-		assertNotNull(InMemorySearchDatastore.get(NodeUtils.generateUniqueShaDigest("event1")));
-		assertNotNull(InMemorySearchDatastore.get(NodeUtils.generateUniqueShaDigest("event2")));
+		assertNotNull(searchDb.get(NodeUtils.generateUniqueShaDigest("event1")));
+		assertNotNull(searchDb.get(NodeUtils.generateUniqueShaDigest("event2")));
 		
 		policy.process(getExchangeEvent("event2","delete"));
-		assertNull(InMemorySearchDatastore.get(NodeUtils.generateUniqueShaDigest("event2")));
+		assertNull(searchDb.get(NodeUtils.generateUniqueShaDigest("event2")));
 	}
 	
 	private Exchange getExchangeEvent(String link,String action){

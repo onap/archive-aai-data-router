@@ -307,11 +307,26 @@ limitations under the License.
          </plugin>
          <!-- license plugin -->
          <!-- Uncomment this to add a license header to every source file 
-            <plugin> <groupId>com.mycila</groupId> <artifactId>license-maven-plugin</artifactId> 
-            <version>3.0</version> <configuration> <header>License.txt</header> <includes> 
-            <include>src/main/java/**</include> <include>src/test/java/**</include> </includes> 
-            </configuration> <executions> <execution> <goals> <goal>format</goal> </goals> 
-            <phase>process-sources</phase> </execution> </executions> </plugin> -->
+	<plugin>
+		<groupId>com.mycila</groupId>
+		<artifactId>license-maven-plugin</artifactId>
+		<version>3.0</version>
+		<configuration>
+			<header>License.txt</header>
+			<includes>
+				<include>src/main/java/**</include>
+				<include>src/test/java/**</include>
+			</includes>
+		</configuration>
+		<executions>
+			<execution>
+				<goals>
+					<goal>format</goal>
+				</goals>
+				<phase>process-sources</phase>
+			</execution>
+		</executions>
+	</plugin> -->
          <plugin>
             <groupId>org.sonatype.plugins</groupId>
             <artifactId>nexus-staging-maven-plugin</artifactId>

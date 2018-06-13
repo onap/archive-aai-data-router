@@ -27,30 +27,43 @@ import org.onap.aai.datarouter.policy.EntityEventPolicy;
 import org.onap.aai.datarouter.policy.EntityEventPolicyConfig;
 
 public class EntityEventPolicyStubbed extends EntityEventPolicy {
-	
 
-	public EntityEventPolicyStubbed(EntityEventPolicyConfig config) throws FileNotFoundException {
-		super(config);
-		
-	}
+  private InMemorySearchDatastore searchDb;
 
-	protected void handleSearchServiceOperation(DocumentStoreDataEntity eventEntity, String action, String index) {
-		//Stub out the actual call to Search Data service and instead store/update documents in memory
-		try {
-			switch (action.toLowerCase()) {
-			case "create":
-				InMemorySearchDatastore.put(eventEntity.getId(), eventEntity.getAsJson()); // they are executed if variable == c1
-				break;
-			case "update":
-				InMemorySearchDatastore.put(eventEntity.getId(), eventEntity.getAsJson()); // they are executed if variable == c1
-				break;
-			case "delete":
-				InMemorySearchDatastore.remove(eventEntity.getId()); // they are executed if variable == c1
-				break;
-			default:
-				break;
-			}
-		} catch (Exception ex) {
-		}
-	}
+  public EntityEventPolicyStubbed(EntityEventPolicyConfig config) throws FileNotFoundException {
+    super(config);
+
+  }
+
+  public InMemorySearchDatastore getSearchDb() {
+    return searchDb;
+  }
+
+  public EntityEventPolicyStubbed withSearchDb(InMemorySearchDatastore searchDb) {
+    this.searchDb = searchDb;
+    return this;
+  }
+
+  protected void handleSearchServiceOperation(DocumentStoreDataEntity eventEntity, String action,
+      String index) {
+    // Stub out the actual call to Search Data service and instead store/update documents in memory
+    try {
+      switch (action.toLowerCase()) {
+        case "create":
+          searchDb.put(eventEntity.getId(), eventEntity.getAsJson()); // they are executed if
+                                                                      // variable == c1
+          break;
+        case "update":
+          searchDb.put(eventEntity.getId(), eventEntity.getAsJson()); // they are executed if
+                                                                      // variable == c1
+          break;
+        case "delete":
+          searchDb.remove(eventEntity.getId()); // they are executed if variable == c1
+          break;
+        default:
+          break;
+      }
+    } catch (Exception ex) {
+    }
+  }
 }

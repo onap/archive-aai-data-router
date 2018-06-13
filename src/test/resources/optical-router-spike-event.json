@@ -1,0 +1,24 @@
+{
+  "header": {
+    "request-id": "c0a81fa7-5ef4-49cd-ab39-e42c53c9b9a4",
+    "timestamp": "20180309T121130Z",
+    "source-name": "SPIKE",
+    "event-type": "$EVENT_TYPE"
+  },
+  "body": {
+    "timestamp": 1514927928167,
+    "operation": "$OPERATION_TYPE",
+    "vertex": {
+      "properties": {
+        "router-id": "optronicGatewayEast",
+        "brand": "optronix",
+        "version": "0.9.123b",
+        "bandwidth": "1Tbps"
+      },
+      "key": "$ENTITY_KEY",
+      "type": "optical-router",
+      "schema-version": "v21"
+    }
+  },
+  "result": "SUCCESS"
+}

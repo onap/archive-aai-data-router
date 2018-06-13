@@ -1,0 +1,31 @@
+{
+  "header": {
+    "request-id": "c0a81fa7-5ef4-49cd-ab39-e42c53c9b9a4",
+    "timestamp": "20180309T121130Z",
+    "source-name": "SPIKE",
+    "event-type": "$EVENT_TYPE"
+  },
+  "body": {
+    "timestamp": 1514927928167,
+    "operation": "$OPERATION_TYPE",
+    "vertex": {
+      "properties": {
+          "vnf-id": "GenericVNFIdBpCNtULbEw9",
+          "in-maint": "false",
+          "heat-stack-id": "GenericVNFIdBpCNtULbEw1-12345-678-",
+          "prov-status": "junk",
+          "equipment-role": "ASBG",
+          "ipv4-oam-address": "5.6.7.8",
+          "vnf-name": "GenericVNFIdBpCNtULbEw9",
+          "vnf-type": "asbg",
+          "is-closed-loop-disabled": "false",
+          "orchestration-status": "Running",
+          "aai-node-type": "generic-vnf"      
+      },
+      "key": "$ENTITY_KEY",
+      "type": "generic-vnf",
+      "schema-version": "v13"
+    }
+  },
+  "result": "SUCCESS"
+}

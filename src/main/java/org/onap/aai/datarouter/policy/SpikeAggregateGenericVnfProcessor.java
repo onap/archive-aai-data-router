@@ -21,13 +21,11 @@
 package org.onap.aai.datarouter.policy;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.List;
 
 import org.apache.camel.Exchange;
-import org.eclipse.persistence.jaxb.dynamic.DynamicJAXBContext;
 import org.onap.aai.datarouter.entity.SpikeAggregationEntity;
-import org.onap.aai.datarouter.entity.SpikeEventVertex;
+import org.onap.aai.datarouter.entity.SpikeEventMeta;
 import org.onap.aai.datarouter.logging.EntityEventPolicyMsgs;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -37,13 +35,11 @@ public class SpikeAggregateGenericVnfProcessor extends AbstractSpikeEntityEventP
 
   public static final String additionalInfo = "Response of SpikeEntityEventPolicy";
 
-  /** Agent for communicating with the Search Service. */
-
   public SpikeAggregateGenericVnfProcessor(SpikeEventPolicyConfig config)
       throws FileNotFoundException {
     super(config);
   }
-  
+
   @Override
   protected void startup() {
     // Create the indexes in the search service if they do not already exist.
@@ -55,55 +51,31 @@ public class SpikeAggregateGenericVnfProcessor extends AbstractSpikeEntityEventP
   public void process(Exchange exchange) throws Exception {
 
     long startTime = System.currentTimeMillis();
-    String uebPayload = getExchangeBody(exchange);
-    if (uebPayload == null) {
+
+    SpikeEventMeta meta = processSpikeEvent(exchange);
+
+    if (meta == null) {
       return;
     }
-    JsonNode uebAsJson = null;
-    try {
-      uebAsJson = mapper.readTree(uebPayload);
-    } catch (IOException e) {
-      returnWithError(exchange, uebPayload, "Invalid Payload");
-      return;
-    }
-    
-    String action = getSpikeEventAction(exchange, uebPayload);
-    if (action == null) {
-      return;
-    }
-    SpikeEventVertex eventVertex = populateEventVertex(exchange, uebPayload);
-    if (eventVertex == null) {
-      return;
-    }
-    String entityType = getEntityType(exchange, eventVertex, uebPayload);
-    if (entityType == null) {
-      return;
-    }
-    String entityLink = getEntityLink(exchange, eventVertex, uebPayload);
-    if (entityLink == null) {
-      return;
-    }
-    DynamicJAXBContext oxmJaxbContext = readOxm(exchange, uebPayload);
-    if (oxmJaxbContext == null) {
-      return;
-    }
-    String oxmEntityType = getOxmEntityType(entityType);
-    List<String> searchableAttr =  getSearchableAttibutes(oxmJaxbContext, oxmEntityType, entityType, uebPayload,
-        exchange);
+
+    String oxmEntityType = getOxmEntityType(meta.getSpikeEventVertex().getType());
+
+    List<String> searchableAttr = getSearchableAttibutes(meta.getOxmJaxbContext(), oxmEntityType,
+        meta.getSpikeEventVertex().getType(), meta.getEventEntity().toString(), exchange);
+
     if (searchableAttr == null) {
       return;
     }
-    
 
-    // log the fact that all data are in good shape
-    logger.info(EntityEventPolicyMsgs.PROCESS_ENTITY_EVENT_POLICY_NONVERBOSE, action, entityType);
-    logger.debug(EntityEventPolicyMsgs.PROCESS_ENTITY_EVENT_POLICY_VERBOSE, action, entityType,
-        uebPayload);
+    JsonNode propertiesNode =
+        mapper.readValue(meta.getVertexProperties().toString(), JsonNode.class);
 
     SpikeAggregationEntity spikeAgregationEntity = new SpikeAggregationEntity();
-    spikeAgregationEntity.setLink(entityLink);
-    spikeAgregationEntity.deriveFields(uebAsJson);
-    handleSearchServiceOperation(spikeAgregationEntity, action, searchIndexName);
+    spikeAgregationEntity.setLink(meta.getSpikeEventVertex().getEntityLink());
+    spikeAgregationEntity.deriveFields(propertiesNode);
+
+    handleSearchServiceOperation(spikeAgregationEntity, meta.getBodyOperationType(),
+        searchIndexName);
 
     long stopTime = System.currentTimeMillis();
     metricsLogger.info(EntityEventPolicyMsgs.OPERATION_RESULT_NO_ERRORS, PROCESS_SPIKE_EVENT,

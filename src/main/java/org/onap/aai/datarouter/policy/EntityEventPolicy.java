@@ -37,6 +37,7 @@ import org.apache.camel.Processor;
 import org.eclipse.persistence.dynamic.DynamicType;
 import org.eclipse.persistence.internal.helper.DatabaseField;
 import org.eclipse.persistence.jaxb.dynamic.DynamicJAXBContext;
+import org.eclipse.persistence.oxm.MediaType;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.onap.aai.datarouter.entity.AaiEventEntity;
@@ -1000,6 +1001,13 @@ public class EntityEventPolicy implements Processor {
             logger.error(EntityEventPolicyMsgs.NO_ETAG_AVAILABLE_FAILURE, index,
                 entityId);
           }
+          
+          /*
+           * The Spring-Boot version of the search-data-service rejects the DELETE operation unless
+           * we specify a Content-Type.
+           */
+
+          headers.put("Content-Type", Arrays.asList(MediaType.APPLICATION_JSON.getMediaType()));
 
           searchAgent.deleteDocument(index, eventEntity.getId(), headers);
         } else {

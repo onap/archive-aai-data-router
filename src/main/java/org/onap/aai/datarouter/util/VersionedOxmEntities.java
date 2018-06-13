@@ -341,5 +341,9 @@ public class VersionedOxmEntities {
         return sb.toString();
 
     }
+    
+    public Map<String, DynamicType> getEntityTypeLookup() {
+      return entityTypeLookup;
+    }
 
 }

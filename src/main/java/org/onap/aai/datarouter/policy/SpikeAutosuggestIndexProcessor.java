@@ -21,20 +21,15 @@
 package org.onap.aai.datarouter.policy;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.camel.Exchange;
-import org.eclipse.persistence.jaxb.dynamic.DynamicJAXBContext;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.onap.aai.datarouter.entity.OxmEntityDescriptor;
-import org.onap.aai.datarouter.entity.SpikeEventVertex;
+import org.onap.aai.datarouter.entity.SpikeEventMeta;
 import org.onap.aai.datarouter.entity.SuggestionSearchEntity;
 import org.onap.aai.datarouter.logging.EntityEventPolicyMsgs;
 import org.onap.aai.datarouter.util.EntityOxmReferenceHelper;
@@ -44,21 +39,18 @@ import org.onap.aai.datarouter.util.VersionedOxmEntities;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-
 public class SpikeAutosuggestIndexProcessor extends AbstractSpikeEntityEventProcessor {
 
   public static final String additionalInfo = "Response of SpikeEntityEventPolicy";
 
-  private final String EVENT_VERTEX = "vertex";
+  private static final String PROCESS_SPIKE_EVENT = "Process Spike Event";
 
-  private String oxmVersion = null;
-
+  
   /** Agent for communicating with the Search Service. */
 
   public SpikeAutosuggestIndexProcessor(SpikeEventPolicyConfig config)
       throws FileNotFoundException {
     super(config);
-    parseLatestOxmVersion();
   }
 
   @Override
@@ -71,76 +63,30 @@ public class SpikeAutosuggestIndexProcessor extends AbstractSpikeEntityEventProc
   @Override
   public void process(Exchange exchange) throws Exception {
    
-    long startTime = System.currentTimeMillis();
-    String uebPayload = getExchangeBody(exchange);
-    if (uebPayload == null) {
-      return;
-    }
-    JsonNode uebAsJson = null;
-    try {
-      uebAsJson = mapper.readTree(uebPayload);
-    } catch (IOException e) {
-      returnWithError(exchange, uebPayload, "Invalid Payload");
-      return;
-    }
+  long startTime = System.currentTimeMillis();
     
-    String action = getSpikeEventAction(exchange, uebPayload);
-    if (action == null) {
-      return;
-    }
-    JSONObject uebObjEntity = getUebContentAsJson(uebPayload, EVENT_VERTEX);
-    if (uebObjEntity == null) {
-      returnWithError(exchange, uebPayload, "Payload is missing " + EVENT_VERTEX);
-      return;
-    }
+    SpikeEventMeta meta = processSpikeEvent(exchange);
     
-    SpikeEventVertex eventVertex = populateEventVertex(exchange, uebPayload);
-    if (eventVertex == null) {
+    if ( meta == null ) {
       return;
     }
-    String entityType = getEntityType(exchange, eventVertex, uebPayload);
-    if (entityType == null) {
-      return;
-    }
-    String entityLink = getEntityLink(exchange, eventVertex, uebPayload);
-    if (entityLink == null) {
-      return;
-    }
-    DynamicJAXBContext oxmJaxbContext = readOxm(exchange, uebPayload);
-    if (oxmJaxbContext == null) {
-      return;
-    }
-    String oxmEntityType = getOxmEntityType(entityType);
-    List<String> searchableAttr =  getSearchableAttibutes(oxmJaxbContext, oxmEntityType, entityType, uebPayload,
-        exchange);
-    if (searchableAttr == null) {
-      return;
-    }    
-   
-    // log the fact that all data are in good shape
-    logger.info(EntityEventPolicyMsgs.PROCESS_ENTITY_EVENT_POLICY_NONVERBOSE, action, entityType);
-    logger.debug(EntityEventPolicyMsgs.PROCESS_ENTITY_EVENT_POLICY_VERBOSE, action, entityType,
-        uebPayload);
-    
-        
+ 
     /*
      * Use the versioned OXM Entity class to get access to cross-entity reference helper collections
      */
     VersionedOxmEntities oxmEntities =
         EntityOxmReferenceHelper.getInstance().getVersionedOxmEntities(Version.valueOf(oxmVersion));
     
-    /*
-     * Process for autosuggestable entities
-     */
     if (oxmEntities != null) {
       Map<String, OxmEntityDescriptor> rootDescriptor =
           oxmEntities.getSuggestableEntityDescriptors();
       if (!rootDescriptor.isEmpty()) {
         List<String> suggestibleAttrInPayload = new ArrayList<>();
-        List<String> suggestibleAttrInOxm = extractSuggestableAttr(oxmEntities, entityType);
+        List<String> suggestibleAttrInOxm =
+            extractSuggestableAttr(oxmEntities, meta.getSpikeEventVertex().getType());
         if (suggestibleAttrInOxm != null) {
-          for (String attr: suggestibleAttrInOxm){
-            if ( uebAsJson.get("vertex").get("properties").has(attr) ){
+          for (String attr : suggestibleAttrInOxm) {
+            if (meta.getVertexProperties().has(attr)) {
               suggestibleAttrInPayload.add(attr);
             }
           }
@@ -149,24 +95,26 @@ public class SpikeAutosuggestIndexProcessor extends AbstractSpikeEntityEventProc
         if (suggestibleAttrInPayload.isEmpty()) {
           return;
         }
-        List<String> suggestionAliases = extractAliasForSuggestableEntity(oxmEntities, entityType);       
+        List<String> suggestionAliases = extractAliasForSuggestableEntity(oxmEntities,  meta.getSpikeEventVertex().getType());       
 
         /*
          * It was decided to silently ignore DELETE requests for resources we don't allow to be
          * deleted. e.g. auto-suggestion deletion is not allowed while aggregation deletion is.
          */
-        if (!ACTION_DELETE.equalsIgnoreCase(action)) {
+        if (!DELETE.equalsIgnoreCase(meta.getBodyOperationType())) {
           List<ArrayList<String>> listOfValidPowerSetElements =
               SearchSuggestionPermutation.getNonEmptyUniqueLists(suggestibleAttrInPayload);
-
+          
+          JsonNode propertiesNode = mapper.readValue(meta.getVertexProperties().toString(), JsonNode.class);
+          
           // Now we have a list containing the power-set (minus empty element) for the status that are
           // available in the payload. Try inserting a document for every combination.
           for (ArrayList<String> list : listOfValidPowerSetElements) {
             SuggestionSearchEntity suggestionSearchEntity = new SuggestionSearchEntity();
-            suggestionSearchEntity.setEntityType(entityType);
+            suggestionSearchEntity.setEntityType(meta.getSpikeEventVertex().getType());
             suggestionSearchEntity.setSuggestableAttr(list);
             suggestionSearchEntity.setEntityTypeAliases(suggestionAliases);
-            suggestionSearchEntity.setFilterBasedPayloadFromResponse(uebAsJson.get("vertex").get("properties"),
+            suggestionSearchEntity.setFilterBasedPayloadFromResponse(propertiesNode,
                 suggestibleAttrInOxm, list);
             suggestionSearchEntity.setSuggestionInputPermutations(
                 suggestionSearchEntity.generateSuggestionInputPermutations());
@@ -180,7 +128,7 @@ public class SpikeAutosuggestIndexProcessor extends AbstractSpikeEntityEventProc
                         + e.getLocalizedMessage());
               }
 
-              handleSearchServiceOperation(suggestionSearchEntity, action, searchIndexName);
+              handleSearchServiceOperation(suggestionSearchEntity, meta.getBodyOperationType(), searchIndexName);
             }
           }
         }
@@ -192,7 +140,7 @@ public class SpikeAutosuggestIndexProcessor extends AbstractSpikeEntityEventProc
     setResponse(exchange, ResponseType.SUCCESS, additionalInfo);
     return;
   }
-
+ 
   public List<String> extractSuggestableAttr(VersionedOxmEntities oxmEntities, String entityType) {
     // Extract suggestable attributeshandleTopographicalData
     Map<String, OxmEntityDescriptor> rootDescriptor = oxmEntities.getSuggestableEntityDescriptors();
@@ -224,29 +172,5 @@ public class SpikeAutosuggestIndexProcessor extends AbstractSpikeEntityEventProc
     OxmEntityDescriptor desc = rootDescriptor.get(entityType);
     return desc.getAlias();
   }
-
-  private void parseLatestOxmVersion() {
-    int latestVersion = -1;
-    if (oxmVersionContextMap != null) {
-      Iterator it = oxmVersionContextMap.entrySet().iterator();
-      while (it.hasNext()) {
-        Map.Entry pair = (Map.Entry) it.next();
-
-        String version = pair.getKey().toString();
-        int versionNum = Integer.parseInt(version.substring(1, version.length()));
-
-        if (versionNum > latestVersion) {
-          latestVersion = versionNum;
-          oxmVersion = pair.getKey().toString();
-        }
-
-        logger.info(EntityEventPolicyMsgs.PROCESS_OXM_MODEL_FOUND, pair.getKey().toString());
-      }
-    } else {
-      logger.error(EntityEventPolicyMsgs.PROCESS_OXM_MODEL_MISSING, "");
-    }
-  }
-  
-  
 
 }

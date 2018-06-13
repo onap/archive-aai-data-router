@@ -24,23 +24,20 @@ import java.io.FileNotFoundException;
 import java.util.List;
 
 import org.apache.camel.Exchange;
-import org.eclipse.persistence.jaxb.dynamic.DynamicJAXBContext;
 import org.onap.aai.datarouter.entity.SpikeEventEntity;
-import org.onap.aai.datarouter.entity.SpikeEventVertex;
+import org.onap.aai.datarouter.entity.SpikeEventMeta;
 import org.onap.aai.datarouter.logging.EntityEventPolicyMsgs;
 
 
 public class SpikeEntitySearchProcessor extends AbstractSpikeEntityEventProcessor {
 
   public static final String additionalInfo = "Response of SpikeEntityEventPolicy";
-  private static final String searchIndexSchema = "";
 
-
+  private static final String PROCESS_SPIKE_EVENT = "Process Spike Event";
 
   /** Agent for communicating with the Search Service. */
 
-  public SpikeEntitySearchProcessor(SpikeEventPolicyConfig config)
-      throws FileNotFoundException {
+  public SpikeEntitySearchProcessor(SpikeEventPolicyConfig config) throws FileNotFoundException {
     super(config);
 
   }
@@ -56,59 +53,40 @@ public class SpikeEntitySearchProcessor extends AbstractSpikeEntityEventProcesso
   public void process(Exchange exchange) throws Exception {
 
     long startTime = System.currentTimeMillis();
-    String uebPayload = getExchangeBody(exchange);
-    if (uebPayload == null) {
+
+    SpikeEventMeta meta = processSpikeEvent(exchange);
+
+    if (meta == null) {
       return;
     }
 
-    String action = getSpikeEventAction(exchange, uebPayload);
-    if (action == null) {
-      return;
-    }
-    SpikeEventVertex eventVertex = populateEventVertex(exchange, uebPayload);
-    if (eventVertex == null) {
-      return;
-    }
-    String entityType = getEntityType(exchange, eventVertex, uebPayload);
-    if (entityType == null) {
-      return;
-    }
-    String entityLink = getEntityLink(exchange, eventVertex, uebPayload);
-    if (entityLink == null) {
-      return;
-    }
-    DynamicJAXBContext oxmJaxbContext = readOxm(exchange, uebPayload);
-    if (oxmJaxbContext == null) {
-      return;
-    }
-    String oxmEntityType = getOxmEntityType(entityType);
-    List<String> searchableAttr =  getSearchableAttibutes(oxmJaxbContext, oxmEntityType, entityType, uebPayload,
-        exchange);
+    String oxmEntityType = getOxmEntityType(meta.getSpikeEventVertex().getType());
+    List<String> searchableAttr = getSearchableAttibutes(meta.getOxmJaxbContext(), oxmEntityType,
+        meta.getSpikeEventVertex().getType(), meta.getEventEntity().toString(), exchange);
     if (searchableAttr == null) {
       return;
     }
 
-    // log the fact that all data are in good shape
-    logger.info(EntityEventPolicyMsgs.PROCESS_ENTITY_EVENT_POLICY_NONVERBOSE, action, entityType);
-    logger.debug(EntityEventPolicyMsgs.PROCESS_ENTITY_EVENT_POLICY_VERBOSE, action, entityType,
-        uebPayload);
 
     SpikeEventEntity spikeEventEntity = new SpikeEventEntity();
-    spikeEventEntity.setEntityType(entityType);
-    spikeEventEntity.setLink(entityLink);
-    spikeEventEntity = populateSpikeEventEntity(exchange, spikeEventEntity, oxmJaxbContext,
-        entityType, action, uebPayload, oxmEntityType,searchableAttr);
+    spikeEventEntity.setEntityType(meta.getSpikeEventVertex().getType());
+    spikeEventEntity.setLink(meta.getSpikeEventVertex().getEntityLink());
+    spikeEventEntity = populateSpikeEventEntity(exchange, spikeEventEntity,
+        meta.getOxmJaxbContext(), meta.getSpikeEventVertex().getType(), meta.getBodyOperationType(),
+        meta.getVertexProperties().toString(), oxmEntityType, searchableAttr);
+
     if (spikeEventEntity == null) {
       return;
     }
 
-    handleSearchServiceOperation(spikeEventEntity, action, searchIndexName);
+    handleSearchServiceOperation(spikeEventEntity, meta.getBodyOperationType(), searchIndexName);
     long stopTime = System.currentTimeMillis();
     metricsLogger.info(EntityEventPolicyMsgs.OPERATION_RESULT_NO_ERRORS, PROCESS_SPIKE_EVENT,
         String.valueOf(stopTime - startTime));
     setResponse(exchange, ResponseType.SUCCESS, additionalInfo);
     return;
   }
+
 
   /*
    * This is not for this Scope. We get back to it later. (updateCerInEntity) private void

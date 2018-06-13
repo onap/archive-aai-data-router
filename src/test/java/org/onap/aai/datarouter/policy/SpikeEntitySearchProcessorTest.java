@@ -34,79 +34,109 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.onap.aai.datarouter.util.NodeUtils;
-import org.onap.aai.datarouter.util.SearchServiceAgent;
 import org.powermock.api.mockito.PowerMockito;
 
-
-
 public class SpikeEntitySearchProcessorTest {
-  SpikeEntitySearchProcessor policy;
-  String eventJson;
+  private SpikeEntitySearchProcessor policy;
+  private String eventJson;
+  private InMemorySearchDatastore searchDb;
 
-  @SuppressWarnings("unchecked")
   @Before
   public void init() throws Exception {
     SpikeEventPolicyConfig config = PowerMockito.mock(SpikeEventPolicyConfig.class);
     PowerMockito.when(config.getSearchKeystorePwd()).thenReturn("password");
     PowerMockito.when(config.getSourceDomain()).thenReturn("JUNIT");
 
-
-    SearchServiceAgent searchServiceAgent = PowerMockito.mock(SearchServiceAgent.class);
-    PowerMockito.whenNew(SearchServiceAgent.class).withAnyArguments()
-        .thenReturn(searchServiceAgent);
-
-
-    policy = new SpikeEntitySearchProcessorStubbed(config);
-    FileInputStream event = new FileInputStream(new File("src/test/resources/spike_event.json"));
-    eventJson = IOUtils.toString(event, "UTF-8");  
+    searchDb = new InMemorySearchDatastore();
+    policy = new SpikeEntitySearchProcessorStubbed(config).withSearchDb(searchDb);
 
   }
 
   @Test
   public void testProcess_success() throws Exception {
-    policy.process(getExchangeEvent("12345", "create", "generic-vnf"));
-    policy.process(getExchangeEvent("23456", "create", "generic-vnf"));
 
-    assertNotNull(
-        InMemorySearchDatastore.get(NodeUtils.generateUniqueShaDigest("generic-vnf/12345")));
-    assertNotNull(
-        InMemorySearchDatastore.get(NodeUtils.generateUniqueShaDigest("generic-vnf/23456")));
+    String genericVnfEventJsonTemplate = IOUtils.toString(
+        new FileInputStream(new File("src/test/resources/generic-vnf-spike-event.json")), "UTF-8");
 
-   
-    policy.process(getExchangeEvent("23456", "delete", "generic-vnf"));
-    assertNull(InMemorySearchDatastore.get(NodeUtils.generateUniqueShaDigest("generic-vnf/23456")));
+    policy.process(
+        getExchangeEvent(genericVnfEventJsonTemplate, "update-notification", "CREATE", "gvnf123"));
+
+    assertNotNull(searchDb.get(NodeUtils.generateUniqueShaDigest("generic-vnf/gvnf123")));
+
+    policy.process(
+        getExchangeEvent(genericVnfEventJsonTemplate, "update-notification", "DELETE", "gvnf123"));
+
+    assertNull(searchDb.get(NodeUtils.generateUniqueShaDigest("generic-vnf/gvnf123")));
+
     
-    policy.process(getExchangeEvent("333333", "", "generic-vnf"));
-    assertNull(InMemorySearchDatastore.get(NodeUtils.generateUniqueShaDigest("generic-vnf/333333")));
   }
+  /*
+   * Failure test cases - no searchable attribute for type
+   */
+
   @Test
-  public void testProcess_fail() throws Exception {
-    policy.process(getExchangeEvent("xxxxx", "create", "NotValid"));
-    assertNull(
-        InMemorySearchDatastore.get(NodeUtils.generateUniqueShaDigest("NotValid/xxxxx")));
-    
-    policy.process(getExchangeEvent("", "create", "generic-vnf"));
-    assertNull(
-        InMemorySearchDatastore.get(NodeUtils.generateUniqueShaDigest("generic-vnf/")));
-   
-    policy.process(getExchangeEvent("yyyy", "create", ""));
-    assertNull(
-        InMemorySearchDatastore.get(NodeUtils.generateUniqueShaDigest("/yyyy")));
-    policy.process(getExchangeEvent("", "create", ""));
-    assertNull(
-        InMemorySearchDatastore.get(NodeUtils.generateUniqueShaDigest("/")));
+  public void testProcess_failure_unknownOxmEntityType() throws Exception {
+
+    String pserverEventJsonTemplate = IOUtils.toString(
+        new FileInputStream(new File("src/test/resources/optical-router-spike-event.json")),
+        "UTF-8");
+
+    policy.process(
+        getExchangeEvent(pserverEventJsonTemplate, "update-notification", "CREATE", "optronic123"));
+
+    assertNull(searchDb.get(NodeUtils.generateUniqueShaDigest("optical-router/optronic123")));
   }
+
   @Test
-  public void testProcess_null() throws Exception {
-    policy.process(getExchangeEvent());
+  public void testProcess_failure_missingMandatoryFieldsFromBodyObject() throws Exception {
+
+    String pserverEventJsonTemplate = IOUtils.toString(
+        new FileInputStream(
+            new File("src/test/resources/pserver-missing-mandtory-field-spike-event.json")),
+        "UTF-8");
+
+    policy.process(
+        getExchangeEvent(pserverEventJsonTemplate, "update-notification", "CREATE", "pserver123"));
+
+    assertNull(searchDb.get(NodeUtils.generateUniqueShaDigest("pserver/pserver123")));
   }
-  
-  private Exchange getExchangeEvent(String key, String action, String type) {
-    Object obj = eventJson.replace("$KEY", key).replace("$ACTION", action).replace("$TYPE", type);
+
+  @Test
+  public void testProcess_failure_missingMandatoryVertexProperties() throws Exception {
+
+    String pserverEventJsonTemplate =
+        IOUtils.toString(
+            new FileInputStream(
+                new File("src/test/resources/pserver-missing-primary-key-spike-event.json")),
+            "UTF-8");
+
+    policy.process(
+        getExchangeEvent(pserverEventJsonTemplate, "update-notification", "CREATE", "pserver123"));
+
+    assertNull(searchDb.get(NodeUtils.generateUniqueShaDigest("pserver/pserver123")));
+  }
+
+  @Test
+  public void testProcess_failure_noSuggestibleAttributesForEntityType() throws Exception {
+
+    String pserverEventJsonTemplate = IOUtils.toString(
+        new FileInputStream(new File("src/test/resources/vserver-spike-event.json")), "UTF-8");
+
+    policy.process(
+        getExchangeEvent(pserverEventJsonTemplate, "update-notification", "CREATE", "vserver123"));
+
+    assertNull(searchDb.get(NodeUtils.generateUniqueShaDigest("vserver/vserver123")));
+  }
+
+  private Exchange getExchangeEvent(String payloadTemplate, String eventType, String operationType,
+      String entityKey) {
+    Object obj = payloadTemplate.replace("$EVENT_TYPE", eventType)
+        .replace("$OPERATION_TYPE", operationType).replace("$ENTITY_KEY", entityKey);
+
     Exchange exchange = PowerMockito.mock(Exchange.class);
     Message inMessage = PowerMockito.mock(Message.class);
     Message outMessage = PowerMockito.mock(Message.class);
-    PowerMockito.when(exchange.getIn()).thenReturn(inMessage); 
+    PowerMockito.when(exchange.getIn()).thenReturn(inMessage);
     PowerMockito.when(inMessage.getBody()).thenReturn(obj);
 
     PowerMockito.when(exchange.getOut()).thenReturn(outMessage);
@@ -116,22 +146,7 @@ public class SpikeEntitySearchProcessorTest {
     return exchange;
 
   }
-  
-  private Exchange getExchangeEvent() {
-    Object obj = "";
-    Exchange exchange = PowerMockito.mock(Exchange.class);
-    Message inMessage = PowerMockito.mock(Message.class);
-    Message outMessage = PowerMockito.mock(Message.class);
-    PowerMockito.when(exchange.getIn()).thenReturn(inMessage); 
-    PowerMockito.when(inMessage.getBody()).thenReturn(obj);
 
-    PowerMockito.when(exchange.getOut()).thenReturn(outMessage);
-    PowerMockito.doNothing().when(outMessage).setBody(anyObject());
-    PowerMockito.doNothing().when(outMessage).setHeader(anyString(), anyObject());
-    
-    return exchange;
-
-  }
 
 
 }
