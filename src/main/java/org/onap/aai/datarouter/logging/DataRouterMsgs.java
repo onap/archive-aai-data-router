@@ -194,7 +194,10 @@ public enum DataRouterMsgs implements LogMessageEnum {
   READING_JSON_SCHEMA_ERROR,
   
   /** Arguments: {0} = Error message */
-  JSON_CONVERSION_ERROR;
+  JSON_CONVERSION_ERROR,
+
+  /** Failed to load the schemaIngest.properties file */
+  SCHEMA_INGEST_LOAD_ERROR;
   
   /**
    * Static initializer to ensure the resource bundles for this class are loaded...

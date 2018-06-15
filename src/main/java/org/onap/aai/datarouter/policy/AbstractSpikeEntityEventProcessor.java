@@ -46,9 +46,9 @@ import org.onap.aai.datarouter.entity.OxmEntityDescriptor;
 import org.onap.aai.datarouter.entity.SpikeEventEntity;
 import org.onap.aai.datarouter.entity.SpikeEventVertex;
 import org.onap.aai.datarouter.logging.EntityEventPolicyMsgs;
+import org.onap.aai.datarouter.schema.OxmModelLoader;
 import org.onap.aai.datarouter.util.EntityOxmReferenceHelper;
 import org.onap.aai.datarouter.util.ExternalOxmModelProcessor;
-import org.onap.aai.datarouter.util.OxmModelLoader;
 import org.onap.aai.datarouter.util.RouterServiceUtil;
 import org.onap.aai.datarouter.util.SearchServiceAgent;
 import org.onap.aai.restclient.client.Headers;
@@ -59,7 +59,6 @@ import org.slf4j.MDC;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 
 public abstract class AbstractSpikeEntityEventProcessor implements Processor {
 
@@ -174,6 +173,8 @@ public abstract class AbstractSpikeEntityEventProcessor implements Processor {
 
     return uebObjContent;
   }
+  
+  @Override
   public abstract void process(Exchange exchange) throws Exception;
 
 
@@ -279,7 +280,7 @@ public abstract class AbstractSpikeEntityEventProcessor implements Processor {
   }
 
   protected DynamicJAXBContext readOxm(Exchange exchange, String uebPayload) {
-    DynamicJAXBContext oxmJaxbContext = loadOxmContext(oxmVersion.toLowerCase());
+    DynamicJAXBContext oxmJaxbContext = loadOxmContext(oxmVersion);
     if (oxmJaxbContext == null) {
       logger.error(EntityEventPolicyMsgs.OXM_VERSION_NOT_SUPPORTED, oxmVersion);
       logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE, "OXM version mismatch", uebPayload);
@@ -523,7 +524,7 @@ public abstract class AbstractSpikeEntityEventProcessor implements Processor {
   private List<String> getOxmAttributes(DynamicJAXBContext oxmJaxbContext, String oxmEntityType,
       String entityType, String fieldName) {
 
-    DynamicType entity = (DynamicType) oxmJaxbContext.getDynamicType(oxmEntityType);
+    DynamicType entity = oxmJaxbContext.getDynamicType(oxmEntityType);
     if (entity == null) {
       return null;
     }

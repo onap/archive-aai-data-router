@@ -39,6 +39,9 @@ import org.eclipse.persistence.internal.helper.DatabaseField;
 import org.eclipse.persistence.jaxb.dynamic.DynamicJAXBContext;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.onap.aai.cl.api.Logger;
+import org.onap.aai.cl.eelf.LoggerFactory;
+import org.onap.aai.cl.mdc.MdcContext;
 import org.onap.aai.datarouter.entity.AaiEventEntity;
 import org.onap.aai.datarouter.entity.AggregationEntity;
 import org.onap.aai.datarouter.entity.DocumentStoreDataEntity;
@@ -47,24 +50,20 @@ import org.onap.aai.datarouter.entity.SuggestionSearchEntity;
 import org.onap.aai.datarouter.entity.TopographicalEntity;
 import org.onap.aai.datarouter.entity.UebEventHeader;
 import org.onap.aai.datarouter.logging.EntityEventPolicyMsgs;
+import org.onap.aai.datarouter.schema.OxmModelLoader;
 import org.onap.aai.datarouter.util.CrossEntityReference;
 import org.onap.aai.datarouter.util.EntityOxmReferenceHelper;
 import org.onap.aai.datarouter.util.ExternalOxmModelProcessor;
 import org.onap.aai.datarouter.util.NodeUtils;
-import org.onap.aai.datarouter.util.OxmModelLoader;
 import org.onap.aai.datarouter.util.RouterServiceUtil;
 import org.onap.aai.datarouter.util.SearchServiceAgent;
 import org.onap.aai.datarouter.util.SearchSuggestionPermutation;
 import org.onap.aai.datarouter.util.Version;
 import org.onap.aai.datarouter.util.VersionedOxmEntities;
-import org.onap.aai.cl.api.Logger;
-import org.onap.aai.cl.eelf.LoggerFactory;
-import org.onap.aai.cl.mdc.MdcContext;
 import org.onap.aai.restclient.client.Headers;
 import org.onap.aai.restclient.client.OperationResult;
 import org.onap.aai.restclient.rest.HttpUtil;
 import org.slf4j.MDC;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -251,7 +250,7 @@ public class EntityEventPolicy implements Processor {
       return;
     }
 
-    DynamicJAXBContext oxmJaxbContext = loadOxmContext(oxmVersion.toLowerCase());
+    DynamicJAXBContext oxmJaxbContext = loadOxmContext(oxmVersion);
     if (oxmJaxbContext == null) {
       logger.error(EntityEventPolicyMsgs.OXM_VERSION_NOT_SUPPORTED, oxmVersion);
       logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE, "OXM version mismatch",
@@ -389,7 +388,7 @@ public class EntityEventPolicy implements Processor {
      * Use the versioned OXM Entity class to get access to cross-entity reference helper collections
      */
     VersionedOxmEntities oxmEntities =
-        EntityOxmReferenceHelper.getInstance().getVersionedOxmEntities(Version.valueOf(oxmVersion));
+                EntityOxmReferenceHelper.getInstance().getVersionedOxmEntities(Version.valueOf(oxmVersion.toLowerCase()));
 
     /**
      * NOTES:
@@ -787,7 +786,7 @@ public class EntityEventPolicy implements Processor {
   private List<String> getOxmAttributes(String payload, DynamicJAXBContext oxmJaxbContext,
       String oxmEntityType, String entityType, String fieldName) {
 
-    DynamicType entity = (DynamicType) oxmJaxbContext.getDynamicType(oxmEntityType);
+    DynamicType entity = oxmJaxbContext.getDynamicType(oxmEntityType);
     if (entity == null) {
       return null;
     }

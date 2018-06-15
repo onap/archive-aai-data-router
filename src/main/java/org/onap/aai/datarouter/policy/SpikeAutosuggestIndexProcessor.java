@@ -31,7 +31,6 @@ import java.util.Map;
 
 import org.apache.camel.Exchange;
 import org.eclipse.persistence.jaxb.dynamic.DynamicJAXBContext;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.onap.aai.datarouter.entity.OxmEntityDescriptor;
 import org.onap.aai.datarouter.entity.SpikeEventVertex;
@@ -127,7 +126,7 @@ public class SpikeAutosuggestIndexProcessor extends AbstractSpikeEntityEventProc
      * Use the versioned OXM Entity class to get access to cross-entity reference helper collections
      */
     VersionedOxmEntities oxmEntities =
-        EntityOxmReferenceHelper.getInstance().getVersionedOxmEntities(Version.valueOf(oxmVersion));
+        EntityOxmReferenceHelper.getInstance().getVersionedOxmEntities(Version.valueOf(oxmVersion.toLowerCase()));
     
     /*
      * Process for autosuggestable entities

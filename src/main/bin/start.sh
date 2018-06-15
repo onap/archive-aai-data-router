@@ -29,7 +29,7 @@ keytool -importkeystore -noprompt -deststorepass $PASS -destkeypass $PASS -srcke
 ## import into cacerts
 sudo keytool -importkeystore -noprompt -deststorepass changeit -destkeypass changeit -destkeystore /$JAVA_HOME/jre/lib/security/cacerts -srckeystore $BASEDIR/config/auth/onap.p12 -srcstoretype PKCS12 -srcstorepass $PASS -alias tomcat
 
-
+PROPS="-DBASEDIR=$BASEDIR"
 PROPS="-DAJSC_HOME=$AJSC_HOME"
 PROPS="$PROPS -DAJSC_CONF_HOME=$AJSC_CONF_HOME"
 PROPS="$PROPS -Dlogging.config=$BASEDIR/bundleconfig/etc/logback.xml"
