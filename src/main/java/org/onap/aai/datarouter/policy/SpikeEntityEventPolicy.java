@@ -50,7 +50,7 @@ import org.onap.aai.datarouter.entity.SpikeEventVertex;
 import org.onap.aai.datarouter.logging.EntityEventPolicyMsgs;
 import org.onap.aai.datarouter.util.EntityOxmReferenceHelper;
 import org.onap.aai.datarouter.util.ExternalOxmModelProcessor;
-import org.onap.aai.datarouter.util.OxmModelLoader;
+import org.onap.aai.datarouter.schema.OxmModelLoader;
 import org.onap.aai.datarouter.util.RouterServiceUtil;
 import org.onap.aai.datarouter.util.SearchServiceAgent;
 import org.onap.aai.restclient.client.Headers;
@@ -291,7 +291,7 @@ public class SpikeEntityEventPolicy implements Processor {
       return;
     }
 
-    DynamicJAXBContext oxmJaxbContext = loadOxmContext(oxmVersion.toLowerCase());
+    DynamicJAXBContext oxmJaxbContext = loadOxmContext(oxmVersion);
     if (oxmJaxbContext == null) {
       logger.error(EntityEventPolicyMsgs.OXM_VERSION_NOT_SUPPORTED, oxmVersion);
       logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE, "OXM version mismatch", eventPayload);
@@ -526,7 +526,7 @@ public class SpikeEntityEventPolicy implements Processor {
   private List<String> getOxmAttributes(DynamicJAXBContext oxmJaxbContext, String oxmEntityType,
       String entityType, String fieldName) {
 
-    DynamicType entity = (DynamicType) oxmJaxbContext.getDynamicType(oxmEntityType);
+    DynamicType entity = oxmJaxbContext.getDynamicType(oxmEntityType);
     if (entity == null) {
       return null;
     }

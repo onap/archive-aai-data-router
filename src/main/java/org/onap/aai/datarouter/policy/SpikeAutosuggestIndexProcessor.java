@@ -75,7 +75,7 @@ public class SpikeAutosuggestIndexProcessor extends AbstractSpikeEntityEventProc
      * Use the versioned OXM Entity class to get access to cross-entity reference helper collections
      */
     VersionedOxmEntities oxmEntities =
-        EntityOxmReferenceHelper.getInstance().getVersionedOxmEntities(Version.valueOf(oxmVersion));
+        EntityOxmReferenceHelper.getInstance().getVersionedOxmEntities(Version.valueOf(oxmVersion.toLowerCase()));
     
     if (oxmEntities != null) {
       Map<String, OxmEntityDescriptor> rootDescriptor =

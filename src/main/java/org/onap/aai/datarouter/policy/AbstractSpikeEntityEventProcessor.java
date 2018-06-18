@@ -43,6 +43,7 @@ import org.json.JSONObject;
 import org.onap.aai.cl.api.Logger;
 import org.onap.aai.cl.eelf.LoggerFactory;
 import org.onap.aai.cl.mdc.MdcContext;
+import org.onap.aai.datarouter.schema.OxmModelLoader;
 import org.onap.aai.datarouter.entity.DocumentStoreDataEntity;
 import org.onap.aai.datarouter.entity.OxmEntityDescriptor;
 import org.onap.aai.datarouter.entity.SpikeEventEntity;
@@ -51,7 +52,6 @@ import org.onap.aai.datarouter.entity.SpikeEventVertex;
 import org.onap.aai.datarouter.logging.EntityEventPolicyMsgs;
 import org.onap.aai.datarouter.util.EntityOxmReferenceHelper;
 import org.onap.aai.datarouter.util.ExternalOxmModelProcessor;
-import org.onap.aai.datarouter.util.OxmModelLoader;
 import org.onap.aai.datarouter.util.RouterServiceUtil;
 import org.onap.aai.datarouter.util.SearchServiceAgent;
 import org.onap.aai.datarouter.util.Version;
@@ -295,7 +295,7 @@ public abstract class AbstractSpikeEntityEventProcessor implements Processor {
   }
 
   protected DynamicJAXBContext readOxm(Exchange exchange, String uebPayload) {
-    DynamicJAXBContext oxmJaxbContext = loadOxmContext(oxmVersion.toLowerCase());
+    DynamicJAXBContext oxmJaxbContext = loadOxmContext(oxmVersion);
     if (oxmJaxbContext == null) {
       logger.error(EntityEventPolicyMsgs.OXM_VERSION_NOT_SUPPORTED, oxmVersion);
       logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE, "OXM version mismatch", uebPayload);
@@ -539,7 +539,7 @@ public abstract class AbstractSpikeEntityEventProcessor implements Processor {
   private List<String> getOxmAttributes(DynamicJAXBContext oxmJaxbContext, String oxmEntityType,
       String entityType, String fieldName) {
 
-    DynamicType entity = (DynamicType) oxmJaxbContext.getDynamicType(oxmEntityType);
+    DynamicType entity = oxmJaxbContext.getDynamicType(oxmEntityType);
     if (entity == null) {
       return null;
     }
@@ -806,7 +806,7 @@ public abstract class AbstractSpikeEntityEventProcessor implements Processor {
 
     meta.setSpikeEventVertex(spikeEventVertex);
 
-    DynamicJAXBContext oxmJaxbContext = loadOxmContext(oxmVersion.toLowerCase());
+    DynamicJAXBContext oxmJaxbContext = loadOxmContext(oxmVersion);
     if (oxmJaxbContext == null) {
       logger.error(EntityEventPolicyMsgs.OXM_VERSION_NOT_SUPPORTED, oxmVersion);
       logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE, "OXM version mismatch",
@@ -834,7 +834,7 @@ public abstract class AbstractSpikeEntityEventProcessor implements Processor {
      */
 
     VersionedOxmEntities oxmEntities =
-    EntityOxmReferenceHelper.getInstance().getVersionedOxmEntities(Version.valueOf(oxmVersion));
+    EntityOxmReferenceHelper.getInstance().getVersionedOxmEntities(Version.valueOf(oxmVersion.toLowerCase()));
     
     if (oxmEntities != null && !oxmEntities.getEntityTypeLookup().containsKey(entityType)) {
       logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE, "No matching OXM Descriptor for entity-type='" + entityType + "'",

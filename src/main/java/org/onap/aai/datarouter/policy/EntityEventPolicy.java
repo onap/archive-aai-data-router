@@ -52,7 +52,7 @@ import org.onap.aai.datarouter.util.CrossEntityReference;
 import org.onap.aai.datarouter.util.EntityOxmReferenceHelper;
 import org.onap.aai.datarouter.util.ExternalOxmModelProcessor;
 import org.onap.aai.datarouter.util.NodeUtils;
-import org.onap.aai.datarouter.util.OxmModelLoader;
+import org.onap.aai.datarouter.schema.OxmModelLoader;
 import org.onap.aai.datarouter.util.RouterServiceUtil;
 import org.onap.aai.datarouter.util.SearchServiceAgent;
 import org.onap.aai.datarouter.util.SearchSuggestionPermutation;
@@ -252,7 +252,7 @@ public class EntityEventPolicy implements Processor {
       return;
     }
 
-    DynamicJAXBContext oxmJaxbContext = loadOxmContext(oxmVersion.toLowerCase());
+    DynamicJAXBContext oxmJaxbContext = loadOxmContext(oxmVersion);
     if (oxmJaxbContext == null) {
       logger.error(EntityEventPolicyMsgs.OXM_VERSION_NOT_SUPPORTED, oxmVersion);
       logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE, "OXM version mismatch",
@@ -390,7 +390,7 @@ public class EntityEventPolicy implements Processor {
      * Use the versioned OXM Entity class to get access to cross-entity reference helper collections
      */
     VersionedOxmEntities oxmEntities =
-        EntityOxmReferenceHelper.getInstance().getVersionedOxmEntities(Version.valueOf(oxmVersion));
+        EntityOxmReferenceHelper.getInstance().getVersionedOxmEntities(Version.valueOf(oxmVersion.toLowerCase()));
 
     /**
      * NOTES:
