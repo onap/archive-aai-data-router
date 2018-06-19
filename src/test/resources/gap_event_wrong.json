@@ -1,0 +1,50 @@
+{  
+   "event-header":{  
+      "entity-type":"pserver",
+      "top-entity-type":"pserver",
+      "entity-link":"/services/inventory/v11/pservers?properties=all",
+      "event-type":"${crud.event.type.api}",
+      "domain":"dev",
+      "topic-name":"CRUD-DATA-EXPORT-SDWAN",
+      "event-id":"7445ecab-40fc-46a9-a595-42d940488b02"
+   },
+   "entity2":{  
+      "in":[  
+         {  
+            "id":"9387d038-1e4f-4a08-ac5e-97c09530bbd8",
+            "source":"services/inventory/v11/vserver/ad7c5ad8-142f-4cd1-b38a-11fd7d98239d",
+            "type":"tosca.relationships.HostedOn",
+            "url":"services/inventory/relationships/v12/tosca.relationships.HostedOn/9387d038-1e4f-4a08-ac5e-97c09530bbd8"
+         }
+      ],
+      "id":"441d5a1e-a107-4fc3-b885-ccf683e3513b",
+      "type":"pserver",
+      "url":"services/inventory/v11/pserver/441d5a1e-a107-4fc3-b885-ccf683e3513b",
+      "properties":{  
+         "aai-last-mod-ts":"1522935511411",
+         "equip-type":"Rack Server",
+         "equip-vendor":"HP",
+         "serial-number":"S4MPLEDDD456D",
+         "pserver-id":"Pserver-AMT-8",
+         "aai-created-ts":"1522935511411",
+         "source-of-truth":"RO",
+         "number-of-cpus":10,
+         "aai-node-type":"pserver",
+         "hostname":"10_aaingenvnf-pserver-fw-8",
+         "equip-model":"PowerEdge R930",
+         "in-maint":false,
+         "resource-version":"64684545",
+         "disk-in-gigabytes":146,
+         "ram-in-megabytes":62914556,
+         "last-mod-source-of-truth":"RO"
+      },
+      "out":[  
+         {  
+            "id":"bfa7ec57-cfa6-4bda-b1dc-a11a192bacaa",
+            "type":"org.onap.relationships.inventory.LocatedIn",
+            "url":"services/inventory/relationships/v12/org.onap.relationships.inventory.LocatedIn/bfa7ec57-cfa6-4bda-b1dc-a11a192bacaa",
+            "target":"services/inventory/v11/complex/90564f64-d3c4-47f8-847d-553497f6b04a"
+         }
+      ]
+   }
+}

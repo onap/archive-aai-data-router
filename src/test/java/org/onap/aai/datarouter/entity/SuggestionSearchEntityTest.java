@@ -18,7 +18,7 @@
  * limitations under the License.
  * ============LICENSE_END=========================================================
  */
-package org.openecomp.datarouter.entity;
+package org.onap.aai.datarouter.entity;
 
 import static org.junit.Assert.assertEquals;
 
