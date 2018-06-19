@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a93c517_928e7c78",
+        "filename": "version.properties",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1157
+      },
+      "writtenOn": "2018-06-19T15:07:39Z",
+      "side": 1,
+      "message": "Same comment wrt to upversioning the snapshot",
+      "revId": "d631fbf2200628fc87903c062d8363cac8ce0677",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
