@@ -407,13 +407,7 @@ public abstract class AbstractSpikeEntityEventProcessor implements Processor {
 
 
  protected String getOxmEntityType(String entityType) {
-
-   String[] entityTypeArr = entityType.split("-");
-   String oxmEntityType = "";
-   for (String entityWord : entityTypeArr) {
-     oxmEntityType += entityWord.substring(0, 1).toUpperCase() + entityWord.substring(1);
-   }
-   return oxmEntityType;
+   return new OxmEntityTypeConverter().convert(entityType);
  }
  
  protected List<String> getSearchableAttibutes(DynamicJAXBContext oxmJaxbContext, String oxmEntityType,
