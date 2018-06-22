@@ -320,8 +320,7 @@ public class SearchServiceAgent {
    * Removes a document from the Search Service.
    * 
    * @param index   - The index to create the document in.
-   * @param id      - The identifier for the document.
-   * @param payload - The document contents.
+   * @param documentId      - The identifier for the document.
    * @param headers - HTTP headers.
    */
   public void deleteDocument(String index, String documentId, Map<String, List<String>> headers) {
@@ -340,12 +339,12 @@ public class SearchServiceAgent {
    */
   protected String loadFileData(String filename) throws Exception {
     StringBuilder data = new StringBuilder();
-    try {
-      BufferedReader in = new BufferedReader(new InputStreamReader(
-          EntityEventPolicy.class.getClassLoader().getResourceAsStream("/" + filename),
-          StandardCharsets.UTF_8));
-      String line;
+    try (BufferedReader in = new BufferedReader(new InputStreamReader(
+            EntityEventPolicy.class.getClassLoader().getResourceAsStream("/" + filename),
+            StandardCharsets.UTF_8))
+    ) {
 
+      String line;
       while ((line = in.readLine()) != null) {
         data.append(line);
       }
