@@ -338,11 +338,7 @@ public class SpikeEntityEventPolicy implements Processor {
         eventPayload);
 
     // Process for building SpikeEventEntity object
-    String[] entityTypeArr = entityType.split("-");
-    String oxmEntityType = "";
-    for (String entityWord : entityTypeArr) {
-      oxmEntityType += entityWord.substring(0, 1).toUpperCase() + entityWord.substring(1);
-    }
+    String oxmEntityType = new OxmEntityTypeConverter().convert(entityType);
     
     List<String> searchableAttr =
         getOxmAttributes(oxmJaxbContext, oxmEntityType, entityType, "searchable");

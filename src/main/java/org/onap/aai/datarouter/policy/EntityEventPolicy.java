@@ -314,11 +314,7 @@ public class EntityEventPolicy implements Processor {
 
 
     // Process for building AaiEventEntity object
-    String[] entityTypeArr = entityType.split("-");
-    String oxmEntityType = "";
-    for (String entityWord : entityTypeArr) {
-      oxmEntityType += entityWord.substring(0, 1).toUpperCase() + entityWord.substring(1);
-    }
+    String oxmEntityType = new OxmEntityTypeConverter().convert(entityType);
 
     List<String> searchableAttr =
         getOxmAttributes(uebPayload, oxmJaxbContext, oxmEntityType, entityType, "searchable");
