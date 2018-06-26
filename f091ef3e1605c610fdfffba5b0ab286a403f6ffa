@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a93c517_40d015c9",
+        "filename": "src/main/java/org/onap/aai/datarouter/util/SearchServiceAgent.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 345,
+      "author": {
+        "id": 703
+      },
+      "writtenOn": "2018-06-26T09:52:05Z",
+      "side": 1,
+      "message": "Safer to declare both readers explicitly in the try-with-resources block, e.g.\n\ntry (InputStreamReader isr \u003d new InputStreamReader(EntityEventPolicy.class.getClassLoader().getResourceAsStream(\"/\" + filename), StandardCharsets.UTF_8); BufferedReader br \u003d new BufferedReader(isr)) {...}\n\nThis way, the close() method is guaranteed to be called on both readers in case where an exception is thrown from br\u0027s constructor.",
+      "range": {
+        "startLine": 342,
+        "startChar": 0,
+        "endLine": 345,
+        "endChar": 7
+      },
+      "revId": "f091ef3e1605c610fdfffba5b0ab286a403f6ffa",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
