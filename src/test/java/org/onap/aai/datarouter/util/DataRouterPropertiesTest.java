@@ -3,13 +3,13 @@
  * org.onap.aai
  * ================================================================================
  * Copyright © 2017-2018 AT&T Intellectual Property. All rights reserved.
- * Copyright © 2017-2018 Amdocs
+ * Copyright © 2017-2018 Nokia
  * ================================================================================
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,14 +20,43 @@
  */
 package org.onap.aai.datarouter.util;
 
+import java.io.File;
+import java.net.URISyntaxException;
+import org.junit.Assert;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
+/**
+ * @author Bogumil Zebek
+ */
 public class DataRouterPropertiesTest {
 
     @Test
-    public void testGet(){
-        DataRouterProperties.get("key");
+    public void shouldLoadDataRouterPropertiesProperlyWhenSpecifiedFileExists() throws URISyntaxException {
+        // given
+        ClassLoader classLoader = getClass().getClassLoader();
+
+        File file = new File(
+            classLoader.getResource("data-router.properties").getFile()
+        );
+
+        // when
+        DataRouterProperties.loadProperties(file);
+
+        //then
+        Assert.assertEquals("value1", DataRouterProperties.get("key1"));
+        Assert.assertEquals("value2", DataRouterProperties.get("key2"));
+        Assert.assertNull(DataRouterProperties.get("nonExistingKey"));
+    }
+
+    @Test
+    public void shouldCreateEmptyDataRouterPropertiesContainerWhenSpecifiedFileDoesNotExist() {
+        // given
+        File nonExistingFile = new File("nonExistingFile.properties");
+
+        // when
+        DataRouterProperties.loadProperties(nonExistingFile);
+
+        // then
+        Assert.assertNull(DataRouterProperties.get("key"));
     }
 }
