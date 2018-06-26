@@ -22,6 +22,30 @@
       "revId": "f091ef3e1605c610fdfffba5b0ab286a403f6ffa",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a93c517_e0de01da",
+        "filename": "src/main/java/org/onap/aai/datarouter/util/SearchServiceAgent.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 345,
+      "author": {
+        "id": 3433
+      },
+      "writtenOn": "2018-06-26T10:16:54Z",
+      "side": 1,
+      "message": "You are right. Fixed.",
+      "parentUuid": "5a93c517_40d015c9",
+      "range": {
+        "startLine": 342,
+        "startChar": 0,
+        "endLine": 345,
+        "endChar": 7
+      },
+      "revId": "f091ef3e1605c610fdfffba5b0ab286a403f6ffa",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }
