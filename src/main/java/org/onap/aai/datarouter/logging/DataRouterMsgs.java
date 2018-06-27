@@ -153,13 +153,6 @@ public enum DataRouterMsgs implements LogMessageEnum {
   
   INVALID_OXM_DIR,
   LOAD_OXM_ERROR,
-  /**
-   * Successfully loaded schema: {0}
-   *
-   * <p>Arguments:
-   * {0} = oxm filename
-   */
-  LOADED_OXM_FILE,
   
   /**
    * Arguments: {0} = origin payload
@@ -194,10 +187,7 @@ public enum DataRouterMsgs implements LogMessageEnum {
   READING_JSON_SCHEMA_ERROR,
   
   /** Arguments: {0} = Error message */
-  JSON_CONVERSION_ERROR,
-
-  /** Failed to load the schemaIngest.properties file */
-  SCHEMA_INGEST_LOAD_ERROR;
+  JSON_CONVERSION_ERROR;
   
   /**
    * Static initializer to ensure the resource bundles for this class are loaded...

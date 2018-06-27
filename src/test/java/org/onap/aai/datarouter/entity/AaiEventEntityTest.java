@@ -22,7 +22,7 @@ package org.onap.aai.datarouter.entity;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.onap.aai.datarouter.util.CrossEntityReference;
+import org.onap.aai.util.CrossEntityReference;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -93,34 +93,6 @@ public class AaiEventEntityTest {
         entity.setId("id-1");
         entity.setLink("link-1");
         Assert.assertNotNull(entity.toString());
-    }
-
-    @Test
-    public void testOxmEntityDescriptor(){
-        OxmEntityDescriptor descriptor = new OxmEntityDescriptor();
-        descriptor.setEntityName("entity-1");
-        Assert.assertEquals(descriptor.getEntityName(), "entity-1");
-
-        descriptor.setPrimaryKeyAttributeName(new ArrayList<String>());
-        Assert.assertTrue(descriptor.getPrimaryKeyAttributeName().size()==0);
-
-        Assert.assertFalse(descriptor.hasSearchableAttributes());
-
-        List<String> searchableAttr = new ArrayList<String>();
-        searchableAttr.add("search");
-        descriptor.setSearchableAttributes(searchableAttr);
-        Assert.assertTrue(descriptor.getSearchableAttributes().size()==1);
-
-        Assert.assertTrue(descriptor.hasSearchableAttributes());
-
-        CrossEntityReference ref = new CrossEntityReference();
-        descriptor.setCrossEntityReference(ref);
-        Assert.assertEquals(descriptor.getCrossEntityReference(), ref);
-
-        descriptor.setSuggestableEntity(true);
-        Assert.assertTrue(descriptor.isSuggestableEntity());
-
-        Assert.assertNotNull(descriptor.toString());
     }
 
     @Test

@@ -28,14 +28,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.camel.Exchange;
-import org.onap.aai.datarouter.entity.OxmEntityDescriptor;
 import org.onap.aai.datarouter.entity.SpikeEventMeta;
 import org.onap.aai.datarouter.entity.SuggestionSearchEntity;
 import org.onap.aai.datarouter.logging.EntityEventPolicyMsgs;
-import org.onap.aai.datarouter.util.EntityOxmReferenceHelper;
 import org.onap.aai.datarouter.util.SearchSuggestionPermutation;
-import org.onap.aai.datarouter.util.Version;
-import org.onap.aai.datarouter.util.VersionedOxmEntities;
+import org.onap.aai.entity.OxmEntityDescriptor;
+import org.onap.aai.util.EntityOxmReferenceHelper;
+import org.onap.aai.util.Version;
+import org.onap.aai.util.VersionedOxmEntities;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
