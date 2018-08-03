@@ -1,0 +1,14 @@
+{
+	"validationId": "b65a3abf-c95a-4917-bf70-50f588dc4c09",
+	"validationTimestamp": "20180531T161324Z",
+	"modelVersionId": "e9851a43-c068-4eb2-9fe7-2d123bd94ff0",
+	"modelInvariantId": "4fd21763-23ed-4f69-8654-e121626df327",
+	"serviceInstanceId": "b06270ab-99e6-4a58-9bc0-db2df5c36f4d",
+	"violationId": "596314f8158658eed4e12991b87409e21b57818cd62c2e6da4c42a61b3b9c29c",
+	"violationTimestamp": "20180724T161324Z",
+	"category": "INVALID_VALUE",
+	"severity": "CRITICAL",
+	"violationType": "Rule",
+	"validationRule": "Default rule: Validate that vnf-type AAI VF instance matches vnf-type in SDN-C",
+	"message": "The vnf-type AAI VF instance does not match vnf-type in SDN-C"
+}

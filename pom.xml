@@ -38,10 +38,10 @@ limitations under the License.
       <camel-spring-boot.version>2.20.0</camel-spring-boot.version>
       <docker.location>${basedir}/target</docker.location>
       <absoluteDistFilesRoot>/appl/${project.artifactId}</absoluteDistFilesRoot>
-      <!-- For NO Versioning, REMOVE the /${project.version} from the <distFilesRoot> 
-         property, below. PLEASE, NOTE: If your ${project.version} is a "-SNAPSHOT" 
-         version, THIS will be used as your directory structure. If you do NOT want 
-         this, simply remove the "-SNAPSHOT" from your <version> declaration at the 
+      <!-- For NO Versioning, REMOVE the /${project.version} from the <distFilesRoot>
+         property, below. PLEASE, NOTE: If your ${project.version} is a "-SNAPSHOT"
+         version, THIS will be used as your directory structure. If you do NOT want
+         this, simply remove the "-SNAPSHOT" from your <version> declaration at the
          top of pom.xml -->
       <distFilesRoot>/appl/${project.artifactId}/${project.version}</distFilesRoot>
       <!-- For SOA Cloud Installation -->
@@ -49,8 +49,8 @@ limitations under the License.
       <installOwnerGroup>aaiadmin</installOwnerGroup>
       <ownerManagementGroup>com.att.csid.lab</ownerManagementGroup>
 
-      <!-- Port Selection. A value of 0 will allow for dynamic port selection. 
-         For local testing, you may choose to hardcode this value to something like 
+      <!-- Port Selection. A value of 0 will allow for dynamic port selection.
+         For local testing, you may choose to hardcode this value to something like
          8080 -->
       <serverPort>0</serverPort>
       <sslport>9502</sslport>
@@ -232,7 +232,14 @@ limitations under the License.
         <version>${version.com.google.guava}</version>
       </dependency>
 
+      <dependency>
+         <groupId>com.att.nsa</groupId>
+         <artifactId>cambriaClient</artifactId>
+         <version>1.2.1-oss</version>
+     </dependency>
+
    </dependencies>
+
 
    <build>
       <finalName>${project.artifactId}</finalName>
@@ -360,7 +367,7 @@ limitations under the License.
             </configuration>
          </plugin>
          <!-- license plugin -->
-         <!-- Uncomment this to add a license header to every source file 
+         <!-- Uncomment this to add a license header to every source file
 	<plugin>
 		<groupId>com.mycila</groupId>
 		<artifactId>license-maven-plugin</artifactId>
@@ -424,6 +431,13 @@ limitations under the License.
                </execution>
             </executions>
          </plugin>
+          <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-surefire-plugin</artifactId>
+              <version>2.22.0</version>
+          </plugin>
+
+
 
       </plugins>
    </build>
