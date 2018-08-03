@@ -1,0 +1,336 @@
+{
+  "validationId": "f825a232-b95b-425e-8ab0-bad4b913f770",
+  "validationTimestamp": "20180726T130520Z",
+  "entityType": "poa-entity",
+  "resourceVersion": null,
+  "violations": [
+    {
+      "severity": "CRITICAL",
+      "modelName": null,
+      "violationType": "Rule",
+      "validationRule": "Verify AAI nf-naming-code",
+      "violationDetails": {
+        "context-list.aai.vf-list[*]": [
+          {
+            "vnfc-list": [],
+            "name": "USBBBBmtwnjVVHP058",
+            "type": "HP",
+            "vf-module-list": [
+              {
+                "min-instances": 0,
+                "max-instances": 1,
+                "uuid": "null",
+                "invariant-id": "null"
+              }
+            ]
+          }
+        ]
+      },
+      "errorMessage": "The nf-naming-code is not populated in AAI VNF instance",
+      "category": "INVALID_VALUE",
+      "violationId": "b3ebe9ed846d3e1b07aad757cdd07cbec9d7012cab88d86889805b964cb70693"
+    },
+    {
+      "severity": "INFO",
+      "modelName": null,
+      "violationType": "Rule",
+      "validationRule": "port-mirroring-AAI-vnfc-type-exists-in-SDC-SUCCESS",
+      "violationDetails": {
+        "context-list.aai.vf-list[*]": [
+          {
+            "vnfc-list": [],
+            "name": "USBBBBmtwnjVVHP058",
+            "type": "HP",
+            "vf-module-list": [
+              {
+                "min-instances": 0,
+                "max-instances": 1,
+                "uuid": "null",
+                "invariant-id": "null"
+              }
+            ]
+          }
+        ],
+        "context-list.sdc.vf-list[*]": [
+          {
+            "vnfc-list": [
+              {
+                "name": "IP_Mux_Demux",
+                "uuid": "85311c4a-e105-450e-9e54-756e9a3b3354",
+                "invariant-id": "ae2cbc96-5094-4fe6-9bd0-f87c56a92576"
+              }
+            ],
+            "name": "Pri_IP_Mux_Demux_7-27 0",
+            "type": "org.openecomp.resource.vf.IpMuxDemux727",
+            "uuid": "166c8608-a448-4413-8768-44bb2611f44b",
+            "invariant-id": "302b5f0c-f0c7-458e-a9f6-a4e49d40eba9",
+            "vf-module-list": []
+          },
+          {
+            "vnfc-list": [
+              {
+                "name": "TEST",
+                "uuid": "14f2ee54-dc70-4193-af20-6c726897d3fa",
+                "invariant-id": "988b7048-4f46-4938-b6fd-b4e7ee1aec09"
+              }
+            ],
+            "name": "vHNF for SNIRO 0",
+            "type": "org.openecomp.resource.vf.VhnfForSniro",
+            "uuid": "68c00070-7f27-433b-b344-3b743e969039",
+            "invariant-id": "0c1522b2-fcd6-4718-8610-ed243ebb4659",
+            "vf-module-list": [
+              {
+                "min-instances": 1,
+                "max-instances": 1,
+                "uuid": "1b6ccf7b-6217-45f7-a193-9f05422ddf35",
+                "invariant-id": "e428d1d8-3260-4ba8-9ca6-c400ee3ca085"
+              }
+            ]
+          },
+          {
+            "vnfc-list": [
+              {
+                "name": "Tunnel_XConn",
+                "uuid": "85311c4a-e105-450e-9e54-756e9a3b3354",
+                "invariant-id": "ae2cbc96-5094-4fe6-9bd0-f87c56a92576"
+              }
+            ],
+            "name": "Pri_Tunnel_XConn_7-27 0",
+            "type": "org.openecomp.resource.vf.TunnelXconn727",
+            "uuid": "1c05f81c-e2f1-4480-946e-56b01d8ef368",
+            "invariant-id": "d7db10ac-ed6e-456b-a57a-509384a3d70c",
+            "vf-module-list": []
+          },
+          {
+            "vnfc-list": [
+              {
+                "name": "Tunnel_XConn",
+                "uuid": "85311c4a-e105-450e-9e54-756e9a3b3354",
+                "invariant-id": "ae2cbc96-5094-4fe6-9bd0-f87c56a92576"
+              }
+            ],
+            "name": "Sec_Tunnel_XConn_7-27 1",
+            "type": "org.openecomp.resource.vf.TunnelXconn727",
+            "uuid": "1c05f81c-e2f1-4480-946e-56b01d8ef368",
+            "invariant-id": "d7db10ac-ed6e-456b-a57a-509384a3d70c",
+            "vf-module-list": []
+          },
+          {
+            "vnfc-list": [
+              {
+                "name": "service_admin",
+                "uuid": "85311c4a-e105-450e-9e54-756e9a3b3354",
+                "invariant-id": "ae2cbc96-5094-4fe6-9bd0-f87c56a92576"
+              }
+            ],
+            "name": "Sec_service_admin_7-27 1",
+            "type": "org.openecomp.resource.vf.ServiceAdmin727",
+            "uuid": "a02eaa28-62af-47ee-aac2-e66079a91a4d",
+            "invariant-id": "d39bf435-c760-4d42-9882-65371db9c7bb",
+            "vf-module-list": []
+          },
+          {
+            "vnfc-list": [
+              {
+                "name": "IP_Mux_Demux",
+                "uuid": "85311c4a-e105-450e-9e54-756e9a3b3354",
+                "invariant-id": "ae2cbc96-5094-4fe6-9bd0-f87c56a92576"
+              }
+            ],
+            "name": "Sec_IP_Mux_Demux_7-27 1",
+            "type": "org.openecomp.resource.vf.IpMuxDemux727",
+            "uuid": "166c8608-a448-4413-8768-44bb2611f44b",
+            "invariant-id": "302b5f0c-f0c7-458e-a9f6-a4e49d40eba9",
+            "vf-module-list": []
+          },
+          {
+            "vnfc-list": [
+              {
+                "name": "service_admin",
+                "uuid": "85311c4a-e105-450e-9e54-756e9a3b3354",
+                "invariant-id": "ae2cbc96-5094-4fe6-9bd0-f87c56a92576"
+              }
+            ],
+            "name": "Pri_service_admin_7-27 0",
+            "type": "org.openecomp.resource.vf.ServiceAdmin727",
+            "uuid": "a02eaa28-62af-47ee-aac2-e66079a91a4d",
+            "invariant-id": "d39bf435-c760-4d42-9882-65371db9c7bb",
+            "vf-module-list": []
+          }
+        ]
+      },
+      "errorMessage": "Every vnfc type specified in sdc has been created in AAI",
+      "category": "SUCCESS",
+      "violationId": "bfe9ba434a231a0bd263f0753c517fc503639fc5210847f61c591e98e6dafbfa"
+    }
+  ],
+  "entityId": {
+
+  },
+  "entityLink": "",
+  "entity": {
+    "poa-event": {
+      "serviceType": "HNPORTAL",
+      "modelVersionId": "f8cd30d9-6583-4cc9-8b41-48ca67689ba1",
+      "modelInvariantId": "b4b1177c-4b1f-48b9-85fd-a57804df88ce",
+      "customerId": "21014aa2-526b-11e6-beb8-9e71128cae77",
+      "serviceInstanceId": "6133b7a8-da74-40c5-8a67-b458e0c0beb7",
+      "xTransactionId": "2309039=x",
+      "xFromAppId": "Data-Router"
+    },
+    "context-list": {
+      "sdc": {
+        "vf-list": [
+          {
+            "vnfc-list": [
+              {
+                "name": "IP_Mux_Demux",
+                "uuid": "85311c4a-e105-450e-9e54-756e9a3b3354",
+                "invariant-id": "ae2cbc96-5094-4fe6-9bd0-f87c56a92576"
+              }
+            ],
+            "name": "Pri_IP_Mux_Demux_7-27 0",
+            "type": "org.openecomp.resource.vf.IpMuxDemux727",
+            "uuid": "166c8608-a448-4413-8768-44bb2611f44b",
+            "invariant-id": "302b5f0c-f0c7-458e-a9f6-a4e49d40eba9",
+            "vf-module-list": []
+          },
+          {
+            "vnfc-list": [
+              {
+                "name": "TEST",
+                "uuid": "14f2ee54-dc70-4193-af20-6c726897d3fa",
+                "invariant-id": "988b7048-4f46-4938-b6fd-b4e7ee1aec09"
+              }
+            ],
+            "name": "vHNF for SNIRO 0",
+            "type": "org.openecomp.resource.vf.VhnfForSniro",
+            "uuid": "68c00070-7f27-433b-b344-3b743e969039",
+            "invariant-id": "0c1522b2-fcd6-4718-8610-ed243ebb4659",
+            "vf-module-list": [
+              {
+                "min-instances": 1,
+                "max-instances": 1,
+                "uuid": "1b6ccf7b-6217-45f7-a193-9f05422ddf35",
+                "invariant-id": "e428d1d8-3260-4ba8-9ca6-c400ee3ca085"
+              }
+            ]
+          },
+          {
+            "vnfc-list": [
+              {
+                "name": "Tunnel_XConn",
+                "uuid": "85311c4a-e105-450e-9e54-756e9a3b3354",
+                "invariant-id": "ae2cbc96-5094-4fe6-9bd0-f87c56a92576"
+              }
+            ],
+            "name": "Pri_Tunnel_XConn_7-27 0",
+            "type": "org.openecomp.resource.vf.TunnelXconn727",
+            "uuid": "1c05f81c-e2f1-4480-946e-56b01d8ef368",
+            "invariant-id": "d7db10ac-ed6e-456b-a57a-509384a3d70c",
+            "vf-module-list": []
+          },
+          {
+            "vnfc-list": [
+              {
+                "name": "Tunnel_XConn",
+                "uuid": "85311c4a-e105-450e-9e54-756e9a3b3354",
+                "invariant-id": "ae2cbc96-5094-4fe6-9bd0-f87c56a92576"
+              }
+            ],
+            "name": "Sec_Tunnel_XConn_7-27 1",
+            "type": "org.openecomp.resource.vf.TunnelXconn727",
+            "uuid": "1c05f81c-e2f1-4480-946e-56b01d8ef368",
+            "invariant-id": "d7db10ac-ed6e-456b-a57a-509384a3d70c",
+            "vf-module-list": []
+          },
+          {
+            "vnfc-list": [
+              {
+                "name": "service_admin",
+                "uuid": "85311c4a-e105-450e-9e54-756e9a3b3354",
+                "invariant-id": "ae2cbc96-5094-4fe6-9bd0-f87c56a92576"
+              }
+            ],
+            "name": "Sec_service_admin_7-27 1",
+            "type": "org.openecomp.resource.vf.ServiceAdmin727",
+            "uuid": "a02eaa28-62af-47ee-aac2-e66079a91a4d",
+            "invariant-id": "d39bf435-c760-4d42-9882-65371db9c7bb",
+            "vf-module-list": []
+          },
+          {
+            "vnfc-list": [
+              {
+                "name": "IP_Mux_Demux",
+                "uuid": "85311c4a-e105-450e-9e54-756e9a3b3354",
+                "invariant-id": "ae2cbc96-5094-4fe6-9bd0-f87c56a92576"
+              }
+            ],
+            "name": "Sec_IP_Mux_Demux_7-27 1",
+            "type": "org.openecomp.resource.vf.IpMuxDemux727",
+            "uuid": "166c8608-a448-4413-8768-44bb2611f44b",
+            "invariant-id": "302b5f0c-f0c7-458e-a9f6-a4e49d40eba9",
+            "vf-module-list": []
+          },
+          {
+            "vnfc-list": [
+              {
+                "name": "service_admin",
+                "uuid": "85311c4a-e105-450e-9e54-756e9a3b3354",
+                "invariant-id": "ae2cbc96-5094-4fe6-9bd0-f87c56a92576"
+              }
+            ],
+            "name": "Pri_service_admin_7-27 0",
+            "type": "org.openecomp.resource.vf.ServiceAdmin727",
+            "uuid": "a02eaa28-62af-47ee-aac2-e66079a91a4d",
+            "invariant-id": "d39bf435-c760-4d42-9882-65371db9c7bb",
+            "vf-module-list": []
+          }
+        ],
+        "service": {
+          "name": "SD-WAN_7-27",
+          "uuid": "f8cd30d9-6583-4cc9-8b41-48ca67689ba1",
+          "invariant-id": "b4b1177c-4b1f-48b9-85fd-a57804df88ce"
+        }
+      },
+      "sdnc": {
+        "vf-list": [
+          {
+            "vnfc-list": [],
+            "name": "null",
+            "type": "null",
+            "uuid": "null",
+            "invariant-id": "null",
+            "vf-module-list": []
+          }
+        ],
+        "service": {
+          "name": "null",
+          "uuid": "null",
+          "invariant-id": "null"
+        }
+      },
+      "aai": {
+        "vf-list": [
+          {
+            "vnfc-list": [],
+            "name": "USBBBBmtwnjVVHP058",
+            "type": "HP",
+            "vf-module-list": [
+              {
+                "min-instances": 0,
+                "max-instances": 1,
+                "uuid": "null",
+                "invariant-id": "null"
+              }
+            ]
+          }
+        ],
+        "service": {
+          "uuid": "f8cd30d9-6583-4cc9-8b41-48ca67689ba1",
+          "invariant-id": "b4b1177c-4b1f-48b9-85fd-a57804df88ce"
+        }
+      }
+    }
+  }
+}
