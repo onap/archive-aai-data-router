@@ -1,5 +1,5 @@
 /**
- * ﻿============LICENSE_START=======================================================
+ * ============LICENSE_START=======================================================
  * org.onap.aai
  * ================================================================================
  * Copyright © 2017-2018 AT&T Intellectual Property. All rights reserved.
@@ -53,6 +53,10 @@ public class DataRouterProperties {
 
     public static String get(String key) {
         return properties.getProperty(key);
+    }
+
+    public static String get(String key, String defaultValue) {
+        return properties.getProperty(key, defaultValue);
     }
 
 }
