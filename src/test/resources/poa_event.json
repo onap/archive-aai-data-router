@@ -1,0 +1,18 @@
+{
+  "serviceInstanceList": [
+  {
+    "serviceInstanceId": "24602405-7714-4c64-81da-9e182a3eba59",
+    "modelVersionId": "2f836857-d399-4de3-a6f8-e4a09d3017eb",
+    "modelInvariantId": "8c383ba3-20c3-4196-b092-c8c007ef7ddc",
+    "serviceType": "Mobility",
+    "customerId": "some.customer.id1"
+  },
+  {
+    "serviceInstanceId": "1111-744444-4c64-81da-9e182a3eba59",
+    "modelVersionId": "3333dfef836857-d399-4de3-a6f8-e4a09d3017eb",
+    "modelInvariantId": "7c5tba-20c3-4196-b092-c8c007ef7ddc",
+    "serviceType": "some.service.type",
+    "customerId": "some.customer.id2"
+  }
+  ]
+}
