@@ -38,8 +38,7 @@ import org.onap.aai.datarouter.util.SearchSuggestionPermutation;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-public class SuggestionSearchEntity implements DocumentStoreDataEntity, Serializable {
-  private static final long serialVersionUID = -3636393943669310760L;
+public class SuggestionSearchEntity implements DocumentStoreDataEntity {
 
   private static final String FILTER_ID = "filterId";
   private static final String FILTER_VALUE = "filterValue";
