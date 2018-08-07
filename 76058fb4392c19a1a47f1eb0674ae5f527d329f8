@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_6509e82b",
+        "filename": "src/main/java/org/onap/aai/datarouter/entity/POAServiceInstanceEntity.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2018-08-07T14:00:38Z",
+      "side": 1,
+      "message": "Move this check out of the try/catch block so it is not immediately caught and re-thrown.\n\nMaybe the payload should be attached to the exception, or at least logged so that it can be debugged?",
+      "revId": "76058fb4392c19a1a47f1eb0674ae5f527d329f8",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_c52b1c81",
+        "filename": "src/main/java/org/onap/aai/datarouter/event/EventPublisher.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2018-08-07T14:00:38Z",
+      "side": 1,
+      "message": "Long \u003d\u003e long?  Also, the l suffix looks too much like 1; either leave it off (not necessary here) or use L",
+      "revId": "76058fb4392c19a1a47f1eb0674ae5f527d329f8",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_45370ce4",
+        "filename": "src/main/java/org/onap/aai/datarouter/event/POAAuditEvent.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2018-08-07T14:00:38Z",
+      "side": 1,
+      "message": "Personally I don\u0027t think business rules like this belong in POJOs (model layer) - they should be in the service/controller layer.",
+      "revId": "76058fb4392c19a1a47f1eb0674ae5f527d329f8",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_e54ad854",
+        "filename": "src/main/java/org/onap/aai/datarouter/policy/ServiceIntegrityValidationPolicy.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2018-08-07T14:00:38Z",
+      "side": 1,
+      "message": "Exceeding the 120 column limit throughout this class",
+      "revId": "76058fb4392c19a1a47f1eb0674ae5f527d329f8",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
