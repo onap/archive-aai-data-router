@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_23e511a8",
+        "filename": "src/main/java/org/onap/aai/datarouter/event/EventPublisher.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 453
+      },
+      "writtenOn": "2018-08-10T20:27:22Z",
+      "side": 1,
+      "message": "This class explicitly instantiates a publisher of type DMaaPEventPublisher.  This introduces a build-time dependency on DMaaP which would prevent the data-router from working with another back-end message bus technologies.\n\nThe goal of the event-client library is to remove this type of build-time dependency.  In fact, you shouldn\u0027t need this file at all.  If you instantiate the DMaaPEventPublisher via a beans.xml file, you will remove the build-time dependency and allow run-time configuration to specify which type of producer to use (DmaaP, Kafka, RabbitMQ, etc).\n\nHave a look at how this is done for the EntityEventPolicy.  You can find an example of how a DMaapEventConsumer is instantiated via a beans file here:\n\nhttps://gerrit.onap.org/r/gitweb?p\u003daai/test-config.git;a\u003dblob;f\u003ddata-router/dynamic/conf/entity-event-policy.xml;h\u003dccd6648bf6acaf4ee7061e3a78726ae00d96698f;hb\u003dHEAD",
+      "revId": "ac3299721677a1e790df359b27834fbd247c2a53",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
