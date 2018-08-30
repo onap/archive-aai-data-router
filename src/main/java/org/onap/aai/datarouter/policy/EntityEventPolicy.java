@@ -96,16 +96,16 @@ public class EntityEventPolicy implements Processor {
 
   /** Agent for communicating with the Search Service. */
   private SearchServiceAgent searchAgent = null;
-  
+
   /** Search index name for storing AAI event entities. */
   private String entitySearchIndex;
 
   /** Search index name for storing topographical search data. */
   private String topographicalSearchIndex;
-  
+
   /** Search index name for suggestive search data. */
   private String aggregateGenericVnfIndex;
-  
+
   private String autosuggestIndex;
 
   private String srcDomain;
@@ -130,7 +130,7 @@ public class EntityEventPolicy implements Processor {
     topographicalSearchIndex = config.getSearchTopographySearchIndex();
     aggregateGenericVnfIndex = config.getSearchAggregationVnfIndex();
     autosuggestIndex		 = config.getSearchEntityAutoSuggestIndex();
-       
+
     // Instantiate the agent that we will use for interacting with the Search Service.
     searchAgent = new SearchServiceAgent(config.getSearchCertName(),
                                          config.getSearchKeystore(),
@@ -171,11 +171,11 @@ public class EntityEventPolicy implements Processor {
   }
 
   public void startup() {
-    
+
     // Create the indexes in the search service if they do not already exist.
     searchAgent.createSearchIndex(entitySearchIndex, ENTITY_SEARCH_SCHEMA);
     searchAgent.createSearchIndex(topographicalSearchIndex, TOPOGRAPHICAL_SEARCH_SCHEMA);
-    
+
     logger.info(EntityEventPolicyMsgs.ENTITY_EVENT_POLICY_REGISTERED);
   }
 
@@ -207,7 +207,7 @@ public class EntityEventPolicy implements Processor {
     logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE, errorMsg, payload);
     setResponse(exchange, ResponseType.FAILURE, additionalInfo);
   }
-  
+
   @Override
   public void process(Exchange exchange) throws Exception {
 
@@ -230,7 +230,7 @@ public class EntityEventPolicy implements Processor {
       returnWithError(exchange, uebPayload, "Payload is missing " + EVENT_HEADER);
       return;
     }
-    
+
     JSONObject uebObjEntity = getUebContentAsJson(uebPayload, ENTITY_HEADER);
     if (uebObjEntity == null) {
       returnWithError(exchange, uebPayload, "Payload is missing " + ENTITY_HEADER);
@@ -392,14 +392,14 @@ public class EntityEventPolicy implements Processor {
      * NOTES:
      * 1. If the entity type is "customer", the below check will return true if any nested entityType
      * in that model could contain a CER based on the OXM model version that has been loaded.
-     * 2. For a DELETE operation on outer/parent entity (handled by the regular flow: 
+     * 2. For a DELETE operation on outer/parent entity (handled by the regular flow:
      * handleSearchServiceOperation()), ignore processing for cross-entity-reference under the
      * assumption that AAI will push down all required cascade-deletes for nested entities as well
      * 3. Handling the case where UEB events arrive out of order: CREATE customer is received before
      *  CREATE service-instance.
      */
 
-    if (!action.equalsIgnoreCase(ACTION_DELETE) && oxmEntities != null 
+    if (!action.equalsIgnoreCase(ACTION_DELETE) && oxmEntities != null
         && oxmEntities.entityModelContainsCrossEntityReference(topEntityType)) {
 
       // We know the model "can" contain a CER reference definition, let's process a bit more
@@ -409,10 +409,14 @@ public class EntityEventPolicy implements Processor {
 
       JSONObject entityJsonObject = getUebEntity(uebPayload);
 
-      JsonNode entityJsonNode = convertToJsonNode(entityJsonObject.toString());
-      
+      JsonNode entityJsonNode = null;
+
+      if(entityJsonObject != null) {
+          entityJsonNode = convertToJsonNode(entityJsonObject.toString());
+      }
+
       String parentEntityType = entityType;
-      
+
       String targetEntityUrl = entityLink;
 
       for (Map.Entry<String, CrossEntityReference> entry : crossEntityRefMap.entrySet()) {
@@ -432,18 +436,18 @@ public class EntityEventPolicy implements Processor {
         if (!foundNodes.isEmpty()) {
 
           for (JsonNode n : foundNodes) {
-            if ("customer".equalsIgnoreCase(parentEntityType)){  
+            if ("customer".equalsIgnoreCase(parentEntityType)){
               /*
                * NOTES:
                * 1. prepare to hand-create url for service-instance
                * 2. this will break if the URL structure for service-instance changes
                */
               if (n.has("service-type")){
-                targetEntityUrl += "/service-subscriptions/service-subscription/" 
-                    + RouterServiceUtil.getNodeFieldAsText(n, "service-type") 
+                targetEntityUrl += "/service-subscriptions/service-subscription/"
+                    + RouterServiceUtil.getNodeFieldAsText(n, "service-type")
                     + "/service-instances/service-instance/";
               }
-              
+
             }
 
             List<String> extractedParentEntityAttributeValues = new ArrayList<>();
@@ -457,24 +461,24 @@ public class EntityEventPolicy implements Processor {
 
             for (JsonNode targetEntityInstance : nestedTargetEntityInstances) {
               /*
-               * Now: 
-               * 1. build the AAIEntityType (IndexDocument) based on the extract entity 
+               * Now:
+               * 1. build the AAIEntityType (IndexDocument) based on the extract entity
                * 2. Get data from ES
-               * 3. Extract ETAG 
+               * 3. Extract ETAG
                * 4. Merge ES Doc + AAIEntityType + Extracted Parent Cross-Entity-Reference Values
-               * 5. Put data into ES with ETAG + updated doc 
+               * 5. Put data into ES with ETAG + updated doc
                */
 
               // Get the complete URL for target entity
               if (targetEntityInstance.has("link")) {   // nested SI has url mentioned
-                targetEntityUrl = RouterServiceUtil.getNodeFieldAsText(targetEntityInstance, 
+                targetEntityUrl = RouterServiceUtil.getNodeFieldAsText(targetEntityInstance,
                     "link");
-              } else if ("customer".equalsIgnoreCase(parentEntityType) && 
+              } else if ("customer".equalsIgnoreCase(parentEntityType) &&
                   targetEntityInstance.has("service-instance-id")){
-                targetEntityUrl += RouterServiceUtil.getNodeFieldAsText(targetEntityInstance, 
+                targetEntityUrl += RouterServiceUtil.getNodeFieldAsText(targetEntityInstance,
                     "service-instance-id");
               }
-                    
+
               OxmEntityDescriptor searchableDescriptor =
                   oxmEntities.getSearchableEntityDescriptor(cerDescriptor.getTargetEntityType());
 
@@ -609,7 +613,7 @@ public class EntityEventPolicy implements Processor {
     }
 
     OxmEntityDescriptor desc = rootDescriptor.get(entityType);
-    
+
     if (desc == null) {
       return Collections.emptyList();
     }
@@ -884,11 +888,11 @@ public class EntityEventPolicy implements Processor {
 
       if (HttpUtil.isHttpResponseClassSuccess(storedEntity.getResultCode())) {
         /*
-         * NOTES: aaiEventEntity (ie the nested entity) may contain a subset of properties of 
-         * the pre-existing object, 
+         * NOTES: aaiEventEntity (ie the nested entity) may contain a subset of properties of
+         * the pre-existing object,
          * so all we want to do is update the CER on the pre-existing object (if needed).
          */
-        
+
         List<String> etag = storedEntity.getHeaders().get(Headers.ETAG);
 
         if (etag != null && !etag.isEmpty()) {
@@ -897,7 +901,7 @@ public class EntityEventPolicy implements Processor {
           logger.error(EntityEventPolicyMsgs.NO_ETAG_AVAILABLE_FAILURE,
                   entitySearchIndex, entityId);
         }
-        
+
         ArrayList<JsonNode> sourceObject = new ArrayList<>();
         NodeUtils.extractObjectsByKey(
             NodeUtils.convertJsonStrToJsonNode(storedEntity.getResult()),
@@ -905,7 +909,7 @@ public class EntityEventPolicy implements Processor {
 
         if (!sourceObject.isEmpty()) {
           JsonNode node = sourceObject.get(0);
-          final String sourceCer = NodeUtils.extractFieldValueFromObject(node, 
+          final String sourceCer = NodeUtils.extractFieldValueFromObject(node,
               "crossEntityReferenceValues");
           String newCer = aaiEventEntity.getCrossReferenceEntityValues();
           boolean hasNewCer = true;
@@ -916,7 +920,7 @@ public class EntityEventPolicy implements Processor {
               hasNewCer = false;
             }
           }
-          
+
           if (hasNewCer){
             // Do the PUT with new CER
             ((ObjectNode)node).put("crossEntityReferenceValues", newCer);
@@ -943,13 +947,13 @@ public class EntityEventPolicy implements Processor {
   /**
    * Perform create, read, update or delete (CRUD) operation on search engine's suggestive search
    * index
-   * 
+   *
    * @param eventEntity Entity/data to use in operation
    * @param action The operation to perform
    * @param target Resource to perform the operation on
    * @param allowDeleteEvent Allow delete operation to be performed on resource
    */
-  protected void handleSearchServiceOperation(DocumentStoreDataEntity eventEntity, 
+  protected void handleSearchServiceOperation(DocumentStoreDataEntity eventEntity,
                                             String                  action,
                                             String                  index) {
     try {
@@ -983,7 +987,7 @@ public class EntityEventPolicy implements Processor {
       } else if (action.equalsIgnoreCase(ACTION_CREATE)) {
         // Write the entry to the search service.
         searchAgent.postDocument(index, eventEntity.getAsJson(), headers);
-        
+
       } else if (action.equalsIgnoreCase(ACTION_DELETE)) {
         // Run the GET to retrieve the ETAG from the search service
         OperationResult storedEntity = searchAgent.getDocument(index, entityId);
@@ -997,7 +1001,7 @@ public class EntityEventPolicy implements Processor {
             logger.error(EntityEventPolicyMsgs.NO_ETAG_AVAILABLE_FAILURE, index,
                 entityId);
           }
-          
+
           /*
            * The Spring-Boot version of the search-data-service rejects the DELETE operation unless
            * we specify a Content-Type.
@@ -1069,7 +1073,7 @@ public class EntityEventPolicy implements Processor {
   // put this here until we find a better spot
   /**
    * Helper utility to concatenate substrings of a URI together to form a proper URI.
-   * 
+   *
    * @param suburis the list of substrings to concatenate together
    * @return the concatenated list of substrings
    */
