@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_1da8131f",
+        "filename": "src/main/java/org/onap/aai/datarouter/policy/EntityEventPolicy.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 434,
+      "author": {
+        "id": 703
+      },
+      "writtenOn": "2018-08-30T09:21:48Z",
+      "side": 1,
+      "message": "More diligence is required.\n\nWith the above fix, this method will now throw a null pointer exception when entityJsonNode is null.\n\nI think we need to ask the question, does the rest of the method need to be executed at all if entityJsonObject is null? Or do we want to exit (possibly with an exception) instead?",
+      "range": {
+        "startLine": 434,
+        "startChar": 8,
+        "endLine": 434,
+        "endChar": 79
+      },
+      "revId": "fb8039e45dd4948e9356bb80bf2bb87c1eda55f1",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
