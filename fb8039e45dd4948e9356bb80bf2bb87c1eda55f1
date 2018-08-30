@@ -22,6 +22,29 @@
       "revId": "fb8039e45dd4948e9356bb80bf2bb87c1eda55f1",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_4ce25e30",
+        "filename": "src/main/java/org/onap/aai/datarouter/policy/EntityEventPolicy.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 434,
+      "author": {
+        "id": 2399
+      },
+      "writtenOn": "2018-08-30T13:01:32Z",
+      "side": 1,
+      "message": "I suggest removing initialization line#414 and adding this:\n\nif (entityJsonNode !\u003d null) {\nRouterServiceUtil.extractObjectsByKey(entityJsonNode, key, foundNodes);\n}",
+      "range": {
+        "startLine": 434,
+        "startChar": 8,
+        "endLine": 434,
+        "endChar": 22
+      },
+      "revId": "fb8039e45dd4948e9356bb80bf2bb87c1eda55f1",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }
