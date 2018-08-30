@@ -22,6 +22,30 @@
       "revId": "62668e30ad6e590133e12867f64263c3dbc1642f",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_2c47e2bd",
+        "filename": "src/main/java/org/onap/aai/datarouter/policy/EntityEventPolicy.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 412,
+      "author": {
+        "id": 3479
+      },
+      "writtenOn": "2018-08-30T13:48:18Z",
+      "side": 1,
+      "message": "fixed in patch 3.",
+      "parentUuid": "1a76adc5_ec91ea47",
+      "range": {
+        "startLine": 412,
+        "startChar": 6,
+        "endLine": 412,
+        "endChar": 37
+      },
+      "revId": "62668e30ad6e590133e12867f64263c3dbc1642f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }
