@@ -170,7 +170,7 @@ public class ServiceIntegrityValidationPolicy {
             formattedValidation.addProperty("modelName", validation.get("entity").getAsJsonObject().get("context-list").getAsJsonObject().get("sdc").getAsJsonObject().get("service").getAsJsonObject().get("name").getAsString());
             logger.debug("model name: " +  validation.get("entity").getAsJsonObject().get("context-list").getAsJsonObject().get("sdc").getAsJsonObject().get("service").getAsJsonObject().get("name").getAsString());
         }catch (NullPointerException ex){
-            ex.printStackTrace();
+        	logger.debug(ex.getMessage());
             formattedValidation.addProperty("modelName","");
         }
 
