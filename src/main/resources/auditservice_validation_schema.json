@@ -5,6 +5,8 @@
               {"name": "modelVersionId", "data-type": "string"},
               {"name": "modelInvariantId", "data-type": "string"},
               {"name": "serviceInstanceId", "data-type": "string"},
+              {"name": "requestId", "data-type": "string"},
+              {"name": "client", "data-type": "string"},
               {"name": "result", "data-type": "string"},
               {"name": "violations", "data-type": "nested", "sub-fields": [
                      {"name": "violationId", "data-type": "string", "searchable": "false"},
