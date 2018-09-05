@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_3042ba68",
+        "filename": "src/main/java/org/onap/aai/datarouter/policy/ServiceIntegrityValidationPolicy.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 3479
+      },
+      "writtenOn": "2018-09-05T21:27:23Z",
+      "side": 1,
+      "message": "Don\u0027t really know how the ValidationPolicy work, this is most likely already taken into account.  Thought I would mention it anyway.  \n\nThe \"X-FromAppId\" and \"X-TransactionId\" don\u0027t seem to align with what specify in the header, they are probably already converted to \"xFromAppId\" and \"xTransactionId\" at this point but just in case.",
+      "revId": "2299099253ccd39b923e10f707a0fe5decc4e534",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
