@@ -16,6 +16,24 @@
       "revId": "2299099253ccd39b923e10f707a0fe5decc4e534",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_3ca37101",
+        "filename": "src/main/java/org/onap/aai/datarouter/policy/ServiceIntegrityValidationPolicy.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 2015
+      },
+      "writtenOn": "2018-09-06T13:57:30Z",
+      "side": 1,
+      "message": "Yes. These attributes we extract from event itself which is pulled from message-router and this is how it is structured there by whoever creates the event. It is not taken from HTTP header directly",
+      "parentUuid": "1a76adc5_3042ba68",
+      "revId": "2299099253ccd39b923e10f707a0fe5decc4e534",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }
