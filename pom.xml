@@ -68,6 +68,7 @@ limitations under the License.
       <sonar.projectVersion>${project.version}</sonar.projectVersion>
       <logback.version>1.2.3</logback.version>
       <version.com.google.guava>16.0.1</version.com.google.guava>
+      <camel-spring-boot.version>2.22.0</camel-spring-boot.version>
    </properties>
 
    <dependencies>
@@ -93,7 +94,7 @@ limitations under the License.
       <dependency>
          <groupId>org.apache.camel</groupId>
          <artifactId>camel-core</artifactId>
-         <version>2.20.1</version>
+         <version>${camel-spring-boot.version}</version>
       </dependency>
       <dependency>
          <groupId>org.apache.camel</groupId>
@@ -102,7 +103,7 @@ limitations under the License.
       <dependency>
          <groupId>org.apache.camel</groupId>
          <artifactId>camel-cxf</artifactId>
-         <version>2.20.1</version>
+         <version>${camel-spring-boot.version}</version>
       </dependency>
       <!-- Spring dependencies -->
       <dependency>
