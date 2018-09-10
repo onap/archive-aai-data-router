@@ -165,6 +165,8 @@ public class ServiceIntegrityValidationPolicy {
         formattedValidation.addProperty("modelVersionId", validation.get("entity").getAsJsonObject().get("poa-event").getAsJsonObject().get("modelVersionId").getAsString());
         formattedValidation.addProperty("modelInvariantId", validation.get("entity").getAsJsonObject().get("poa-event").getAsJsonObject().get("modelInvariantId").getAsString());
         formattedValidation.addProperty("serviceInstanceId",validation.get("entity").getAsJsonObject().get("poa-event").getAsJsonObject().get("serviceInstanceId").getAsString());
+        formattedValidation.addProperty("requestId",validation.get("entity").getAsJsonObject().get("poa-event").getAsJsonObject().get("xTransactionId").getAsString());
+        formattedValidation.addProperty("client",validation.get("entity").getAsJsonObject().get("poa-event").getAsJsonObject().get("xFromAppId").getAsString());
 
         try {
             formattedValidation.addProperty("modelName", validation.get("entity").getAsJsonObject().get("context-list").getAsJsonObject().get("sdc").getAsJsonObject().get("service").getAsJsonObject().get("name").getAsString());
