@@ -34,8 +34,6 @@ public class POAServiceInstanceEntityTest {
         String svcInstanceId = "24602405-7714-4c64-81da-9e182a3eba59";
         String modelVersionId = "2f836857-d399-4de3-a6f8-e4a09d3017eb";
         String modelInvariantId = "8c383ba3-20c3-4196-b092-c8c007ef7ddc";
-        String  customerId =  "global-customer-01";
-        String  serviceType = "vFW";
         String xFromAppId ="REST-client";
         String xTransactionId = "aaa111cccc4444";
 
@@ -43,8 +41,6 @@ public class POAServiceInstanceEntityTest {
         svcEntity.setServiceInstanceId(svcInstanceId);
         svcEntity.setModelVersionId(modelVersionId);
         svcEntity.setModelInvariantId(modelInvariantId);
-        svcEntity.setCustomerId(customerId);
-        svcEntity.setServiceType(serviceType);
         svcEntity.setxFromAppId(xFromAppId);
         svcEntity.setxTransactionId(xTransactionId);
 
@@ -52,8 +48,6 @@ public class POAServiceInstanceEntityTest {
         Assert.assertEquals(modelVersionId, svcEntity.getModelVersionId());
         Assert.assertEquals(modelInvariantId, svcEntity.getModelInvariantId());
 
-        Assert.assertEquals(customerId, svcEntity.getCustomerId());
-        Assert.assertEquals(serviceType, svcEntity.getServiceType());
         Assert.assertEquals(xFromAppId, svcEntity.getxFromAppId());
         Assert.assertEquals(xTransactionId, svcEntity.getxTransactionId());
 
@@ -63,15 +57,11 @@ public class POAServiceInstanceEntityTest {
     public void testNullServiceInstanceId() throws POAAuditException {
         String modelVersionId = "2f836857-d399-4de3-a6f8-e4a09d3017eb";
         String modelInvariantId = "8c383ba3-20c3-4196-b092-c8c007ef7ddc";
-        String  customerId =  "global-customer-01";
-        String  serviceType = "vFW";
 
         POAServiceInstanceEntity  svcEntity= new POAServiceInstanceEntity();
         svcEntity.setServiceInstanceId(null);
         svcEntity.setModelVersionId(modelVersionId);
         svcEntity.setModelInvariantId(modelInvariantId);
-        svcEntity.setCustomerId(customerId);
-        svcEntity.setServiceType(serviceType);
 
         try  {
             svcEntity.validate();
@@ -85,15 +75,11 @@ public class POAServiceInstanceEntityTest {
     public void testEmptyServiceInstanceId() throws POAAuditException {
         String modelVersionId = "2f836857-d399-4de3-a6f8-e4a09d3017eb";
         String modelInvariantId = "8c383ba3-20c3-4196-b092-c8c007ef7ddc";
-        String  customerId =  "global-customer-01";
-        String  serviceType = "vFW";
 
         POAServiceInstanceEntity  svcEntity= new POAServiceInstanceEntity();
         svcEntity.setServiceInstanceId("");
         svcEntity.setModelVersionId(modelVersionId);
         svcEntity.setModelInvariantId(modelInvariantId);
-        svcEntity.setCustomerId(customerId);
-        svcEntity.setServiceType(serviceType);
 
         try  {
             svcEntity.validate();
@@ -107,16 +93,11 @@ public class POAServiceInstanceEntityTest {
     public void testNullModelVersionId() throws POAAuditException {
         String svcInstanceId = "24602405-7714-4c64-81da-9e182a3eba59";
         String modelInvariantId = "8c383ba3-20c3-4196-b092-c8c007ef7ddc";
-        String  customerId =  "global-customer-01";
-        String  serviceType = "vFW";
 
         POAServiceInstanceEntity  svcEntity= new POAServiceInstanceEntity();
         svcEntity.setServiceInstanceId(svcInstanceId);
         svcEntity.setModelVersionId(null);
         svcEntity.setModelInvariantId(modelInvariantId);
-        svcEntity.setCustomerId(customerId);
-        svcEntity.setServiceType(serviceType);
-
         try  {
             svcEntity.validate();
         } catch (POAAuditException e) {
@@ -128,15 +109,11 @@ public class POAServiceInstanceEntityTest {
     public void testEmptyModelVersionId() throws POAAuditException {
         String svcInstanceId = "24602405-7714-4c64-81da-9e182a3eba59";
         String modelInvariantId = "8c383ba3-20c3-4196-b092-c8c007ef7ddc";
-        String  customerId =  "global-customer-01";
-        String  serviceType = "vFW";
 
         POAServiceInstanceEntity  svcEntity= new POAServiceInstanceEntity();
         svcEntity.setServiceInstanceId(svcInstanceId);
         svcEntity.setModelVersionId("");
         svcEntity.setModelInvariantId(modelInvariantId);
-        svcEntity.setCustomerId(customerId);
-        svcEntity.setServiceType(serviceType);
 
         try  {
             svcEntity.validate();
@@ -150,15 +127,11 @@ public class POAServiceInstanceEntityTest {
     public void testNullModelInvariantId() throws POAAuditException {
         String svcInstanceId = "24602405-7714-4c64-81da-9e182a3eba59";
         String modelVersionId = "2f836857-d399-4de3-a6f8-e4a09d3017eb";
-        String  customerId =  "global-customer-01";
-        String  serviceType = "vFW";
 
         POAServiceInstanceEntity  svcEntity= new POAServiceInstanceEntity();
         svcEntity.setServiceInstanceId(svcInstanceId);
         svcEntity.setModelVersionId(modelVersionId);
         svcEntity.setModelInvariantId(null);
-        svcEntity.setCustomerId(customerId);
-        svcEntity.setServiceType(serviceType);
 
         try  {
             svcEntity.validate();
@@ -172,105 +145,11 @@ public class POAServiceInstanceEntityTest {
     public void testEmptyModelInvariantId() throws POAAuditException {
         String svcInstanceId = "24602405-7714-4c64-81da-9e182a3eba59";
         String modelVersionId = "2f836857-d399-4de3-a6f8-e4a09d3017eb";
-        String  customerId =  "global-customer-01";
-        String  serviceType = "vFW";
 
         POAServiceInstanceEntity  svcEntity= new POAServiceInstanceEntity();
         svcEntity.setServiceInstanceId(svcInstanceId);
         svcEntity.setModelVersionId(modelVersionId);
         svcEntity.setModelInvariantId("");
-        svcEntity.setCustomerId(customerId);
-        svcEntity.setServiceType(serviceType);
-
-        try  {
-            svcEntity.validate();
-        } catch (POAAuditException e) {
-            assertEquals(Status.BAD_REQUEST,  e.getHttpStatus());
-        }
-    }
-
-    @Test
-    public void testNullServiceType() throws POAAuditException {
-        String svcInstanceId = "24602405-7714-4c64-81da-9e182a3eba59";
-        String modelVersionId = "2f836857-d399-4de3-a6f8-e4a09d3017eb";
-        String modelInvariantId = "8c383ba3-20c3-4196-b092-c8c007ef7ddc";
-        String  customerId =  "global-customer-01";
-
-
-        POAServiceInstanceEntity  svcEntity= new POAServiceInstanceEntity();
-        svcEntity.setServiceInstanceId(svcInstanceId);
-        svcEntity.setModelVersionId(modelVersionId);
-        svcEntity.setModelInvariantId(modelInvariantId);
-        svcEntity.setCustomerId(customerId);
-        svcEntity.setServiceType(null);
-
-        try  {
-            svcEntity.validate();
-        } catch (POAAuditException e) {
-            assertEquals(Status.BAD_REQUEST,  e.getHttpStatus());
-        }
-    }
-
-
-    @Test
-    public void testEmptyServiceType() throws POAAuditException {
-        String svcInstanceId = "24602405-7714-4c64-81da-9e182a3eba59";
-        String modelVersionId = "2f836857-d399-4de3-a6f8-e4a09d3017eb";
-        String modelInvariantId = "8c383ba3-20c3-4196-b092-c8c007ef7ddc";
-        String  customerId =  "global-customer-01";
-
-
-        POAServiceInstanceEntity  svcEntity= new POAServiceInstanceEntity();
-        svcEntity.setServiceInstanceId(svcInstanceId);
-        svcEntity.setModelVersionId(modelVersionId);
-        svcEntity.setModelInvariantId(modelInvariantId);
-        svcEntity.setCustomerId(customerId);
-        svcEntity.setServiceType("");
-
-        try  {
-            svcEntity.validate();
-        } catch (POAAuditException e) {
-            assertEquals(Status.BAD_REQUEST,  e.getHttpStatus());
-        }
-    }
-
-
-    @Test
-    public void testNullCustomerId() throws POAAuditException {
-        String svcInstanceId = "24602405-7714-4c64-81da-9e182a3eba59";
-        String modelVersionId = "2f836857-d399-4de3-a6f8-e4a09d3017eb";
-        String modelInvariantId = "8c383ba3-20c3-4196-b092-c8c007ef7ddc";
-        String  serviceType = "vFW";
-
-        POAServiceInstanceEntity  svcEntity= new POAServiceInstanceEntity();
-        svcEntity.setServiceInstanceId(svcInstanceId);
-        svcEntity.setModelVersionId(modelVersionId);
-        svcEntity.setModelInvariantId(modelInvariantId);
-        svcEntity.setCustomerId(null);
-        svcEntity.setServiceType(serviceType);
-
-        try  {
-            svcEntity.validate();
-        } catch (POAAuditException e) {
-            assertEquals(Status.BAD_REQUEST,  e.getHttpStatus());
-        }
-    }
-
-
-    @Test
-    public void testEmptyCustomerId() throws POAAuditException {
-        String svcInstanceId = "24602405-7714-4c64-81da-9e182a3eba59";
-        String modelVersionId = "2f836857-d399-4de3-a6f8-e4a09d3017eb";
-        String modelInvariantId = "8c383ba3-20c3-4196-b092-c8c007ef7ddc";
-        String  serviceType = "vFW";
-
-        POAServiceInstanceEntity  svcEntity= new POAServiceInstanceEntity();
-        svcEntity.setServiceInstanceId(svcInstanceId);
-        svcEntity.setModelVersionId(modelVersionId);
-        svcEntity.setModelInvariantId(modelInvariantId);
-        svcEntity.setCustomerId("");
-        svcEntity.setServiceType(serviceType);
-
         try  {
             svcEntity.validate();
         } catch (POAAuditException e) {
