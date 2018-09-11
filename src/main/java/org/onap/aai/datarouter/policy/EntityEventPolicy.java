@@ -433,17 +433,18 @@ public class EntityEventPolicy implements Processor {
               if (!foundNodes.isEmpty()) {
 
                   for (JsonNode n : foundNodes) {
-                      if ("customer".equalsIgnoreCase(parentEntityType)) {
-                          /*
-                           * NOTES: 1. prepare to hand-create url for service-instance 2. this will break if the
-                           * URL structure for service-instance changes
-                           */
-                          if (n.has("service-type")) {
-                              targetEntityUrl += "/service-subscriptions/service-subscription/"
-                                      + RouterServiceUtil.getNodeFieldAsText(n, "service-type")
-                                      + "/service-instances/service-instance/";
-                          }
-                      }
+////pleigh ???
+//                      if ("customer".equalsIgnoreCase(parentEntityType)) {
+//                          /*
+//                           * NOTES: 1. prepare to hand-create url for service-instance 2. this will break if the
+//                           * URL structure for service-instance changes
+//                           */
+//                          if (n.has("service-type")) {
+//                              targetEntityUrl += "/service-subscriptions/service-subscription/"
+//                                      + RouterServiceUtil.getNodeFieldAsText(n, "service-type")
+//                                      + "/service-instances/service-instance/";
+//                          }
+//                      }
 
                       List<String> extractedParentEntityAttributeValues = new ArrayList<>();
 
