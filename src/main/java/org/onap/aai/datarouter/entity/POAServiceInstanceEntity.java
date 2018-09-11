@@ -36,20 +36,16 @@ import org.onap.aai.datarouter.service.AuditService;
 public class POAServiceInstanceEntity
 {
     private static final String ATTR_SERVICE_INST_ID = "serviceInstanceId";
-    private static final String ATTR_SERVICE_TYPE = "serviceType";
     private static final String ATTR_MODEL_VERSION_ID = "modelVersionId";
     private static final String ATTR_MODEL_INVARIANT_ID = "modelInvariantId";
-    private static final String ATTR_CUSTOMER_ID = "customerId";
 
     private static final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
 
     private String xFromAppId;
     private String xTransactionId;
     private String serviceInstanceId;
-    private String serviceType;
     private String modelVersionId;
     private String modelInvariantId;
-    private String customerId;
 
     private static Logger logger = LoggerFactory.getInstance().getLogger(POAServiceInstanceEntity.class.getName());
 
@@ -78,14 +74,6 @@ public class POAServiceInstanceEntity
         this.serviceInstanceId = serviceInstanceId;
     }
 
-    public String getServiceType() {
-        return serviceType;
-    }
-
-    public void setServiceType(String serviceType) {
-        this.serviceType = serviceType;
-    }
-
     public String getModelVersionId() {
         return modelVersionId;
     }
@@ -101,15 +89,6 @@ public class POAServiceInstanceEntity
     public void setModelInvariantId(String modelInvariantId) {
         this.modelInvariantId = modelInvariantId;
     }
-
-    public String getCustomerId() {
-        return customerId;
-    }
-
-    public void setCustomerId(String customerId) {
-        this.customerId = customerId;
-    }
-
 
     public String toJson() {
         return gson.toJson(this);
@@ -142,11 +121,6 @@ public class POAServiceInstanceEntity
             throw new POAAuditException(error, Status.BAD_REQUEST, DataRouterMsgs.BAD_REST_REQUEST, error);
         }
 
-        if(serviceType == null || serviceType.isEmpty()) {
-            String error = "Missing attribute: " + ATTR_SERVICE_TYPE;
-            throw new POAAuditException(error, Status.BAD_REQUEST, DataRouterMsgs.BAD_REST_REQUEST, error);
-        }
-
         if(modelVersionId == null || modelVersionId.isEmpty()) {
             String error = "Missing attribute: " + ATTR_MODEL_VERSION_ID;
             throw new POAAuditException(error, Status.BAD_REQUEST, DataRouterMsgs.BAD_REST_REQUEST, error);
@@ -157,17 +131,13 @@ public class POAServiceInstanceEntity
             throw new POAAuditException(error, Status.BAD_REQUEST, DataRouterMsgs.BAD_REST_REQUEST, error);
         }
 
-        if(customerId == null || customerId.isEmpty()) {
-            String error = "Missing attribute: " + ATTR_CUSTOMER_ID;
-            throw new POAAuditException(error, Status.BAD_REQUEST, DataRouterMsgs.BAD_REST_REQUEST, error);
-        }
     }
 
 
     @Override
     public String toString() {
         return "ServiceInstance [xFromAppId=" + xFromAppId + ", xTransactionId=" + xTransactionId
-                + ", serviceInstanceId=" + serviceInstanceId + ", serviceType=" + serviceType + ", modelVersionId="
-                + modelVersionId + ", modelInvariantId=" + modelInvariantId + ", customerId=" + customerId + "]";
+                + ", serviceInstanceId=" + serviceInstanceId + ", modelVersionId="
+                + modelVersionId + ", modelInvariantId=" + modelInvariantId + "]";
     }
 }
