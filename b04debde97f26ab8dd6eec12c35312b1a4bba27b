@@ -22,6 +22,30 @@
       "revId": "b04debde97f26ab8dd6eec12c35312b1a4bba27b",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_bae5250a",
+        "filename": "src/main/java/org/onap/aai/datarouter/policy/EntityEventPolicy.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 446,
+      "author": {
+        "id": 4353
+      },
+      "writtenOn": "2018-09-12T14:11:46Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "1a76adc5_0c6f502c",
+      "range": {
+        "startLine": 436,
+        "startChar": 20,
+        "endLine": 446,
+        "endChar": 23
+      },
+      "revId": "b04debde97f26ab8dd6eec12c35312b1a4bba27b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }
