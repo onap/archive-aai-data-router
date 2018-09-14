@@ -35,7 +35,7 @@ limitations under the License.
 
    <properties>
       <java.version>1.8</java.version>
-      <camel-spring-boot.version>2.20.1</camel-spring-boot.version>
+      <camel-spring-boot.version>2.21.1</camel-spring-boot.version>
       <docker.location>${basedir}/target</docker.location>
       <absoluteDistFilesRoot>/appl/${project.artifactId}</absoluteDistFilesRoot>
       <!-- For NO Versioning, REMOVE the /${project.version} from the <distFilesRoot>
