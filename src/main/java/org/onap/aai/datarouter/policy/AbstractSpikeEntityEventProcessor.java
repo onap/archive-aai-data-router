@@ -26,6 +26,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -903,6 +904,23 @@ public abstract class AbstractSpikeEntityEventProcessor implements Processor {
 
     return eventVertex;
 
+  }
+  
+  protected List<String> extractSuggestableAttr(VersionedOxmEntities oxmEntities, String entityType) {
+    // Extract suggestable attributeshandleTopographicalData
+    Map<String, OxmEntityDescriptor> rootDescriptor = oxmEntities.getSuggestableEntityDescriptors();
+
+    if (rootDescriptor == null) {
+      return Collections.emptyList();
+    }
+
+    OxmEntityDescriptor desc = rootDescriptor.get(entityType);
+
+    if (desc == null) {
+      return Collections.emptyList();
+    }
+
+    return desc.getSuggestableAttributes();
   }
   
 }

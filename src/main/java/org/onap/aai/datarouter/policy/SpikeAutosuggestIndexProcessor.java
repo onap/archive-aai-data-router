@@ -141,23 +141,6 @@ public class SpikeAutosuggestIndexProcessor extends AbstractSpikeEntityEventProc
     return;
   }
  
-  public List<String> extractSuggestableAttr(VersionedOxmEntities oxmEntities, String entityType) {
-    // Extract suggestable attributeshandleTopographicalData
-    Map<String, OxmEntityDescriptor> rootDescriptor = oxmEntities.getSuggestableEntityDescriptors();
-
-    if (rootDescriptor == null) {
-      return Collections.emptyList();
-    }
-
-    OxmEntityDescriptor desc = rootDescriptor.get(entityType);
-
-    if (desc == null) {
-      return Collections.emptyList();
-    }
-
-    return desc.getSuggestableAttributes();
-  }
-
 
   public List<String> extractAliasForSuggestableEntity(VersionedOxmEntities oxmEntities,
       String entityType) {
