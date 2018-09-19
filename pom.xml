@@ -67,7 +67,7 @@ limitations under the License.
       <sonar.jacoco.reportMissing.force.zero>false</sonar.jacoco.reportMissing.force.zero>
       <sonar.projectVersion>${project.version}</sonar.projectVersion>
       <logback.version>1.2.3</logback.version>
-      <version.com.google.guava>26.0-jre</version.com.google.guava>
+      <version.com.google.guava>16.0.1</version.com.google.guava>
    </properties>
 
    <dependencies>
