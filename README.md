@@ -1,5 +1,7 @@
 # Synapse Micro Service
 
+[![alt text](https://bestpractices.coreinfrastructure.org/projects/1737/badge)](https://bestpractices.coreinfrastructure.org/projects/1737)
+
 ## Overview
 The Synapse microservice (data router service) acts as a message broker between different sources of information and business logic within the context of AAI. The goal is to provide an extensible framework that can stitch sources of data and business logic together to satisfy use cases through configuration and minimal coding.
 
