@@ -21,16 +21,12 @@
 package org.onap.aai.datarouter.policy;
 
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.camel.Exchange;
 import org.onap.aai.datarouter.entity.SpikeAggregationEntity;
 import org.onap.aai.datarouter.entity.SpikeEventMeta;
 import org.onap.aai.datarouter.logging.EntityEventPolicyMsgs;
-import org.onap.aai.util.EntityOxmReferenceHelper;
-import org.onap.aai.util.Version;
-import org.onap.aai.util.VersionedOxmEntities;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -49,36 +45,25 @@ public class SpikeAggregateGenericVnfProcessor extends AbstractSpikeEntityEventP
     // Create the indexes in the search service if they do not already exist.
     searchAgent.createSearchIndex(searchIndexName, searchIndexSchema, createIndexUrl);
     logger.info(EntityEventPolicyMsgs.ENTITY_EVENT_POLICY_REGISTERED);
-    
   }
-  
+
   @Override
   public void process(Exchange exchange) throws Exception {
 
     long startTime = System.currentTimeMillis();
 
     SpikeEventMeta meta = processSpikeEvent(exchange);
-    
+
     if (meta == null) {
       return;
     }
 
     String oxmEntityType = getOxmEntityType(meta.getSpikeEventVertex().getType());
-    
-    VersionedOxmEntities oxmEntities =
-        EntityOxmReferenceHelper.getInstance().getVersionedOxmEntities(Version.valueOf(oxmVersion.toLowerCase()));
-    
-    List<String> suggestibleAttrInPayload = new ArrayList<>();
-    List<String> suggestibleAttrInOxm = extractSuggestableAttr(oxmEntities, meta.getSpikeEventVertex().getType());
-    if (suggestibleAttrInOxm != null) {
-      for (String attr: suggestibleAttrInOxm){
-        if (meta.getVertexProperties().has(attr)) {
-          suggestibleAttrInPayload.add(attr);
-        }
-      }
-    }
 
-    if (suggestibleAttrInPayload.isEmpty()) {
+    List<String> searchableAttr = getSearchableAttibutes(meta.getOxmJaxbContext(), oxmEntityType,
+        meta.getSpikeEventVertex().getType(), meta.getEventEntity().toString(), exchange);
+
+    if (searchableAttr == null) {
       return;
     }
 

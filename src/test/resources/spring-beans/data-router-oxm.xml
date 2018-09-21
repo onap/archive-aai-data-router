@@ -1,0 +1,14 @@
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://www.springframework.org/schema/beans" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd 
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+
+  <context:property-placeholder location="file:src/test/resources/config/schemaIngest.properties" ignore-unresolvable="true" />
+  
+  <bean id="schemaVersions" class="org.onap.aai.setup.SchemaVersions"/>
+  
+  <bean id="schemaLocationsBean" class="org.onap.aai.setup.SchemaLocationsBean"/>
+  
+</beans>

@@ -27,6 +27,7 @@ ENV CONFIG_HOME=${CONFIG_HOME}
 COPY data-router.jar $MICRO_HOME/
 COPY bundleconfig-local $MICRO_HOME/bundleconfig
 COPY bundleconfig-local/etc/logback.xml $MICRO_HOME/bundleconfig/etc
+COPY oxm $MICRO_HOME/
 
 
 EXPOSE 9502 9502

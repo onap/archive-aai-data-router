@@ -20,6 +20,9 @@
  */
 package org.onap.aai.datarouter.policy;
 
+import org.onap.aai.setup.SchemaLocationsBean;
+import org.onap.aai.setup.SchemaVersions;
+
 public class EntityEventPolicyConfig {
 
   private String sourceDomain;
@@ -33,6 +36,8 @@ public class EntityEventPolicyConfig {
   private String searchCertName;
   private String searchKeystorePwd;
   private String searchKeystore;
+  private SchemaVersions schemaVersions;
+  private SchemaLocationsBean schemaLocationsBean;
 
   
   public String getSourceDomain() {
@@ -121,5 +126,21 @@ public class EntityEventPolicyConfig {
   
   public void setSearchAggregationVnfIndex(String searchAggregationVnfIndex) {
       this.searchAggregationVnfIndex = searchAggregationVnfIndex;
+  }
+  
+  public SchemaVersions getSchemaVersions() {
+    return schemaVersions;
+  }
+  
+  public void setSchemaVersions(SchemaVersions schemaVersions) {
+    this.schemaVersions = schemaVersions;
+  }
+  
+  public SchemaLocationsBean getSchemaLocationsBean() {
+    return schemaLocationsBean;
+  }
+  
+  public void setSchemaLocationsBean(SchemaLocationsBean schemaLocationsBean) {
+    this.schemaLocationsBean = schemaLocationsBean;
   }
 }

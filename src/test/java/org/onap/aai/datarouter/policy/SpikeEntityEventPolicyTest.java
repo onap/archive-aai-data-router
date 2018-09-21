@@ -20,7 +20,8 @@
  */
 package org.onap.aai.datarouter.policy;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 
@@ -32,14 +33,26 @@ import org.apache.camel.Message;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.onap.aai.datarouter.util.NodeUtils;
+import org.onap.aai.setup.SchemaLocationsBean;
+import org.onap.aai.setup.SchemaVersions;
 import org.powermock.api.mockito.PowerMockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration("file:src/test/resources/spring-beans/data-router-oxm.xml")
 public class SpikeEntityEventPolicyTest {
   private SpikeEntityEventPolicyConfig eventPolicyConfig;
   private SpikeEntityEventPolicy policy;
   private InMemorySearchDatastore searchDb;
   
+  @Autowired
+  private SchemaVersions schemaVersions;
+  @Autowired
+  private SchemaLocationsBean schemaLocationsBean;
   
   @Before
   public void init() throws Exception {
@@ -47,6 +60,9 @@ public class SpikeEntityEventPolicyTest {
     eventPolicyConfig = new SpikeEntityEventPolicyConfig();
     eventPolicyConfig.setSearchKeystorePwd("password");
     eventPolicyConfig.setSourceDomain("JUNIT");
+    
+    eventPolicyConfig.setSchemaVersions(schemaVersions);
+    eventPolicyConfig.setSchemaLocationsBean(schemaLocationsBean);
 
     searchDb = new InMemorySearchDatastore();
     policy = new SpikeEntityEventPolicyStubbed(eventPolicyConfig).withSearchDb(searchDb);
