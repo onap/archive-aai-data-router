@@ -26,7 +26,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -59,6 +58,7 @@ import org.onap.aai.util.VersionedOxmEntities;
 import org.onap.aai.restclient.client.Headers;
 import org.onap.aai.restclient.client.OperationResult;
 import org.onap.aai.restclient.rest.HttpUtil;
+import org.onap.aai.setup.SchemaVersions;
 import org.slf4j.MDC;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -109,8 +109,7 @@ public abstract class AbstractSpikeEntityEventProcessor implements Processor {
   protected Logger logger;
   protected Logger metricsLogger;
   protected ObjectMapper mapper;
-
-
+  
   public AbstractSpikeEntityEventProcessor(SpikeEventPolicyConfig config)
       throws FileNotFoundException {
     mapper = new ObjectMapper();
@@ -128,7 +127,7 @@ public abstract class AbstractSpikeEntityEventProcessor implements Processor {
     this.externalOxmModelProcessors = new ArrayList<>();
     this.externalOxmModelProcessors.add(EntityOxmReferenceHelper.getInstance());
     OxmModelLoader.registerExternalOxmModelProcessors(externalOxmModelProcessors);
-    OxmModelLoader.loadModels();
+    OxmModelLoader.loadModels(config.getSchemaVersions(), config.getSchemaLocationsBean());
     oxmVersionContextMap = OxmModelLoader.getVersionContextMap();
     parseLatestOxmVersion();
   }
@@ -904,23 +903,6 @@ public abstract class AbstractSpikeEntityEventProcessor implements Processor {
 
     return eventVertex;
 
-  }
-  
-  protected List<String> extractSuggestableAttr(VersionedOxmEntities oxmEntities, String entityType) {
-    // Extract suggestable attributeshandleTopographicalData
-    Map<String, OxmEntityDescriptor> rootDescriptor = oxmEntities.getSuggestableEntityDescriptors();
-
-    if (rootDescriptor == null) {
-      return Collections.emptyList();
-    }
-
-    OxmEntityDescriptor desc = rootDescriptor.get(entityType);
-
-    if (desc == null) {
-      return Collections.emptyList();
-    }
-
-    return desc.getSuggestableAttributes();
   }
   
 }

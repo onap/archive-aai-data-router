@@ -53,6 +53,7 @@ import org.onap.aai.entity.OxmEntityDescriptor;
 import org.onap.aai.util.EntityOxmReferenceHelper;
 import org.onap.aai.util.ExternalOxmModelProcessor;
 import org.onap.aai.schema.OxmModelLoader;
+import org.onap.aai.setup.SchemaVersions;
 import org.onap.aai.restclient.client.Headers;
 import org.onap.aai.restclient.client.OperationResult;
 import org.onap.aai.restclient.rest.HttpUtil;
@@ -112,7 +113,7 @@ public class SpikeEntityEventPolicy implements Processor {
 
   private Logger logger;
   private Logger metricsLogger;
-
+  
   public enum ResponseType {
     SUCCESS, PARTIAL_SUCCESS, FAILURE;
   };
@@ -137,7 +138,7 @@ public class SpikeEntityEventPolicy implements Processor {
     this.externalOxmModelProcessors = new ArrayList<>();
     this.externalOxmModelProcessors.add(EntityOxmReferenceHelper.getInstance());
     OxmModelLoader.registerExternalOxmModelProcessors(externalOxmModelProcessors);
-    OxmModelLoader.loadModels();
+    OxmModelLoader.loadModels(config.getSchemaVersions(), config.getSchemaLocationsBean());
     oxmVersionContextMap = OxmModelLoader.getVersionContextMap();
     parseLatestOxmVersion();
   }

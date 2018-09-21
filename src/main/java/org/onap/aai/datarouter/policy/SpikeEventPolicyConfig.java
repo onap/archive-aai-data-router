@@ -20,6 +20,9 @@
  */
 package org.onap.aai.datarouter.policy;
 
+import org.onap.aai.setup.SchemaLocationsBean;
+import org.onap.aai.setup.SchemaVersions;
+
 public class SpikeEventPolicyConfig {
 
   private String sourceDomain;
@@ -29,7 +32,8 @@ public class SpikeEventPolicyConfig {
   private String searchCertName;
   private String searchKeystorePwd;
   private String searchKeystore;
-
+  private SchemaVersions schemaVersions;
+  private SchemaLocationsBean schemaLocationsBean;
   
   public String getSourceDomain() {
     return sourceDomain;
@@ -87,4 +91,20 @@ public class SpikeEventPolicyConfig {
   public void setSearchKeystorePwd(String searchKeystorePwd) {
     this.searchKeystorePwd = searchKeystorePwd;
   } 
+  
+  public SchemaVersions getSchemaVersions() {
+    return schemaVersions;
+  }
+  
+  public void setSchemaVersions(SchemaVersions schemaVersions) {
+    this.schemaVersions = schemaVersions;
+  }
+  
+  public SchemaLocationsBean getSchemaLocationsBean() {
+    return schemaLocationsBean;
+  }
+  
+  public void setSchemaLocationsBean(SchemaLocationsBean schemaLocationsBean) {
+    this.schemaLocationsBean = schemaLocationsBean;
+  }
 }

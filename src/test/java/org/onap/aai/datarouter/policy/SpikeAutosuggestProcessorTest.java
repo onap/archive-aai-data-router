@@ -33,20 +33,36 @@ import org.apache.camel.Message;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.onap.aai.datarouter.util.NodeUtils;
+import org.onap.aai.setup.SchemaLocationsBean;
+import org.onap.aai.setup.SchemaVersions;
 import org.powermock.api.mockito.PowerMockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration("file:src/test/resources/spring-beans/data-router-oxm.xml")
 public class SpikeAutosuggestProcessorTest {
   private SpikeEventPolicyConfig eventPolicyConfig;
   private SpikeAutosuggestIndexProcessor policy;
   private InMemorySearchDatastore searchDb;
 
+  @Autowired
+  private SchemaVersions schemaVersions;
+  @Autowired
+  private SchemaLocationsBean schemaLocationsBean;
+  
   @Before
   public void init() throws Exception {
     
     eventPolicyConfig = new SpikeEventPolicyConfig();
     eventPolicyConfig.setSearchKeystorePwd("password");
     eventPolicyConfig.setSourceDomain("JUNIT");
+    
+    eventPolicyConfig.setSchemaVersions(schemaVersions);
+    eventPolicyConfig.setSchemaLocationsBean(schemaLocationsBean);
     
     searchDb = new InMemorySearchDatastore();
     policy = new SpikeAutosuggestProcessorStubbed(eventPolicyConfig).withSearchDb(searchDb); 
