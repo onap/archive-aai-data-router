@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_a2c62067",
+        "filename": "src/main/java/org/onap/aai/datarouter/entity/POAServiceInstanceEntity.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1157
+      },
+      "writtenOn": "2018-09-24T03:22:29Z",
+      "side": 1,
+      "message": "It must be a change caused by a stale branch.  We\u0027ll have to pull from gerrit master and rebase the CI.",
+      "parentUuid": "1a76adc5_82be84d3",
+      "revId": "b687e75dd825f9f8bc63420fe09079db28095e18",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_e2cc188d",
         "filename": "src/main/java/org/onap/aai/datarouter/policy/ServiceIntegrityValidationPolicy.java",
         "patchSetId": 1
