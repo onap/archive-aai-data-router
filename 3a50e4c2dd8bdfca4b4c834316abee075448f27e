@@ -1,0 +1,11 @@
+Code-Review+1: Dave Adams <Dave.Adams@amdocs.com>
+Verified+1: ONAP Jobbuilder <onap-jobbuilder@jenkins.onap.org>
+Code-Review+1: Francis Paquette <Francis.Paquette@amdocs.com>
+Code-Review+1: Geora Barsky <georab@amdocs.com>
+Code-Review+1: Jennie Jia <Jennie.Jia@amdocs.com>
+Code-Review+2: Steven Blimkie <Steven.Blimkie@amdocs.com>
+Submitted-by: Steven Blimkie <Steven.Blimkie@amdocs.com>
+Submitted-at: Mon, 24 Sep 2018 14:28:38 +0000
+Reviewed-on: https://gerrit.onap.org/r/68487
+Project: aai/data-router
+Branch: refs/heads/master
