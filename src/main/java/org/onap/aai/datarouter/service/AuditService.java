@@ -50,15 +50,12 @@ import org.onap.aai.event.api.EventPublisher;
 import org.onap.aai.datarouter.util.DataRouterConstants;
 import org.onap.aai.restclient.client.Headers;
 
-
-
 public class AuditService {
 
     private static Logger logger = LoggerFactory.getInstance().getLogger(AuditService.class.getName());
     private static Logger auditLogger = LoggerFactory.getInstance().getAuditLogger(AuditService.class.getName());
 
     private static final String MEDIA_TYPE = MediaType.APPLICATION_JSON;
-    private static final String DATA_ROUTER_APP = "Data-Router";
     private static final String UNKNOWN_APP = "[unknown_app_id]";
     private static final String RESULT_OK = "200 OK";
 
@@ -164,13 +161,12 @@ public class AuditService {
         List<String> eventMessages = new ArrayList<String>();
         for (POAServiceInstanceEntity serviceInstance: auditEvent.getServiceInstanceList()) {
             serviceInstance.validate();
-            serviceInstance.setxFromAppId(DATA_ROUTER_APP);
+            serviceInstance.setxFromAppId(eventHeaders.get(Headers.FROM_APP_ID));
             serviceInstance.setxTransactionId(eventHeaders.get(Headers.TRANSACTION_ID));
             eventMessages.add(serviceInstance.toJson());
         }
         return eventMessages;
     }
-
 
     /**
      * Publish events to DMaaP.
