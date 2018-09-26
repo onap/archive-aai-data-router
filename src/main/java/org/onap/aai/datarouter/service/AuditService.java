@@ -49,8 +49,8 @@ import org.onap.aai.datarouter.util.LoggingUtil;
 import org.onap.aai.event.api.EventPublisher;
 import org.onap.aai.datarouter.util.DataRouterConstants;
 import org.onap.aai.restclient.client.Headers;
-
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 
 public class AuditService {
 
@@ -63,6 +63,8 @@ public class AuditService {
     private static final String RESULT_OK = "200 OK";
 
     private EventPublisher publisher;
+    @Autowired
+    private Environment env;
 
     public AuditService(EventPublisher publisher) throws Exception {
         this.publisher = publisher;
@@ -164,13 +166,31 @@ public class AuditService {
         List<String> eventMessages = new ArrayList<String>();
         for (POAServiceInstanceEntity serviceInstance: auditEvent.getServiceInstanceList()) {
             serviceInstance.validate();
-            serviceInstance.setxFromAppId(DATA_ROUTER_APP);
+            serviceInstance.setxFromAppId(getAppId(eventHeaders));
             serviceInstance.setxTransactionId(eventHeaders.get(Headers.TRANSACTION_ID));
             eventMessages.add(serviceInstance.toJson());
         }
         return eventMessages;
     }
 
+    /**
+     * Get X-FromAppId
+     * @param eventHeaders
+     * @return Returns the appId if it was provisioned, otherwise inheritates from the caller.
+     */
+    private String getAppId(Map<String, String> eventHeaders) {
+        String isUsePrivateXFromAppId = env.getProperty("server.use-private-X-FromAppId");
+        if (isUsePrivateXFromAppId != null) {
+            if (isUsePrivateXFromAppId.equalsIgnoreCase("true")) {
+                String privateXFromAppId = env.getProperty("server.private-X-FromAppId");
+                if (privateXFromAppId != null) {
+                    return privateXFromAppId;
+                }
+            }
+        }
+
+        return eventHeaders.get(Headers.FROM_APP_ID);
+    }
 
     /**
      * Publish events to DMaaP.
