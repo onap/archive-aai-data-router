@@ -57,6 +57,29 @@
       "revId": "179dd3b7654000625838cf468139d9093ff49026",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_8e3a1ce6",
+        "filename": "src/main/java/org/onap/aai/datarouter/service/AuditService.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 2399
+      },
+      "writtenOn": "2018-09-27T13:39:24Z",
+      "side": 1,
+      "message": "I suggest renaming isUsePrivateXFromAppId to usePrivateXFromAppId",
+      "range": {
+        "startLine": 182,
+        "startChar": 15,
+        "endLine": 182,
+        "endChar": 37
+      },
+      "revId": "179dd3b7654000625838cf468139d9093ff49026",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }
