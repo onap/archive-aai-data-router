@@ -16,6 +16,24 @@
       "revId": "179dd3b7654000625838cf468139d9093ff49026",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_3f47751f",
+        "filename": "src/main/java/org/onap/aai/datarouter/service/AuditService.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1157
+      },
+      "writtenOn": "2018-09-27T03:10:56Z",
+      "side": 1,
+      "message": "I think the whole class is pomba specific.  I believe this was the original challenge when the POMBA code was introduced to the data-router.\n\nA small API entrypoint was exposed within data-router to handle a POMBA poke that publishes an event to kick off the POMBA sequence.  \n\nThe single API was not enough to warrant an entire microservice, so a compromise was reached to co-locate this functionality within data-router as the call paths between AAI and POMBA are generally different and shouldn\u0027t interfere with each other.\n\nI don\u0027t think this change set will affect any of the AAI call paths, so I\u0027m ok with it.",
+      "parentUuid": "1a76adc5_5411f85b",
+      "revId": "179dd3b7654000625838cf468139d9093ff49026",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }
