@@ -37,6 +37,42 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_d10435c8",
+        "filename": "src/main/java/org/onap/aai/datarouter/service/AuditService.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 4353
+      },
+      "writtenOn": "2018-09-27T14:28:33Z",
+      "side": 1,
+      "message": "Yes.",
+      "parentUuid": "1a76adc5_5411f85b",
+      "revId": "179dd3b7654000625838cf468139d9093ff49026",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_3151e9d8",
+        "filename": "src/main/java/org/onap/aai/datarouter/service/AuditService.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 4353
+      },
+      "writtenOn": "2018-09-27T14:28:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_3f47751f",
+      "revId": "179dd3b7654000625838cf468139d9093ff49026",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_ee64f04a",
         "filename": "src/main/java/org/onap/aai/datarouter/service/AuditService.java",
         "patchSetId": 1
@@ -60,6 +96,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_51710576",
+        "filename": "src/main/java/org/onap/aai/datarouter/service/AuditService.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 4353
+      },
+      "writtenOn": "2018-09-27T14:28:33Z",
+      "side": 1,
+      "message": "Based on all comments, this X-FromAppId should be passed thru from the initiated request at this data router. So it is not configurable.",
+      "parentUuid": "1a76adc5_ee64f04a",
+      "range": {
+        "startLine": 181,
+        "startChar": 19,
+        "endLine": 181,
+        "endChar": 27
+      },
+      "revId": "179dd3b7654000625838cf468139d9093ff49026",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_8e3a1ce6",
         "filename": "src/main/java/org/onap/aai/datarouter/service/AuditService.java",
         "patchSetId": 1
@@ -71,6 +131,30 @@
       "writtenOn": "2018-09-27T13:39:24Z",
       "side": 1,
       "message": "I suggest renaming isUsePrivateXFromAppId to usePrivateXFromAppId",
+      "range": {
+        "startLine": 182,
+        "startChar": 15,
+        "endLine": 182,
+        "endChar": 37
+      },
+      "revId": "179dd3b7654000625838cf468139d9093ff49026",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_116b8d86",
+        "filename": "src/main/java/org/onap/aai/datarouter/service/AuditService.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 4353
+      },
+      "writtenOn": "2018-09-27T14:28:33Z",
+      "side": 1,
+      "message": "This method will be removed. X-FromAppId is not configurable.",
+      "parentUuid": "1a76adc5_8e3a1ce6",
       "range": {
         "startLine": 182,
         "startChar": 15,
