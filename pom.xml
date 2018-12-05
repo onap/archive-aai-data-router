@@ -167,7 +167,7 @@ limitations under the License.
       <dependency>
          <groupId>com.att.aft</groupId>
          <artifactId>dme2</artifactId>
-         <version>3.1.200</version>
+         <version>3.1.200-oss</version>
          <scope>provided</scope>
       </dependency>
       <!--<dependency>-->
