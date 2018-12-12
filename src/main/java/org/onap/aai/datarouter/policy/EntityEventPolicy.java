@@ -907,7 +907,7 @@ public class EntityEventPolicy implements Processor {
         if (!sourceObject.isEmpty()) {
           JsonNode node = sourceObject.get(0);
           final String sourceCer = NodeUtils.extractFieldValueFromObject(node, 
-              "crossEntityReferenceValues");
+              "crossReferenceEntityValues");
           String newCer = aaiEventEntity.getCrossReferenceEntityValues();
           boolean hasNewCer = true;
           if (sourceCer != null && sourceCer.length() > 0){ // already has CER
@@ -920,7 +920,7 @@ public class EntityEventPolicy implements Processor {
           
           if (hasNewCer){
             // Do the PUT with new CER
-            ((ObjectNode)node).put("crossEntityReferenceValues", newCer);
+            ((ObjectNode)node).put("crossReferenceEntityValues", newCer);
             jsonPayload = NodeUtils.convertObjectToJson(node, false);
             searchAgent.putDocument(entitySearchIndex, entityId, jsonPayload, headers);
           }

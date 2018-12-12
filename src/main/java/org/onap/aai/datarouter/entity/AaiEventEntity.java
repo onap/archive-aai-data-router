@@ -125,7 +125,7 @@ public class AaiEventEntity implements DocumentStoreDataEntity, Serializable {
 
     JsonObject obj = Json.createObjectBuilder().add("entityType", entityType)
         .add("entityPrimaryKeyValue", entityPrimaryKeyValue).add("searchTagIDs", searchTagIds)
-        .add("searchTags", searchTags).add("crossEntityReferenceValues", crossReferenceEntityValues)
+        .add("searchTags", searchTags).add("crossReferenceEntityValues", crossReferenceEntityValues)
         .add("lastmodTimestamp", lastmodTimestamp).add("link", link).build();
 
     return obj.toString();

@@ -22,7 +22,7 @@
            "index-analyzer": "ngram_analyzer"
       },
       {
-           "name": "crossEntityReferenceValues", 
+           "name": "crossReferenceEntityValues",
            "data-type": "string", 
            "index-analyzer": "ngram_analyzer"
       },

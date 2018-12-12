@@ -115,13 +115,13 @@ public class SpikeEntitySearchProcessor extends AbstractSpikeEntityEventProcesso
    * "content", sourceObject);
    * 
    * if (!sourceObject.isEmpty()) { JsonNode node = sourceObject.get(0); final String sourceCer =
-   * NodeUtils.extractFieldValueFromObject(node, "crossEntityReferenceValues"); String newCer =
+   * NodeUtils.extractFieldValueFromObject(node, "crossReferenceEntityValues"); String newCer =
    * spikeEventEntity.getCrossReferenceEntityValues(); boolean hasNewCer = true; if (sourceCer !=
    * null && sourceCer.length() > 0) { // already has CER if (!sourceCer.contains(newCer)) {// don't
    * re-add newCer = sourceCer + ";" + newCer; } else { hasNewCer = false; } }
    * 
    * if (hasNewCer) { // Do the PUT with new CER ((ObjectNode)
-   * node).put("crossEntityReferenceValues", newCer); jsonPayload =
+   * node).put("crossReferenceEntityValues", newCer); jsonPayload =
    * NodeUtils.convertObjectToJson(node, false); searchAgent.putDocument(entitySearchIndex,
    * entityId, jsonPayload, headers); } } } else {
    * 
