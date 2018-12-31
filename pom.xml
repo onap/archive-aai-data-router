@@ -343,6 +343,18 @@ limitations under the License.
             <artifactId>spring-boot-maven-plugin</artifactId>
          </plugin>
          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>2.21.0</version>
+            <configuration>
+                <systemPropertyVariables>
+                    <APP_HOME>${project.basedir}</APP_HOME>
+                    <CONFIG_HOME>${project.basedir}/src/test/resources/config</CONFIG_HOME>
+                    <SERVICE_BEANS>${project.basedir}/src/test/resources/spring-beans</SERVICE_BEANS>
+                    <testShemaUnpackVersion>${shemaUnpackVersion}</testShemaUnpackVersion>
+                </systemPropertyVariables>
+            </configuration>
+         </plugin>
+         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-resources-plugin</artifactId>
             <version>2.7</version>
