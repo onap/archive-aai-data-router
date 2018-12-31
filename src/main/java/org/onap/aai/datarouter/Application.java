@@ -24,20 +24,29 @@ import java.util.HashMap;
 import javax.annotation.PostConstruct;
 import org.apache.camel.component.servlet.CamelHttpTransportServlet;
 import org.eclipse.jetty.util.security.Password;
+import org.onap.aai.config.EdgesConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
+import org.springframework.context.annotation.FilterType;
 
 
 @SpringBootApplication
+@ComponentScan(basePackages = {"org.onap.aai.config", "org.onap.aai.setup", "org.onap.aai.datarouter"}, excludeFilters = {
+@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE,
+value = EdgesConfiguration.class)})
+@PropertySource(value = "file:${CONFIG_HOME}/schemaIngest.properties")
 public class Application extends SpringBootServletInitializer{
 
     private static final String CAMEL_URL_MAPPING = "/*";
     private static final String CAMEL_SERVLET_NAME = "CamelServlet";
+    private static final String JETTY_OBFUSCATION_PATTERN = "OBF:";
 
     @Autowired
     private Environment env;
@@ -50,8 +59,6 @@ public class Application extends SpringBootServletInitializer{
       HashMap<String, Object> props = new HashMap<>();
       props.put("server.ssl.key-store-password", Password.deobfuscate(keyStorePassword));
       new Application().configure(new SpringApplicationBuilder(Application.class).properties(props)).run(args);
-
-
     }
 
     @Bean
@@ -62,7 +69,7 @@ public class Application extends SpringBootServletInitializer{
     }
 
     /**
-     * Set required trust store system properties using values from application.properties
+      * Set required system properties using values from application.properties and schemaIngest.properties
      */
     @PostConstruct
     public void setSystemProperties() {
@@ -77,8 +84,18 @@ public class Application extends SpringBootServletInitializer{
                 throw new IllegalArgumentException("Env property server.ssl.key-store-password not set");
             }
         }
-    }
+  
+        String schemaServiceKeyStorePassword = env.getProperty("schema.service.ssl.key-store-password"); 
+        if( (schemaServiceKeyStorePassword != null) && (schemaServiceKeyStorePassword.startsWith(JETTY_OBFUSCATION_PATTERN))){
+          System.setProperty("schema.service.ssl.key-store-password", Password.deobfuscate(schemaServiceKeyStorePassword));
+        }
 
+        String schemaServiceTrustStorePassword = env.getProperty("schema.service.ssl.trust-store-password");
+        if ( (schemaServiceTrustStorePassword != null) && (schemaServiceTrustStorePassword.startsWith(JETTY_OBFUSCATION_PATTERN)) ){
+          System.setProperty("schema.service.ssl.trust-store-password", Password.deobfuscate(schemaServiceTrustStorePassword));
+        }
+
+    }
 
 
 }

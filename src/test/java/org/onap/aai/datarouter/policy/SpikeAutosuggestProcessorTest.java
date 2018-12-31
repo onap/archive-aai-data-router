@@ -34,6 +34,7 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.onap.aai.datarouter.Application;
 import org.onap.aai.datarouter.util.NodeUtils;
 import org.onap.aai.setup.SchemaLocationsBean;
 import org.onap.aai.setup.SchemaVersions;
@@ -43,7 +44,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("file:src/test/resources/spring-beans/data-router-oxm.xml")
+@ContextConfiguration(classes = {Application.class})
 public class SpikeAutosuggestProcessorTest {
   private SpikeEventPolicyConfig eventPolicyConfig;
   private SpikeAutosuggestIndexProcessor policy;
@@ -53,7 +54,7 @@ public class SpikeAutosuggestProcessorTest {
   private SchemaVersions schemaVersions;
   @Autowired
   private SchemaLocationsBean schemaLocationsBean;
-  
+
   @Before
   public void init() throws Exception {
     
