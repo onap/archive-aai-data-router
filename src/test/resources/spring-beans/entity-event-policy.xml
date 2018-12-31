@@ -1,0 +1,42 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+                        http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+        <bean id="eepConfig" class="org.onap.aai.datarouter.policy.EntityEventPolicyConfig" >
+                <property name="sourceDomain" value="uINT5" />
+                <property name="searchBaseUrl" value="https://au4txvcaaas100.auk4.aic.cip.att.com:9509" />
+                <property name="searchEndpoint" value="services/search-data-service/v1/search/indexes/" />
+                <property name="searchEndpointDocuments" value = "documents" />
+                <property name="searchEntitySearchIndex" value="entitysearchindex-uint5.test" />
+                <property name="searchEntityAutoSuggestIndex" value="entityautosuggestindex-uint5.test" />
+                <property name="searchAggregationVnfIndex" value="aggregate_generic-vnf_index" />
+                <property name="searchTopographySearchIndex" value="topographysearchindex-uint5.test" />
+                <property name="searchCertName" value="aai-client-cert.p12" />
+                <property name="searchKeystorePwd" value="OBF:1i9a1u2a1unz1lr61wn51wn11lss1unz1u301i6o" />
+                <property name="searchKeystore" value="tomcat_keystore" />
+                <property name="schemaVersions" ref="schemaVersions" />
+                <property name="schemaLocationsBean" ref="schemaLocationsBean" />
+        </bean>
+
+		<bean id="nodeIngestor" class="org.onap.aai.nodes.NodeIngestor" autowire="byName"/>
+        <bean id="entityEventPolicy" class="org.onap.aai.datarouter.policy.EntityEventPolicy" init-method="startup" >
+                <constructor-arg ref="eepConfig"/>
+        </bean>
+<!--  
+  <bean id="consumerBeanEntityEvent" class="com.ecomp.DMaapEventClientWrapper" >
+    <constructor-arg name="host" value="uebsb91kcdc.it.att.com:3905,uebsb92kcdc.it.att.com:3905,uebsb93kcdc.it.att.com:3905" />
+    <constructor-arg name="topic" value="AAI-EVENT" />
+    <constructor-arg name="username" value="m08479@aai.ecomp.att.com" />
+    <constructor-arg name="password" value="OBF:1qab1lbw1kfr1ffg1hzn1i231fhe1kcn1lfm1qcr" />
+    <constructor-arg name="consumerGroup" value="datarouter-uint5" />
+    <constructor-arg name="consumerId" value="datarouter-uint5" />
+    <constructor-arg name="timeoutMs" value="15000" />
+    <constructor-arg name="messageLimit" value="10000" />
+    <constructor-arg name="transportType" value="HTTPAAF" />
+    <constructor-arg name="protocol" value="https" />
+    <constructor-arg name="filter"> <null /> </constructor-arg>
+  </bean>
+-->
+</beans>

@@ -5,10 +5,9 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd 
 		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
 
-  <context:property-placeholder location="file:src/test/resources/config/schemaIngest.properties" ignore-unresolvable="true" />
-  
-  <bean id="schemaVersions" class="org.onap.aai.setup.SchemaVersions"/>
-  
-  <bean id="schemaLocationsBean" class="org.onap.aai.setup.SchemaLocationsBean"/>
+   <bean id="nodeIngestor" class="org.onap.aai.nodes.NodeIngestor" autowire="byName"/>
+   <bean id="oxmModelLoader" class="org.onap.aai.schema.OxmModelLoader" >
+			<constructor-arg ref="nodeIngestor"/>
+	</bean>
   
 </beans>
