@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9adffdf1_bf43e840",
+        "filename": "pom.xml",
+        "patchSetId": 3
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 651
+      },
+      "writtenOn": "2019-01-02T13:27:58Z",
+      "side": 1,
+      "message": "This is still referencing the old schema-ingest.\nUpdate this dependency and the verify job may pass.",
+      "revId": "a14ea23c96beb33eea2c58aa3d1723ae507b965d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
