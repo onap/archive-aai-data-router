@@ -56,8 +56,20 @@ public class Application extends SpringBootServletInitializer{
       if(keyStorePassword==null || keyStorePassword.isEmpty()){
         throw new RuntimeException("Env property KEY_STORE_PASSWORD not set");
       }
+      
       HashMap<String, Object> props = new HashMap<>();
-      props.put("server.ssl.key-store-password", Password.deobfuscate(keyStorePassword));
+      String deobfuscatedKeyStorePassword = keyStorePassword.startsWith(JETTY_OBFUSCATION_PATTERN)?Password.deobfuscate(keyStorePassword):keyStorePassword;
+      props.put("server.ssl.key-store-password", deobfuscatedKeyStorePassword);
+      
+      String trustStoreLocation = System.getenv("TRUST_STORE_LOCATION");
+      String trustStorePassword = System.getenv("TRUST_STORE_PASSWORD");
+      if(trustStoreLocation!=null && trustStorePassword !=null){
+          trustStorePassword = trustStorePassword.startsWith(JETTY_OBFUSCATION_PATTERN)?Password.deobfuscate(trustStorePassword):trustStorePassword;
+          props.put("server.ssl.trust-store", trustStoreLocation);
+          props.put("server.ssl.trust-store-password", trustStorePassword);
+      } 
+      
+
       new Application().configure(new SpringApplicationBuilder(Application.class).properties(props)).run(args);
     }
 
