@@ -1,0 +1,8 @@
+Verified+1: ONAP Jobbuilder <onap-jobbuilder@jenkins.onap.org>
+Code-Review+1: Serban Popescu <sp5226@att.com>
+Code-Review+2: Steven Blimkie <Steven.Blimkie@amdocs.com>
+Submitted-by: Steven Blimkie <Steven.Blimkie@amdocs.com>
+Submitted-at: Wed, 09 Jan 2019 14:57:13 +0000
+Reviewed-on: https://gerrit.onap.org/r/75490
+Project: aai/data-router
+Branch: refs/heads/master
