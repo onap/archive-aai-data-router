@@ -96,13 +96,14 @@ public class SearchServiceAgent {
                           String documentEndpoint, 
                           Logger logger) {
     
+    String deobfuscatedCertPassword = keystorePwd.startsWith("OBF:")?Password.deobfuscate(keystorePwd):keystorePwd;
     // Create REST client for search service
     searchClient = new RestClient()
                     .authenticationMode(RestAuthenticationMode.SSL_CERT)
                     .validateServerHostname(false)
                     .validateServerCertChain(true)
                     .clientCertFile(DataRouterConstants.DR_HOME_AUTH + certName)
-                    .clientCertPassword(Password.deobfuscate(keystorePwd))
+                    .clientCertPassword(deobfuscatedCertPassword)
                     .trustStore(DataRouterConstants.DR_HOME_AUTH + keystore);
     
     this.searchUrl        = searchUrl;
