@@ -410,7 +410,11 @@ public class EntityEventPolicy implements Processor {
 
       JSONObject entityJsonObject = getUebEntity(uebPayload);
 
-      JsonNode entityJsonNode = convertToJsonNode(entityJsonObject.toString());
+      JsonNode entityJsonNode=null;
+      if(null!=entityJsonObject) {
+    	  entityJsonNode = convertToJsonNode(entityJsonObject.toString());
+      }
+      
       
       String parentEntityType = entityType;
       
