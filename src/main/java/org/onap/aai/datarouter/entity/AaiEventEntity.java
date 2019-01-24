@@ -22,7 +22,6 @@ package org.onap.aai.datarouter.entity;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -107,7 +106,7 @@ public class AaiEventEntity implements DocumentStoreDataEntity, Serializable {
     this.lastmodTimestamp = currentFormattedTimeStamp;
   }
 
-  public void deriveFields() throws NoSuchAlgorithmException {
+  public void deriveFields() {
     this.id = NodeUtils.generateUniqueShaDigest(link);
     this.searchTags = concatArray(searchTagCollection, ';');
     this.searchTagIds = concatArray(searchTagIdCollection, ';');
@@ -166,7 +165,7 @@ public class AaiEventEntity implements DocumentStoreDataEntity, Serializable {
     return id;
   }
 
-  public ArrayList<String> getSearchTagCollection() {
+  public List<String> getSearchTagCollection() {
     return searchTagCollection;
   }
 
