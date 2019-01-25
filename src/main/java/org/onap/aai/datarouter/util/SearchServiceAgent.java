@@ -101,10 +101,9 @@ public class SearchServiceAgent {
     searchClient = new RestClient()
                     .authenticationMode(RestAuthenticationMode.SSL_CERT)
                     .validateServerHostname(false)
-                    .validateServerCertChain(true)
+                    .validateServerCertChain(false)
                     .clientCertFile(DataRouterConstants.DR_HOME_AUTH + certName)
-                    .clientCertPassword(deobfuscatedCertPassword)
-                    .trustStore(DataRouterConstants.DR_HOME_AUTH + keystore);
+                    .clientCertPassword(deobfuscatedCertPassword);                    
     
     this.searchUrl        = searchUrl;
     this.documentEndpoint = documentEndpoint;
