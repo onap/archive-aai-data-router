@@ -37,13 +37,15 @@ import org.eclipse.jetty.util.security.Password;
 import org.onap.aai.cl.api.Logger;
 import org.onap.aai.cl.mdc.MdcContext;
 import org.onap.aai.datarouter.logging.DataRouterMsgs;
-import org.onap.aai.datarouter.policy.EntityEventPolicy;
 import org.onap.aai.restclient.client.Headers;
 import org.onap.aai.restclient.client.OperationResult;
 import org.onap.aai.restclient.client.RestClient;
 import org.onap.aai.restclient.enums.RestAuthenticationMode;
 import org.onap.aai.restclient.rest.HttpUtil;
 import org.slf4j.MDC;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
@@ -56,6 +58,7 @@ public class SearchServiceAgent {
   
   private String searchUrl = null;
   private String documentEndpoint = null;
+  private String schemaHomeDir = null;
   
   
   /**
@@ -109,6 +112,7 @@ public class SearchServiceAgent {
     this.documentEndpoint = documentEndpoint;
     
     this.logger           = logger;
+    this.schemaHomeDir = DataRouterConstants.DR_SEARCH_SCHEMA_HOME;
   }
   
   
@@ -338,22 +342,42 @@ public class SearchServiceAgent {
    * @throws Exception
    */
   protected String loadFileData(String filename) throws Exception {
-    StringBuilder data = new StringBuilder();
+    Resource fileResource = getSchemaResource(filename);
+    if (fileResource == null) {
+      throw new Exception("Could not find file = " + filename + ".");
+    }
 
-    try (InputStreamReader inputStreamReader = new InputStreamReader(EntityEventPolicy.class.getClassLoader()
-        .getResourceAsStream("/" + filename), StandardCharsets.UTF_8); BufferedReader in = new BufferedReader(
-        inputStreamReader)
-    ) {
-
+    try (
+        InputStreamReader inputStreamReader = new InputStreamReader(fileResource.getInputStream(), StandardCharsets.UTF_8);
+        BufferedReader in = new BufferedReader(inputStreamReader);
+        ){
       String line;
-      while ((line = in.readLine()) != null) {
+      StringBuilder data = new StringBuilder();
+      while((line = in.readLine()) != null) {
         data.append(line);
       }
+      return data.toString();
     } catch (Exception e) {
       throw new Exception("Failed to read from file = " + filename + ".", e);
     }
+  }
 
-    return data.toString();
+  private Resource getSchemaResource(String filename) {
+    Resource fileResource = null;
+
+    if(filename == null) {
+      return null;
+    }
+    
+    if ((schemaHomeDir != null) && (fileResource = new FileSystemResource(schemaHomeDir + "/" + filename)).isReadable()) {
+      return fileResource;
+    }
+
+    if ((fileResource = new ClassPathResource(filename)).isReadable()) {
+      return fileResource;
+    }
+
+    return null;
   }
   
   

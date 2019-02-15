@@ -54,4 +54,6 @@ public class DataRouterConstants {
 
   // Logging related
   public static final String DATA_ROUTER_SERVICE_NAME = "DataRouter";
+
+  public static final String DR_SEARCH_SCHEMA_HOME = DR_SPECIFIC_CONFIG + "search-schema";
 }
