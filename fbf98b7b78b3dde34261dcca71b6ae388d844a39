@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "83b5e114_e45653fb",
+        "filename": "src/main/java/org/onap/aai/datarouter/policy/EntityEventPolicy.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 415,
+      "author": {
+        "id": 33
+      },
+      "writtenOn": "2019-02-18T21:23:25Z",
+      "side": 1,
+      "message": "what if entityJsonObject is actually null here and entityJsonNode doesn\u0027t get a value?",
+      "revId": "fbf98b7b78b3dde34261dcca71b6ae388d844a39",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
