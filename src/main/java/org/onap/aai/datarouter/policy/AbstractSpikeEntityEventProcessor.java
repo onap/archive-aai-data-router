@@ -50,6 +50,7 @@ import org.onap.aai.datarouter.entity.SpikeEventVertex;
 import org.onap.aai.datarouter.logging.EntityEventPolicyMsgs;
 import org.onap.aai.datarouter.util.RouterServiceUtil;
 import org.onap.aai.datarouter.util.SearchServiceAgent;
+import org.onap.aai.datarouter.util.SpikeEventEntityDataObject;
 import org.onap.aai.entity.OxmEntityDescriptor;
 import org.onap.aai.util.EntityOxmReferenceHelper;
 import org.onap.aai.util.ExternalOxmModelProcessor;
@@ -346,57 +347,55 @@ public abstract class AbstractSpikeEntityEventProcessor implements Processor {
   /*
    * Use the OXM Model to determine the primary key field name based on the entity-type
    */
-  protected SpikeEventEntity populateSpikeEventEntity(Exchange exchange,
-      SpikeEventEntity spikeEventEntity, DynamicJAXBContext oxmJaxbContext, String entityType,
-      String action, String uebPayload, String oxmEntityType, List<String> searchableAttr) {
-     
-    String entityPrimaryKeyFieldName =
-        getEntityPrimaryKeyFieldName(oxmJaxbContext, oxmEntityType, entityType);
-    if (entityPrimaryKeyFieldName == null) {
-      logger.error(EntityEventPolicyMsgs.DISCARD_EVENT_NONVERBOSE,
-          "Payload missing primary key attribute");
-      logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE,
-          "Payload missing primary key attribute", uebPayload);
-      setResponse(exchange, ResponseType.FAILURE, additionalInfo);
-      return null;
+    protected SpikeEventEntity populateSpikeEventEntity(SpikeEventEntityDataObject dataObject) {
+
+        String entityPrimaryKeyFieldName = getEntityPrimaryKeyFieldName(dataObject.getOxmJaxbContext(),
+                dataObject.getOxmEntityType(), dataObject.getEntityType());
+        if (entityPrimaryKeyFieldName == null) {
+            logger.error(EntityEventPolicyMsgs.DISCARD_EVENT_NONVERBOSE, "Payload missing primary key attribute");
+            logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE, "Payload missing primary key attribute",
+                    dataObject.getUebPayload());
+            setResponse(dataObject.getExchange(), ResponseType.FAILURE, additionalInfo);
+            return null;
+        }
+        String entityPrimaryKeyFieldValue = lookupValueUsingKey(dataObject.getUebPayload(), entityPrimaryKeyFieldName);
+        if (entityPrimaryKeyFieldValue == null || entityPrimaryKeyFieldValue.isEmpty()) {
+            logger.error(EntityEventPolicyMsgs.DISCARD_EVENT_NONVERBOSE, "Payload missing primary value attribute");
+            logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE, "Payload missing primary value attribute",
+                    dataObject.getUebPayload());
+
+            setResponse(dataObject.getExchange(), ResponseType.FAILURE, additionalInfo);
+            return null;
+        }
+
+
+        if (!getSearchTags(dataObject.getSpikeEventEntity(), dataObject.getSearchableAttr(), dataObject.getUebPayload(),
+                dataObject.getAction())) {
+            logger.error(EntityEventPolicyMsgs.DISCARD_EVENT_NONVERBOSE,
+                    "Payload missing searchable attribute for entity type '" + dataObject.getEntityType() + "'");
+            logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE,
+                    "Payload missing searchable attribute for entity type '" + dataObject.getEntityType() + "'",
+                    dataObject.getUebPayload());
+
+            setResponse(dataObject.getExchange(), ResponseType.FAILURE, additionalInfo);
+            return null;
+        }
+        dataObject.getSpikeEventEntity().setEntityPrimaryKeyName(entityPrimaryKeyFieldName);
+        dataObject.getSpikeEventEntity().setEntityPrimaryKeyValue(entityPrimaryKeyFieldName);
+
+        try {
+            dataObject.getSpikeEventEntity().deriveFields();
+
+        } catch (NoSuchAlgorithmException e) {
+            logger.error(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE, "Cannot create unique SHA digest");
+            logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE, "Cannot create unique SHA digest",
+                    dataObject.getUebPayload());
+
+            setResponse(dataObject.getExchange(), ResponseType.FAILURE, additionalInfo);
+            return null;
+        }
+        return dataObject.getSpikeEventEntity();
     }
-    String entityPrimaryKeyFieldValue = lookupValueUsingKey(uebPayload, entityPrimaryKeyFieldName);
-    if (entityPrimaryKeyFieldValue == null || entityPrimaryKeyFieldValue.isEmpty()) {
-      logger.error(EntityEventPolicyMsgs.DISCARD_EVENT_NONVERBOSE,
-          "Payload missing primary value attribute");
-      logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE,
-          "Payload missing primary value attribute", uebPayload);
-
-      setResponse(exchange, ResponseType.FAILURE, additionalInfo);
-      return null;
-    }
-
-
-    if (!getSearchTags(spikeEventEntity, searchableAttr, uebPayload, action)) {
-      logger.error(EntityEventPolicyMsgs.DISCARD_EVENT_NONVERBOSE,
-          "Payload missing searchable attribute for entity type '" + entityType + "'");
-      logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE,
-          "Payload missing searchable attribute for entity type '" + entityType + "'", uebPayload);
-
-      setResponse(exchange, ResponseType.FAILURE, additionalInfo);
-      return null;
-    }
-    spikeEventEntity.setEntityPrimaryKeyName(entityPrimaryKeyFieldName);
-    spikeEventEntity.setEntityPrimaryKeyValue(entityPrimaryKeyFieldName);
-
-    try {
-      spikeEventEntity.deriveFields();
-
-    } catch (NoSuchAlgorithmException e) {
-      logger.error(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE, "Cannot create unique SHA digest");
-      logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE, "Cannot create unique SHA digest",
-          uebPayload);
-
-      setResponse(exchange, ResponseType.FAILURE, additionalInfo);
-      return null;
-    }
-    return spikeEventEntity;
-  }
 
   protected void setResponse(Exchange exchange, ResponseType responseType, String additionalInfo) {
 

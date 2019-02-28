@@ -27,6 +27,7 @@ import org.apache.camel.Exchange;
 import org.onap.aai.datarouter.entity.SpikeEventEntity;
 import org.onap.aai.datarouter.entity.SpikeEventMeta;
 import org.onap.aai.datarouter.logging.EntityEventPolicyMsgs;
+import org.onap.aai.datarouter.util.SpikeEventEntityDataObject;
 
 
 public class SpikeEntitySearchProcessor extends AbstractSpikeEntityEventProcessor {
@@ -50,42 +51,44 @@ public class SpikeEntitySearchProcessor extends AbstractSpikeEntityEventProcesso
   }
 
   @Override
-  public void process(Exchange exchange) throws Exception {
+    public void process(Exchange exchange) throws Exception {
 
-    long startTime = System.currentTimeMillis();
+        long startTime = System.currentTimeMillis();
 
-    SpikeEventMeta meta = processSpikeEvent(exchange);
+        SpikeEventMeta meta = processSpikeEvent(exchange);
 
-    if (meta == null) {
-      return;
+        if (meta == null) {
+            return;
+        }
+
+        String oxmEntityType = getOxmEntityType(meta.getSpikeEventVertex().getType());
+        List<String> searchableAttr = getSearchableAttibutes(meta.getOxmJaxbContext(), oxmEntityType,
+                meta.getSpikeEventVertex().getType(), meta.getEventEntity().toString(), exchange);
+        if (searchableAttr == null) {
+            return;
+        }
+
+
+        SpikeEventEntity spikeEventEntity = new SpikeEventEntity();
+        spikeEventEntity.setEntityType(meta.getSpikeEventVertex().getType());
+        spikeEventEntity.setLink(meta.getSpikeEventVertex().getEntityLink());
+        spikeEventEntity = populateSpikeEventEntity(
+                new SpikeEventEntityDataObject().setExchange(exchange).setSpikeEventEntity(spikeEventEntity)
+                        .setOxmJaxbContext(meta.getOxmJaxbContext()).setEntityType(meta.getSpikeEventVertex().getType())
+                        .setAction(meta.getBodyOperationType()).setUebPayload(meta.getVertexProperties().toString())
+                        .setOxmEntityType(oxmEntityType).setSearchableAttr(searchableAttr));
+
+        if (spikeEventEntity == null) {
+            return;
+        }
+
+        handleSearchServiceOperation(spikeEventEntity, meta.getBodyOperationType(), searchIndexName);
+        long stopTime = System.currentTimeMillis();
+        metricsLogger.info(EntityEventPolicyMsgs.OPERATION_RESULT_NO_ERRORS, PROCESS_SPIKE_EVENT,
+                String.valueOf(stopTime - startTime));
+        setResponse(exchange, ResponseType.SUCCESS, additionalInfo);
+        return;
     }
-
-    String oxmEntityType = getOxmEntityType(meta.getSpikeEventVertex().getType());
-    List<String> searchableAttr = getSearchableAttibutes(meta.getOxmJaxbContext(), oxmEntityType,
-        meta.getSpikeEventVertex().getType(), meta.getEventEntity().toString(), exchange);
-    if (searchableAttr == null) {
-      return;
-    }
-
-
-    SpikeEventEntity spikeEventEntity = new SpikeEventEntity();
-    spikeEventEntity.setEntityType(meta.getSpikeEventVertex().getType());
-    spikeEventEntity.setLink(meta.getSpikeEventVertex().getEntityLink());
-    spikeEventEntity = populateSpikeEventEntity(exchange, spikeEventEntity,
-        meta.getOxmJaxbContext(), meta.getSpikeEventVertex().getType(), meta.getBodyOperationType(),
-        meta.getVertexProperties().toString(), oxmEntityType, searchableAttr);
-
-    if (spikeEventEntity == null) {
-      return;
-    }
-
-    handleSearchServiceOperation(spikeEventEntity, meta.getBodyOperationType(), searchIndexName);
-    long stopTime = System.currentTimeMillis();
-    metricsLogger.info(EntityEventPolicyMsgs.OPERATION_RESULT_NO_ERRORS, PROCESS_SPIKE_EVENT,
-        String.valueOf(stopTime - startTime));
-    setResponse(exchange, ResponseType.SUCCESS, additionalInfo);
-    return;
-  }
 
 
   /*
