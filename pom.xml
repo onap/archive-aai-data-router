@@ -48,7 +48,7 @@ limitations under the License.
       <installOwnerUser>aaiadmin</installOwnerUser>
       <installOwnerGroup>aaiadmin</installOwnerGroup>
       <ownerManagementGroup>com.att.csid.lab</ownerManagementGroup>
-      <version.aai-schema>1.4.1-SNAPSHOT</version.aai-schema>
+      <version.aai-schema>1.4.0</version.aai-schema>
 
       <!-- Port Selection. A value of 0 will allow for dynamic port selection.
          For local testing, you may choose to hardcode this value to something like
