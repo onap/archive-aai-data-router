@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ebcd1af4_807e73b5",
+        "filename": "src/main/java/org/onap/aai/datarouter/policy/AbstractSpikeEntityEventProcessor.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 774,
+      "author": {
+        "id": 453
+      },
+      "writtenOn": "2019-03-21T16:12:45Z",
+      "side": 1,
+      "message": "Aren\u0027t we trying to solve the issue where there is no vertex element?  And gracefully handle the case where this is an edge element?  I could be reading this wrong, but if this is an edge event, won\u0027t we end up setting spikeVertex to null and throwing a NPE down the line?",
+      "revId": "9fb8000dd28ebeb37bffa1e40273c5e1ac2089d6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
