@@ -81,6 +81,8 @@ public abstract class AbstractSpikeEntityEventProcessor implements Processor {
   protected static final String BODY_KEY = "body";
   protected static final String OPERATION_KEY = "operation";
   
+  protected static final String EDGE_KEY = "relationship";
+  
   protected static final String VERTEX_KEY = "vertex";
   protected static final String VERTEX_PROPERTIES_KEY = "properties";
   protected static final String VERTEX_KEY_KEY = "key";
@@ -743,7 +745,7 @@ public abstract class AbstractSpikeEntityEventProcessor implements Processor {
       // drop event
       logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE, "Ignoring event with sourceName='"
           + sourceName + "' and eventType='" + eventType + "'.  Payload=" + eventPayload);
-      logger.error(EntityEventPolicyMsgs.DISCARD_EVENT_NONVERBOSE,
+      logger.info(EntityEventPolicyMsgs.DISCARD_EVENT_NONVERBOSE,
           "Ignoring event with sourceName='" + sourceName + "' and eventType='" + eventType + "'.");
 
       /*
@@ -765,22 +767,33 @@ public abstract class AbstractSpikeEntityEventProcessor implements Processor {
 
     String action = eventBody.getString(OPERATION_KEY);
     if (action == null || !SUPPORTED_ACTIONS.contains(action.toLowerCase())) {
-      logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE,
-          "Unrecognized action '" + action + "'", eventPayload);
-      logger.error(EntityEventPolicyMsgs.DISCARD_EVENT_NONVERBOSE,
-          "Unrecognized action '" + action + "'");
-      setResponse(exchange, ResponseType.FAILURE, additionalInfo);
+      returnWithError(exchange, eventPayload, "Unrecognized action '" + action + "'");
       return null;
     }
     meta.setBodyOperationType(action);
 
-    // Load the event body data, any errors will result in a failure and discard
+    
+    /*
+     * Ignore spike events for edges
+     */
+    if (eventBody.has(EDGE_KEY)){
+      logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE, "Ignoring event for edge with sourceName='"
+          + sourceName + "' and eventType='" + eventType + "'.  Payload=" + eventPayload);
+      logger.info(EntityEventPolicyMsgs.DISCARD_EVENT_NONVERBOSE,
+          "Ignoring event for edge with sourceName='" + sourceName + "' and eventType='" + eventType + "'.");
+      setResponse(exchange, ResponseType.SUCCESS, additionalInfo);
+      return null;      
+    }
 
-    JSONObject spikeVertex = eventBody.getJSONObject(VERTEX_KEY);
-    if (spikeVertex == null) {
+    
+    // Load the event body data, any errors will result in a failure and discard
+    JSONObject spikeVertex = null;
+    try {
+      spikeVertex = eventBody.getJSONObject(VERTEX_KEY);
+    } catch (JSONException exc) {
       returnWithError(exchange, eventPayload, "Payload is missing " + VERTEX_KEY);
       return null;
-    }
+    }    
 
     meta.setSpikeVertex(spikeVertex);
 
@@ -788,12 +801,7 @@ public abstract class AbstractSpikeEntityEventProcessor implements Processor {
     try {
       spikeEventVertex = initializeSpikeEventVertex(spikeVertex);
     } catch (JSONException exc) {
-      logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE,
-          "Error initializating spike event.  Error: " + exc.getMessage(), eventPayload);
-      logger.error(EntityEventPolicyMsgs.DISCARD_EVENT_NONVERBOSE,
-          "Error initializating spike event.  Error: " + exc.getMessage());
-
-      setResponse(exchange, ResponseType.FAILURE, additionalInfo);
+      returnWithError(exchange, eventPayload, "Error initializating spike event.  Error: " + exc.getMessage());
       return null;
     }
 
@@ -813,12 +821,7 @@ public abstract class AbstractSpikeEntityEventProcessor implements Processor {
 
     String entityType = spikeEventVertex.getType();
     if (entityType == null || entityType.isEmpty()) {
-      logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE,
-          "Payload header missing entity type", eventPayload);
-      logger.error(EntityEventPolicyMsgs.DISCARD_EVENT_NONVERBOSE,
-          "Payload header missing entity type");
-
-      setResponse(exchange, ResponseType.FAILURE, additionalInfo);
+      returnWithError(exchange, eventPayload, "Payload vertex missing entity type");
       return null;
     }
     
@@ -830,49 +833,28 @@ public abstract class AbstractSpikeEntityEventProcessor implements Processor {
     EntityOxmReferenceHelper.getInstance().getVersionedOxmEntities(Version.valueOf(oxmVersion.toLowerCase()));
     
     if (oxmEntities != null && !oxmEntities.getEntityTypeLookup().containsKey(entityType)) {
-      logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE, "No matching OXM Descriptor for entity-type='" + entityType + "'",
-          eventPayload);
-      logger.error(EntityEventPolicyMsgs.DISCARD_EVENT_NONVERBOSE,
-          "No matching OXM Descriptor for entity-type='" + entityType + "'");
-
-      setResponse(exchange, ResponseType.FAILURE, additionalInfo);
+      returnWithError(exchange, eventPayload, "No matching OXM Descriptor for entity-type='" + entityType + "'");
       return null;
     }
 
     
     String entityKey = spikeEventVertex.getKey();
     if (entityKey == null || entityKey.isEmpty()) {
-      logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE, "Payload vertex missing entity key",
-          eventPayload);
-      logger.error(EntityEventPolicyMsgs.DISCARD_EVENT_NONVERBOSE,
-          "Payload vertex missing entity key");
-
-      setResponse(exchange, ResponseType.FAILURE, additionalInfo);
+      returnWithError(exchange, eventPayload, "Payload vertex missing entity key");
       return null;
     }
+
     String entityLink = spikeEventVertex.getEntityLink();
     if (entityLink == null || entityLink.isEmpty()) {
-      logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE,
-          "Payload header missing entity link", eventPayload);
-      logger.error(EntityEventPolicyMsgs.DISCARD_EVENT_NONVERBOSE,
-          "Payload header missing entity link");
-
-      setResponse(exchange, ResponseType.FAILURE, additionalInfo);
+      returnWithError(exchange, eventPayload, "Payload vertex missing entity link");
       return null;
     }
 
     JSONObject vertexProperties = null;
     try {
-
       vertexProperties = spikeVertex.getJSONObject(VERTEX_PROPERTIES_KEY);
-
     } catch (JSONException exc) {
-      logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE,
-          "Payload header missing " + VERTEX_PROPERTIES_KEY, eventPayload);
-      logger.error(EntityEventPolicyMsgs.DISCARD_EVENT_NONVERBOSE,
-          "Payload header missing " + VERTEX_PROPERTIES_KEY);
-
-      setResponse(exchange, ResponseType.FAILURE, additionalInfo);
+      returnWithError(exchange, eventPayload, "Payload vertex missing " + VERTEX_PROPERTIES_KEY);
       return null;
     }
 
