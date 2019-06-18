@@ -30,7 +30,7 @@ limitations under the License.
    </parent>
    <groupId>org.onap.aai.data-router</groupId>
    <artifactId>data-router</artifactId>
-   <version>1.4.1-SNAPSHOT</version>
+   <version>1.5.0-SNAPSHOT</version>
    <name>aai-data-router</name>
 
    <properties>
@@ -48,7 +48,7 @@ limitations under the License.
       <installOwnerUser>aaiadmin</installOwnerUser>
       <installOwnerGroup>aaiadmin</installOwnerGroup>
       <ownerManagementGroup>com.att.csid.lab</ownerManagementGroup>
-      <version.aai-schema>1.0.5</version.aai-schema>
+      <version.aai-schema>1.5.0</version.aai-schema>
 
       <!-- Port Selection. A value of 0 will allow for dynamic port selection.
          For local testing, you may choose to hardcode this value to something like
@@ -185,7 +185,7 @@ limitations under the License.
       <dependency>
          <groupId>org.onap.aai.router-core</groupId>
          <artifactId>router-core</artifactId>
-         <version>1.4.0</version>
+         <version>1.5.0</version>
       </dependency>
 
    
@@ -209,13 +209,13 @@ limitations under the License.
       <dependency>
          <groupId>org.onap.aai.logging-service</groupId>
          <artifactId>common-logging</artifactId>
-         <version>1.2.2</version>
+         <version>1.5.0</version>
       </dependency>
 
       <dependency>
          <groupId>org.onap.aai.logging-service</groupId>
          <artifactId>logging-api</artifactId>
-         <version>1.1.0</version>
+         <version>1.5.0</version>
       </dependency>
 
       <dependency>
