@@ -1,7 +1,7 @@
 #!/bin/sh
 
-BASEDIR="/opt/app/data-router/"
-AJSC_HOME="$BASEDIR"
+MICRO_HOME="/opt/app/data-router"
+
 
 
 if [ -z "$CONFIG_HOME" ]; then
@@ -14,8 +14,8 @@ if [ -z "$KEY_STORE_PASSWORD" ]; then
 	exit 1
 fi
 
-PROPS="-DAJSC_HOME=$AJSC_HOME"
-PROPS="$PROPS -Dlogging.config=$BASEDIR/bundleconfig/etc/logback.xml"
+PROPS="-DAJSC_HOME=${MICRO_HOME}"
+PROPS="$PROPS -Dlogging.config=${MICRO_HOME}/bundleconfig/etc/logback.xml"
 PROPS="$PROPS -DCONFIG_HOME=$CONFIG_HOME"
 PROPS="$PROPS -DKEY_STORE_PASSWORD=$KEY_STORE_PASSWORD"
 
@@ -31,6 +31,6 @@ fi
 JVM_MAX_HEAP=${MAX_HEAP:-1024}
 
 cd ${MICRO_HOME}
-jar uf0 $MICRO_HOME/data-router.jar BOOT-INF/lib/*
+jar uf0 ${MICRO_HOME}/data-router.jar BOOT-INF/lib/* > /dev/null 2>&1
 
 exec java -Xmx${JVM_MAX_HEAP}m $PROPS -jar ${MICRO_HOME}/data-router.jar
