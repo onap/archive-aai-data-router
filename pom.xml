@@ -51,11 +51,12 @@ limitations under the License.
 
         <!-- docker related properties -->
         <docker.fabric.version>0.28.0</docker.fabric.version>
-        <aai.docker.version>1.3.0</aai.docker.version>
+        <aai.docker.version>1.0.0</aai.docker.version>
         <aai.build.directory>${project.build.directory}/${project.artifactId}-build/
         </aai.build.directory>
         <aai.docker.namespace>onap</aai.docker.namespace>
         <aai.base.image>alpine</aai.base.image>
+        <aai.base.image.version>1.6.0</aai.base.image.version>
 
         <!-- Port Selection. A value of 0 will allow for dynamic port selection.
            For local testing, you may choose to hardcode this value to something like
