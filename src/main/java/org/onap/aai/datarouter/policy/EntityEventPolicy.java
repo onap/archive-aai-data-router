@@ -4,6 +4,7 @@
  * ================================================================================
  * Copyright © 2017-2018 AT&T Intellectual Property. All rights reserved.
  * Copyright © 2017-2018 Amdocs
+ * Modifications Copyright (C) 2019 IBM
  * ================================================================================
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -410,7 +411,8 @@ public class EntityEventPolicy implements Processor {
 
       JSONObject entityJsonObject = getUebEntity(uebPayload);
 
-      JsonNode entityJsonNode = convertToJsonNode(entityJsonObject.toString());
+      JsonNode entityJsonNode = 
+    		  convertToJsonNode(entityJsonObject !=null ? entityJsonObject.toString() : "");
       
       String parentEntityType = entityType;
       
