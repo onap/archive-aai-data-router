@@ -42,6 +42,7 @@ import org.json.JSONObject;
 import org.onap.aai.cl.api.Logger;
 import org.onap.aai.cl.eelf.LoggerFactory;
 import org.onap.aai.cl.mdc.MdcContext;
+import org.onap.aai.datarouter.util.DataRouterProperties;
 import org.onap.aai.schema.OxmModelLoader;
 import org.onap.aai.datarouter.entity.DocumentStoreDataEntity;
 import org.onap.aai.datarouter.entity.SpikeEventEntity;
@@ -461,6 +462,10 @@ public abstract class AbstractSpikeEntityEventProcessor implements Processor {
 
   private String getEntityPrimaryKeyFieldName(DynamicJAXBContext oxmJaxbContext,
       String oxmEntityType, String entityType) {
+    String defaultKey = DataRouterProperties.get("entity.primary.field");
+    if (defaultKey != null) {
+      return defaultKey;
+    }
 
     DynamicType entity = oxmJaxbContext.getDynamicType(oxmEntityType);
     if (entity == null) {
