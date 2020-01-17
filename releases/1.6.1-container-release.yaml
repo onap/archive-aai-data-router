@@ -1,0 +1,7 @@
+distribution_type: container
+container_release_tag: 1.6.1
+project: data-router
+ref: 28617cc3d7dd24b558d6824bc4b57ca7ad785fde
+containers:
+    - name: aai-data-router
+      version: 1.6-STAGING-20200117T232300Z
