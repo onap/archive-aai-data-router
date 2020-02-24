@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4ca93e7e_3446c431",
+        "filename": "pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 33
+      },
+      "writtenOn": "2020-02-24T14:09:57Z",
+      "side": 1,
+      "message": "Is it possible to set the parent to aai-common:aai-parent:1.6.6-SNAPSHOT (and 1.6.6 as soon as it\u0027s released) similar to the way model-loader is? If not, can we use 2.1.12.RELEASE?",
+      "revId": "db88059026a9785ef46253c8392c1848ced4c0c8",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}
