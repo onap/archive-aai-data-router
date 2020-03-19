@@ -30,7 +30,7 @@ limitations under the License.
    </parent>
    <groupId>org.onap.aai.data-router</groupId>
    <artifactId>data-router</artifactId>
-   <version>1.6.1-SNAPSHOT</version>
+   <version>1.6.2-SNAPSHOT</version>
    <name>aai-data-router</name>
 
     <properties>
@@ -47,7 +47,7 @@ limitations under the License.
         <installOwnerUser>aaiadmin</installOwnerUser>
         <installOwnerGroup>aaiadmin</installOwnerGroup>
         <ownerManagementGroup>com.att.csid.lab</ownerManagementGroup>
-        <version.aai-schema>1.6.0</version.aai-schema>
+        <version.aai-schema>1.6.5</version.aai-schema>
 
         <!-- docker related properties -->
         <docker.fabric.version>0.28.0</docker.fabric.version>
@@ -195,7 +195,7 @@ limitations under the License.
         <dependency>
             <groupId>org.onap.aai.router-core</groupId>
             <artifactId>router-core</artifactId>
-            <version>1.5.0</version>
+            <version>1.6.5</version>
         </dependency>
 
         <dependency>
