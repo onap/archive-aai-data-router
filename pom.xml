@@ -30,7 +30,7 @@ limitations under the License.
    </parent>
    <groupId>org.onap.aai.data-router</groupId>
    <artifactId>data-router</artifactId>
-   <version>1.6.2-SNAPSHOT</version>
+   <version>1.6.3-SNAPSHOT</version>
    <name>aai-data-router</name>
 
     <properties>
