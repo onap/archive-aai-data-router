@@ -40,7 +40,11 @@ import java.util.UUID;
 import javax.servlet.ServletRequest;
 
 public class RouterServiceUtil {
-  
+
+  private RouterServiceUtil() {
+
+  }
+
   public static void setMdcContext(Exchange exchange){
     String txnID = exchange.getIn().getHeader(Headers.TRANSACTION_ID, 
         Arrays.asList(UUID.randomUUID())).toString();
@@ -86,9 +90,13 @@ public class RouterServiceUtil {
     return concatArray(list, " ");
   }
 
+  public static String concatArray(List<String> list, char delimiter) {
+    return concatArray(list, "" + delimiter);
+  }
+
   public static String concatArray(List<String> list, String delimiter) {
 
-    if (list == null || !list.isEmpty()) {
+    if (list == null || list.isEmpty()) {
       return "";
     }
 

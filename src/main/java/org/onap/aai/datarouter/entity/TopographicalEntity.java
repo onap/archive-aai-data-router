@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -51,29 +50,6 @@ public class TopographicalEntity implements DocumentStoreDataEntity, Serializabl
     return hexString.toString();
   }
 
-  private static String concatArray(List<String> list, char delimiter) {
-
-    if (list == null || list.isEmpty()) {
-      return "";
-    }
-
-    StringBuilder result = new StringBuilder(64);
-
-    boolean firstValue = true;
-
-    for (String item : list) {
-
-      if (firstValue) {
-        result.append(item);
-        firstValue = false;
-      } else {
-        result.append(delimiter).append(item);
-      }
-    }
-    
-    return result.toString();
-  }
-
   /*
    * We'll try and create a unique identity key that we can use for
    * differencing the previously imported record sets as we won't have granular
@@ -93,7 +69,9 @@ public class TopographicalEntity implements DocumentStoreDataEntity, Serializabl
     return convertBytesToHexString(digest.digest());
   }
 
-  public TopographicalEntity() {}
+  public TopographicalEntity() {
+
+  }
 
   /*
    * (non-Javadoc)

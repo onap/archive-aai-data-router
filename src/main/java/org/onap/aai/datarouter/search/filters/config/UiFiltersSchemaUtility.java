@@ -41,8 +41,6 @@ public class UiFiltersSchemaUtility {
 
   /**
    * Reads in the file and populates an object with that data
-   * 
-   * @throws Exception
    */
   public UiFiltersConfig loadUiFiltersConfig() {
     UiFiltersConfig filtersConfig = new UiFiltersConfig();

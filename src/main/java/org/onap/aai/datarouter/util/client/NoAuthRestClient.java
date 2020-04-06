@@ -74,7 +74,7 @@ public class NoAuthRestClient implements SvcRoutingRestClient {
                                          MediaType.APPLICATION_JSON_TYPE);
     }
 
-    public final void handleRequest(String host, String port, Exchange exchange) throws Exception {
+    public final void handleRequest(String host, String port, Exchange exchange) {
         RouterServiceUtil.setMdcContext(exchange);
         Message message = exchange.getIn();
         String body = message.getBody(String.class);
@@ -85,7 +85,7 @@ public class NoAuthRestClient implements SvcRoutingRestClient {
 
         this.setOriginUrl(message.getHeader(Exchange.HTTP_URL).toString());
         if (body != null && body.length() != 0) {
-            JsonNode node = NodeUtils.convertJsonStrToJsonNode(body);
+            JsonNode node = NodeUtils.convertJsonStringToJsonNode(body, logger);
             this.setTargetPayload(AaiUiSvcPolicyUtil.getOriginPayload(node));
             this.setTargetUri(AaiUiSvcPolicyUtil.getTargetUri(node));
         }

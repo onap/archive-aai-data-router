@@ -31,8 +31,17 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.onap.aai.cl.api.Logger;
+import org.onap.aai.datarouter.logging.EntityEventPolicyMsgs;
 
 public class NodeUtils {
+
+  private NodeUtils() {
+
+  }
+
   /**
   * Generate unique sha digest. This method is copy over from NodeUtils class in AAIUI
   *
@@ -84,17 +93,24 @@ public class NodeUtils {
    *
    * @param jsonStr the json str
    * @return the json node
-   * @throws IOException Signals that an I/O exception has occurred.
    */
-  public static JsonNode convertJsonStrToJsonNode(String jsonStr) throws IOException {
-    ObjectMapper mapper = new ObjectMapper();
-    if (jsonStr == null || jsonStr.length() == 0) {
+  public static JsonNode convertJsonStringToJsonNode(String jsonStr, Logger logger) {
+    if (jsonStr == null || jsonStr.isEmpty()) {
       return null;
     }
-
-    return mapper.readTree(jsonStr);
+    ObjectMapper mapper = new ObjectMapper();
+    JsonNode jsonNode = null;
+    try {
+      jsonNode = mapper.readTree(jsonStr);
+    } catch (IOException e) {
+      if (logger != null) {
+        logger.debug(EntityEventPolicyMsgs.FAILED_TO_PARSE_UEB_PAYLOAD, e.getMessage());
+        logger.error(EntityEventPolicyMsgs.FAILED_TO_PARSE_UEB_PAYLOAD, e.getMessage());
+      }
+    }
+    return jsonNode;
   }
-  
+
   /**
    * Extract objects by key.
    *
@@ -171,5 +187,37 @@ public class NodeUtils {
 
     return ow.writeValueAsString(object);
   }
+
+  /**
+   * Load the UEB JSON payload, any errors would result to a failure case response.
+   * @param payload the Payload
+   * @param contentKey the Content key
+   * @param logger the Logger
+   * @return UEB JSON content
+   */
+  public static JSONObject getUebContentAsJson(String payload, String contentKey, Logger logger) {
+
+    JSONObject uebJsonObj;
+    JSONObject uebObjContent;
+
+    try {
+      uebJsonObj = new JSONObject(payload);
+    } catch (JSONException e) {
+      logger.debug(EntityEventPolicyMsgs.UEB_INVALID_PAYLOAD_JSON_FORMAT, payload);
+      logger.error(EntityEventPolicyMsgs.UEB_INVALID_PAYLOAD_JSON_FORMAT, payload);
+      return null;
+    }
+
+    if (uebJsonObj.has(contentKey)) {
+      uebObjContent = uebJsonObj.getJSONObject(contentKey);
+    } else {
+      logger.debug(EntityEventPolicyMsgs.UEB_FAILED_TO_PARSE_PAYLOAD, contentKey);
+      logger.error(EntityEventPolicyMsgs.UEB_FAILED_TO_PARSE_PAYLOAD, contentKey);
+      return null;
+    }
+
+    return uebObjContent;
+  }
+
 
 }

@@ -20,18 +20,7 @@
  */
 package org.onap.aai.datarouter.policy;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
+import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.eclipse.persistence.dynamic.DynamicType;
@@ -47,22 +36,22 @@ import org.onap.aai.datarouter.entity.DocumentStoreDataEntity;
 import org.onap.aai.datarouter.entity.SpikeEventEntity;
 import org.onap.aai.datarouter.entity.SpikeEventVertex;
 import org.onap.aai.datarouter.logging.EntityEventPolicyMsgs;
+import org.onap.aai.datarouter.util.NodeUtils;
+import org.onap.aai.datarouter.util.OxmUtil;
 import org.onap.aai.datarouter.util.RouterServiceUtil;
 import org.onap.aai.datarouter.util.SearchServiceAgent;
 import org.onap.aai.entity.OxmEntityDescriptor;
-import org.onap.aai.util.EntityOxmReferenceHelper;
-import org.onap.aai.util.ExternalOxmModelProcessor;
-import org.onap.aai.schema.OxmModelLoader;
-import org.onap.aai.setup.SchemaVersions;
 import org.onap.aai.restclient.client.Headers;
 import org.onap.aai.restclient.client.OperationResult;
 import org.onap.aai.restclient.rest.HttpUtil;
+import org.onap.aai.schema.OxmModelLoader;
+import org.onap.aai.util.EntityOxmReferenceHelper;
+import org.onap.aai.util.ExternalOxmModelProcessor;
 import org.slf4j.MDC;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.*;
 
 public class SpikeEntityEventPolicy implements Processor {
 
@@ -140,29 +129,7 @@ public class SpikeEntityEventPolicy implements Processor {
     OxmModelLoader.registerExternalOxmModelProcessors(externalOxmModelProcessors);
     OxmModelLoader.loadModels(config.getSchemaVersions(), config.getSchemaLocationsBean());
     oxmVersionContextMap = OxmModelLoader.getVersionContextMap();
-    parseLatestOxmVersion();
-  }
-
-  private void parseLatestOxmVersion() {
-    int latestVersion = -1;
-    if (oxmVersionContextMap != null) {
-      Iterator<Entry<String, DynamicJAXBContext>> it = oxmVersionContextMap.entrySet().iterator();
-      while (it.hasNext()) {
-        Map.Entry pair = (Map.Entry) it.next();
-
-        String version = pair.getKey().toString();
-        int versionNum = Integer.parseInt(version.substring(1, version.length()));
-
-        if (versionNum > latestVersion) {
-          latestVersion = versionNum;
-          oxmVersion = pair.getKey().toString();
-        }
-
-        logger.info(EntityEventPolicyMsgs.PROCESS_OXM_MODEL_FOUND, pair.getKey().toString());
-      }
-    } else {
-      logger.error(EntityEventPolicyMsgs.PROCESS_OXM_MODEL_MISSING, "");
-    }
+    oxmVersion = OxmUtil.parseLatestOxmVersion(oxmVersionContextMap, logger);
   }
 
   public void startup() {
@@ -172,30 +139,6 @@ public class SpikeEntityEventPolicy implements Processor {
     logger.info(EntityEventPolicyMsgs.ENTITY_EVENT_POLICY_REGISTERED);
   }
 
-  
-
-  /**
-   * Convert object to json.
-   *
-   * @param object the object
-   * @param pretty the pretty
-   * @return the string
-   * @throws JsonProcessingException the json processing exception
-   */
-  public static String convertObjectToJson(Object object, boolean pretty)
-      throws JsonProcessingException {
-    ObjectWriter ow;
-
-    if (pretty) {
-      ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-
-    } else {
-      ow = new ObjectMapper().writer();
-    }
-
-    return ow.writeValueAsString(object);
-  }
-
   public void returnWithError(Exchange exchange, String payload, String errorMsg) {
     logger.error(EntityEventPolicyMsgs.DISCARD_EVENT_NONVERBOSE, errorMsg);
     logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE, errorMsg, payload);
@@ -203,7 +146,7 @@ public class SpikeEntityEventPolicy implements Processor {
   }
 
   @Override
-  public void process(Exchange exchange) /*throws Exception*/ {
+  public void process(Exchange exchange) {
 
     long startTime = System.currentTimeMillis();
     
@@ -398,18 +341,7 @@ public class SpikeEntityEventPolicy implements Processor {
       return;
     }
 
-    try {
-      spikeEventEntity.deriveFields();
-
-    } catch (NoSuchAlgorithmException e) {
-      logger.error(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE, "Cannot create unique SHA digest");
-      logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE, "Cannot create unique SHA digest",
-          eventPayload);
-
-      setResponse(exchange, ResponseType.FAILURE, additionalInfo);
-      return;
-    }
-
+    spikeEventEntity.deriveFields();
 
     handleSearchServiceOperation(spikeEventEntity, action, entitySearchIndex);
 
@@ -418,7 +350,6 @@ public class SpikeEntityEventPolicy implements Processor {
         String.valueOf(stopTime - startTime));
 
     setResponse(exchange, ResponseType.SUCCESS, additionalInfo);
-    return;
   }
 
 
@@ -466,27 +397,9 @@ public class SpikeEntityEventPolicy implements Processor {
   }
 
   private String lookupValueUsingKey(String payload, String key) {
-    JsonNode jsonNode = convertToJsonNode(payload);
+    JsonNode jsonNode = NodeUtils.convertJsonStringToJsonNode(payload, logger);
     return RouterServiceUtil.recursivelyLookupJsonPayload(jsonNode, key);
   }
-
-
-  private JsonNode convertToJsonNode(String payload) {
-
-    ObjectMapper mapper = new ObjectMapper();
-    JsonNode jsonNode = null;
-    try {
-      jsonNode = mapper.readTree(mapper.getJsonFactory().createJsonParser(payload));
-    } catch (IOException e) {
-      logger.debug(EntityEventPolicyMsgs.FAILED_TO_PARSE_UEB_PAYLOAD, VERTEX_KEY + " missing",
-          payload);
-      logger.error(EntityEventPolicyMsgs.FAILED_TO_PARSE_UEB_PAYLOAD, VERTEX_KEY + " missing",
-          "");
-    }
-
-    return jsonNode;
-  }
-
 
   private boolean getSearchTags(SpikeEventEntity spikeEventEntity, List<String> searchableAttr,
       String payload, String action) {
@@ -596,8 +509,7 @@ public class SpikeEntityEventPolicy implements Processor {
    * 
    * @param eventEntity Entity/data to use in operation
    * @param action The operation to perform
-   * @param target Resource to perform the operation on
-   * @param allowDeleteEvent Allow delete operation to be performed on resource
+   * @param index The index
    */
   protected void handleSearchServiceOperation(DocumentStoreDataEntity eventEntity, String action,
       String index) {
@@ -664,8 +576,6 @@ public class SpikeEntityEventPolicy implements Processor {
           action);
     }
   }
-
-
 
   // put this here until we find a better spot
   /**
