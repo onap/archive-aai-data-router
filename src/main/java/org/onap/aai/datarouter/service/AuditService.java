@@ -61,7 +61,7 @@ public class AuditService {
 
     private EventPublisher publisher;
 
-    public AuditService(EventPublisher publisher) throws Exception {
+    public AuditService(EventPublisher publisher) {
         this.publisher = publisher;
     }
 

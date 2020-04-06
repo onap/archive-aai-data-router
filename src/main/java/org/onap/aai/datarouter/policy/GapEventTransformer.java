@@ -45,7 +45,7 @@ public class GapEventTransformer {
   }
 
 
-  public void process(Exchange exchange) throws Exception {
+  public void process(Exchange exchange) {
 
     String payload = getExchangeBody(exchange);
     JSONObject newPayload = transformToSpikePattern(payload);

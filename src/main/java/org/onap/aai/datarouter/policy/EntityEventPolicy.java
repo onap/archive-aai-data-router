@@ -21,18 +21,10 @@
  */
 package org.onap.aai.datarouter.policy;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.eclipse.persistence.dynamic.DynamicType;
@@ -41,38 +33,24 @@ import org.eclipse.persistence.jaxb.dynamic.DynamicJAXBContext;
 import org.eclipse.persistence.oxm.MediaType;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.onap.aai.datarouter.entity.AaiEventEntity;
-import org.onap.aai.datarouter.entity.AggregationEntity;
-import org.onap.aai.datarouter.entity.DocumentStoreDataEntity;
-import org.onap.aai.datarouter.entity.SuggestionSearchEntity;
-import org.onap.aai.datarouter.entity.TopographicalEntity;
-import org.onap.aai.datarouter.entity.UebEventHeader;
-import org.onap.aai.datarouter.logging.EntityEventPolicyMsgs;
-import org.onap.aai.datarouter.util.NodeUtils;
-import org.onap.aai.datarouter.util.RouterServiceUtil;
-import org.onap.aai.datarouter.util.SearchServiceAgent;
-import org.onap.aai.datarouter.util.SearchSuggestionPermutation;
-import org.onap.aai.entity.OxmEntityDescriptor;
-import org.onap.aai.util.CrossEntityReference;
-import org.onap.aai.util.EntityOxmReferenceHelper;
-import org.onap.aai.util.ExternalOxmModelProcessor;
-import org.onap.aai.schema.OxmModelLoader;
-import org.onap.aai.setup.SchemaVersions;
-import org.onap.aai.util.Version;
-import org.onap.aai.util.VersionedOxmEntities;
 import org.onap.aai.cl.api.Logger;
 import org.onap.aai.cl.eelf.LoggerFactory;
 import org.onap.aai.cl.mdc.MdcContext;
+import org.onap.aai.datarouter.entity.*;
+import org.onap.aai.datarouter.logging.EntityEventPolicyMsgs;
+import org.onap.aai.datarouter.util.*;
+import org.onap.aai.entity.OxmEntityDescriptor;
 import org.onap.aai.restclient.client.Headers;
 import org.onap.aai.restclient.client.OperationResult;
 import org.onap.aai.restclient.rest.HttpUtil;
+import org.onap.aai.schema.OxmModelLoader;
+import org.onap.aai.util.*;
 import org.slf4j.MDC;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
 
 public class EntityEventPolicy implements Processor {
 
@@ -117,7 +95,7 @@ public class EntityEventPolicy implements Processor {
 
   public enum ResponseType {
     SUCCESS, PARTIAL_SUCCESS, FAILURE;
-  };
+  }
 
   public EntityEventPolicy(EntityEventPolicyConfig config) throws FileNotFoundException {
     LoggerFactory loggerFactoryInstance = LoggerFactory.getInstance();
@@ -147,29 +125,7 @@ public class EntityEventPolicy implements Processor {
     OxmModelLoader.registerExternalOxmModelProcessors(externalOxmModelProcessors);
     OxmModelLoader.loadModels(config.getSchemaVersions(), config.getSchemaLocationsBean());
     oxmVersionContextMap = OxmModelLoader.getVersionContextMap();
-    parseLatestOxmVersion();
-  }
-
-  private void parseLatestOxmVersion() {
-    int latestVersion = -1;
-    if (oxmVersionContextMap != null) {
-      Iterator it = oxmVersionContextMap.entrySet().iterator();
-      while (it.hasNext()) {
-        Map.Entry pair = (Map.Entry) it.next();
-
-        String version = pair.getKey().toString();
-        int versionNum = Integer.parseInt(version.substring(1, version.length()));
-
-        if (versionNum > latestVersion) {
-          latestVersion = versionNum;
-          oxmVersion = pair.getKey().toString();
-        }
-
-        logger.info(EntityEventPolicyMsgs.PROCESS_OXM_MODEL_FOUND, pair.getKey().toString());
-      }
-    } else {
-      logger.error(EntityEventPolicyMsgs.PROCESS_OXM_MODEL_MISSING, "");
-    }
+    oxmVersion = OxmUtil.parseLatestOxmVersion(oxmVersionContextMap, logger);
   }
 
   public void startup() {
@@ -181,29 +137,6 @@ public class EntityEventPolicy implements Processor {
     logger.info(EntityEventPolicyMsgs.ENTITY_EVENT_POLICY_REGISTERED);
   }
 
-
-  /**
-   * Convert object to json.
-   *
-   * @param object the object
-   * @param pretty the pretty
-   * @return the string
-   * @throws JsonProcessingException the json processing exception
-   */
-  public static String convertObjectToJson(Object object, boolean pretty)
-      throws JsonProcessingException {
-    ObjectWriter ow;
-
-    if (pretty) {
-      ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-
-    } else {
-      ow = new ObjectMapper().writer();
-    }
-
-    return ow.writeValueAsString(object);
-  }
-
   public void returnWithError(Exchange exchange, String payload, String errorMsg){
     logger.error(EntityEventPolicyMsgs.DISCARD_EVENT_NONVERBOSE, errorMsg);
     logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE, errorMsg, payload);
@@ -211,7 +144,7 @@ public class EntityEventPolicy implements Processor {
   }
   
   @Override
-  public void process(Exchange exchange) throws Exception {
+  public void process(Exchange exchange) {
 
     long startTime = System.currentTimeMillis();
 
@@ -227,13 +160,13 @@ public class EntityEventPolicy implements Processor {
     }
 
     // Load the UEB payload data, any errors will result in a failure and discard
-    JSONObject uebObjHeader = getUebContentAsJson(uebPayload, EVENT_HEADER);
+    JSONObject uebObjHeader = NodeUtils.getUebContentAsJson(uebPayload, EVENT_HEADER, logger);
     if (uebObjHeader == null) {
       returnWithError(exchange, uebPayload, "Payload is missing " + EVENT_HEADER);
       return;
     }
     
-    JSONObject uebObjEntity = getUebContentAsJson(uebPayload, ENTITY_HEADER);
+    JSONObject uebObjEntity = NodeUtils.getUebContentAsJson(uebPayload, ENTITY_HEADER, logger);
     if (uebObjEntity == null) {
       returnWithError(exchange, uebPayload, "Payload is missing " + ENTITY_HEADER);
       return;
@@ -366,18 +299,7 @@ public class EntityEventPolicy implements Processor {
 
     }
 
-    try {
-      aaiEventEntity.deriveFields();
-
-    } catch (NoSuchAlgorithmException e) {
-      logger.error(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE,
-          "Cannot create unique SHA digest");
-      logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE,
-          "Cannot create unique SHA digest", uebPayload);
-
-      setResponse(exchange, ResponseType.FAILURE, additionalInfo);
-      return;
-    }
+    aaiEventEntity.deriveFields();
 
     handleSearchServiceOperation(aaiEventEntity, action, entitySearchIndex);
 
@@ -484,30 +406,21 @@ public class EntityEventPolicy implements Processor {
               if (searchableDescriptor != null) {
 
                 if (!searchableDescriptor.getSearchableAttributes().isEmpty()) {
+                  AaiEventEntity entityToSync = getPopulatedEntity(targetEntityInstance, searchableDescriptor);
 
-                  AaiEventEntity entityToSync = null;
+                  /*
+                   * Ready to do some ElasticSearch ops
+                   */
 
-                  try {
-
-                    entityToSync = getPopulatedEntity(targetEntityInstance, searchableDescriptor);
-
-                    /*
-                     * Ready to do some ElasticSearch ops
-                     */
-
-                    for (String parentCrossEntityReferenceAttributeValue : extractedParentEntityAttributeValues) {
-                      entityToSync
-                          .addCrossEntityReferenceValue(parentCrossEntityReferenceAttributeValue);
-                    }
-
-                    entityToSync.setLink(targetEntityUrl);
-                    entityToSync.deriveFields();
-
-                    updateCerInEntity(entityToSync);
-
-                  } catch (NoSuchAlgorithmException e) {
-                    logger.debug(e.getMessage());
+                  for (String parentCrossEntityReferenceAttributeValue : extractedParentEntityAttributeValues) {
+                    entityToSync
+                        .addCrossEntityReferenceValue(parentCrossEntityReferenceAttributeValue);
                   }
+
+                  entityToSync.setLink(targetEntityUrl);
+                  entityToSync.deriveFields();
+
+                  updateCerInEntity(entityToSync);
                 }
               } else {
                 logger.debug(EntityEventPolicyMsgs.CROSS_ENTITY_REFERENCE_SYNC,
@@ -573,7 +486,7 @@ public class EntityEventPolicy implements Processor {
             suggestionSearchEntity.setEntityType(entityType);
             suggestionSearchEntity.setSuggestableAttr(list);
             suggestionSearchEntity.setEntityTypeAliases(suggestionAliases);
-            suggestionSearchEntity.setFilterBasedPayloadFromResponse(uebAsJson.get("entity"),
+            suggestionSearchEntity.setFilterBasedPayloadFromResponse(uebAsJson.get(ENTITY_HEADER),
                 suggestibleAttrInOxm, list);
             suggestionSearchEntity.setSuggestionInputPermutations(
                 suggestionSearchEntity.generateSuggestionInputPermutations());
@@ -654,34 +567,6 @@ public class EntityEventPolicy implements Processor {
     desc = rootDescriptor.get(entityType);
     alias = desc.getAlias();
   }
-
-  /*
-   * Load the UEB JSON payload, any errors would result to a failure case response.
-   */
-  private JSONObject getUebContentAsJson(String payload, String contentKey) {
-
-    JSONObject uebJsonObj;
-    JSONObject uebObjContent;
-
-    try {
-      uebJsonObj = new JSONObject(payload);
-    } catch (JSONException e) {
-      logger.debug(EntityEventPolicyMsgs.UEB_INVALID_PAYLOAD_JSON_FORMAT, payload);
-      logger.error(EntityEventPolicyMsgs.UEB_INVALID_PAYLOAD_JSON_FORMAT, payload);
-      return null;
-    }
-
-    if (uebJsonObj.has(contentKey)) {
-      uebObjContent = uebJsonObj.getJSONObject(contentKey);
-    } else {
-      logger.debug(EntityEventPolicyMsgs.UEB_FAILED_TO_PARSE_PAYLOAD, contentKey);
-      logger.error(EntityEventPolicyMsgs.UEB_FAILED_TO_PARSE_PAYLOAD, contentKey);
-      return null;
-    }
-
-    return uebObjContent;
-  }
-
 
   private UebEventHeader initializeUebEventHeader(String payload) {
 
@@ -787,9 +672,9 @@ public class EntityEventPolicy implements Processor {
   private List<String> getOxmAttributes(String payload, DynamicJAXBContext oxmJaxbContext,
       String oxmEntityType, String entityType, String fieldName) {
 
-    DynamicType entity = (DynamicType) oxmJaxbContext.getDynamicType(oxmEntityType);
+    DynamicType entity = oxmJaxbContext.getDynamicType(oxmEntityType);
     if (entity == null) {
-      return null;
+      return new ArrayList<>();
     }
 
     /*
@@ -903,7 +788,7 @@ public class EntityEventPolicy implements Processor {
         
         ArrayList<JsonNode> sourceObject = new ArrayList<>();
         NodeUtils.extractObjectsByKey(
-            NodeUtils.convertJsonStrToJsonNode(storedEntity.getResult()),
+            NodeUtils.convertJsonStringToJsonNode(storedEntity.getResult(), logger),
             "content", sourceObject);
 
         if (!sourceObject.isEmpty()) {
@@ -949,8 +834,7 @@ public class EntityEventPolicy implements Processor {
    * 
    * @param eventEntity Entity/data to use in operation
    * @param action The operation to perform
-   * @param target Resource to perform the operation on
-   * @param allowDeleteEvent Allow delete operation to be performed on resource
+   * @param index The index
    */
   protected void handleSearchServiceOperation(DocumentStoreDataEntity eventEntity, 
                                             String                  action,

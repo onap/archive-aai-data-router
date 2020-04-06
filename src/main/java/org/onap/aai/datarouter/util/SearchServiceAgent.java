@@ -21,6 +21,7 @@
 package org.onap.aai.datarouter.util;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -33,6 +34,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
 
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 import org.eclipse.jetty.util.security.Password;
 import org.onap.aai.cl.api.Logger;
 import org.onap.aai.cl.mdc.MdcContext;
@@ -47,7 +49,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
-import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 public class SearchServiceAgent {
 
@@ -339,12 +340,12 @@ public class SearchServiceAgent {
    * 
    * @param filename the filename to read from disk
    * @return the data contained within the file
-   * @throws Exception
+   * @throws IOException
    */
-  protected String loadFileData(String filename) throws Exception {
+  protected String loadFileData(String filename) throws IOException {
     Resource fileResource = getSchemaResource(filename);
     if (fileResource == null) {
-      throw new Exception("Could not find file = " + filename + ".");
+      throw new IOException("Could not find file = " + filename + ".");
     }
 
     try (
@@ -357,8 +358,8 @@ public class SearchServiceAgent {
         data.append(line);
       }
       return data.toString();
-    } catch (Exception e) {
-      throw new Exception("Failed to read from file = " + filename + ".", e);
+    } catch (IOException e) {
+      throw new IOException("Failed to read from file = " + filename + ".", e);
     }
   }
 
@@ -368,7 +369,7 @@ public class SearchServiceAgent {
     if(filename == null) {
       return null;
     }
-    
+
     if ((schemaHomeDir != null) && (fileResource = new FileSystemResource(schemaHomeDir + "/" + filename)).isReadable()) {
       return fileResource;
     }

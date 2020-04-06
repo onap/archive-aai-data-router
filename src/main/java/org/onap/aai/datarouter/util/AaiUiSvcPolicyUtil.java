@@ -29,9 +29,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class AaiUiSvcPolicyUtil {
 
+  private AaiUiSvcPolicyUtil() {
+
+  }
+
   static ObjectMapper mapper = new ObjectMapper();
   
-  public static JsonNode getOriginPayload(JsonNode payload) throws Exception{
+  public static JsonNode getOriginPayload(JsonNode payload) {
     /*
      *{
         "origin-uri": "/routerService/1search1",
@@ -46,7 +50,7 @@ public class AaiUiSvcPolicyUtil {
     return origPayload;
   }
   
-  public static String getOriginUri ( JsonNode payload ) throws Exception {
+  public static String getOriginUri ( JsonNode payload ) {
     String originUri = "";
     if (payload.has("origin-uri")){
       originUri = payload.get("origin-uri").textValue();
@@ -54,7 +58,7 @@ public class AaiUiSvcPolicyUtil {
     return originUri;
   }
   
-  public static String getTargetUri(JsonNode payload) throws Exception{
+  public static String getTargetUri(JsonNode payload) {
     /*
      *{
         "origin-uri": "/routerService/1search1",

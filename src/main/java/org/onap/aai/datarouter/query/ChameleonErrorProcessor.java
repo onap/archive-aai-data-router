@@ -33,7 +33,7 @@ public class ChameleonErrorProcessor  {
   private ChameleonErrorProcessor(){}
   
   
-  public void process(Exchange exchange) throws Exception {
+  public void process(Exchange exchange) {
     int code = 500;
     if (exchange.getIn().getHeader(ECOMP_QUERY_ERROR_CODE, Integer.class) != null) {
       code = exchange.getIn().getHeader(ECOMP_QUERY_ERROR_CODE, Integer.class);

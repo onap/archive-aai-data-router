@@ -20,17 +20,9 @@
  */
 package org.onap.aai.datarouter.policy;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.eclipse.persistence.dynamic.DynamicType;
@@ -42,29 +34,26 @@ import org.json.JSONObject;
 import org.onap.aai.cl.api.Logger;
 import org.onap.aai.cl.eelf.LoggerFactory;
 import org.onap.aai.cl.mdc.MdcContext;
-import org.onap.aai.datarouter.util.DataRouterProperties;
-import org.onap.aai.schema.OxmModelLoader;
 import org.onap.aai.datarouter.entity.DocumentStoreDataEntity;
 import org.onap.aai.datarouter.entity.SpikeEventEntity;
 import org.onap.aai.datarouter.entity.SpikeEventMeta;
 import org.onap.aai.datarouter.entity.SpikeEventVertex;
 import org.onap.aai.datarouter.logging.EntityEventPolicyMsgs;
-import org.onap.aai.datarouter.util.RouterServiceUtil;
-import org.onap.aai.datarouter.util.SearchServiceAgent;
+import org.onap.aai.datarouter.util.*;
 import org.onap.aai.entity.OxmEntityDescriptor;
+import org.onap.aai.restclient.client.Headers;
+import org.onap.aai.restclient.client.OperationResult;
+import org.onap.aai.restclient.rest.HttpUtil;
+import org.onap.aai.schema.OxmModelLoader;
 import org.onap.aai.util.EntityOxmReferenceHelper;
 import org.onap.aai.util.ExternalOxmModelProcessor;
 import org.onap.aai.util.Version;
 import org.onap.aai.util.VersionedOxmEntities;
-import org.onap.aai.restclient.client.Headers;
-import org.onap.aai.restclient.client.OperationResult;
-import org.onap.aai.restclient.rest.HttpUtil;
-import org.onap.aai.setup.SchemaVersions;
 import org.slf4j.MDC;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.*;
 
 public abstract class AbstractSpikeEntityEventProcessor implements Processor {
 
@@ -132,7 +121,7 @@ public abstract class AbstractSpikeEntityEventProcessor implements Processor {
     OxmModelLoader.registerExternalOxmModelProcessors(externalOxmModelProcessors);
     OxmModelLoader.loadModels(config.getSchemaVersions(), config.getSchemaLocationsBean());
     oxmVersionContextMap = OxmModelLoader.getVersionContextMap();
-    parseLatestOxmVersion();
+    oxmVersion = OxmUtil.parseLatestOxmVersion(oxmVersionContextMap, logger);
   }
 
   public String getCreateIndexUrl() {
@@ -166,77 +155,7 @@ public abstract class AbstractSpikeEntityEventProcessor implements Processor {
 
   }
 
-  /*
-   * Load the UEB JSON payload, any errors would result to a failure case response.
-   */
-  protected JSONObject getUebContentAsJson(String payload, String contentKey) {
-
-    JSONObject uebJsonObj;
-    JSONObject uebObjContent;
-
-    try {
-      uebJsonObj = new JSONObject(payload);
-    } catch (JSONException e) {
-      logger.debug(EntityEventPolicyMsgs.UEB_INVALID_PAYLOAD_JSON_FORMAT, payload);
-      logger.error(EntityEventPolicyMsgs.UEB_INVALID_PAYLOAD_JSON_FORMAT, payload);
-      return null;
-    }
-
-    if (uebJsonObj.has(contentKey)) {
-      uebObjContent = uebJsonObj.getJSONObject(contentKey);
-    } else {
-      logger.debug(EntityEventPolicyMsgs.UEB_FAILED_TO_PARSE_PAYLOAD, contentKey);
-      logger.error(EntityEventPolicyMsgs.UEB_FAILED_TO_PARSE_PAYLOAD, contentKey);
-      return null;
-    }
-
-    return uebObjContent;
-  }
-  public abstract void process(Exchange exchange) throws Exception;
-
-
-  private void parseLatestOxmVersion() {
-    int latestVersion = -1;
-    if (oxmVersionContextMap != null) {
-      Iterator it = oxmVersionContextMap.entrySet().iterator();
-      while (it.hasNext()) {
-        Map.Entry pair = (Map.Entry) it.next();
-
-        String version = pair.getKey().toString();
-        int versionNum = Integer.parseInt(version.substring(1, version.length()));
-
-        if (versionNum > latestVersion) {
-          latestVersion = versionNum;
-          oxmVersion = pair.getKey().toString();
-        }
-
-        logger.info(EntityEventPolicyMsgs.PROCESS_OXM_MODEL_FOUND, pair.getKey().toString());
-      }
-    } else {
-      logger.error(EntityEventPolicyMsgs.PROCESS_OXM_MODEL_MISSING, "");
-    }
-  }
-
-
-
-  /**
-   * This will be used in: updateSearchEntityWithCrossEntityReference not this scope Convert object
-   * to json.
-   *
-   * @param object the object
-   * @param pretty the pretty
-   * @return the string
-   * @throws JsonProcessingException the json processing exception
-   * 
-   *         protected static String convertObjectToJson(Object object, boolean pretty) throws
-   *         JsonProcessingException { ObjectWriter ow;
-   * 
-   *         if (pretty) { ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-   * 
-   *         } else { ow = new ObjectMapper().writer(); }
-   * 
-   *         return ow.writeValueAsString(object); }
-   */
+  public abstract void process(Exchange exchange) throws IOException;
 
   protected void returnWithError(Exchange exchange, String payload, String errorMsg) {
     logger.error(EntityEventPolicyMsgs.DISCARD_EVENT_NONVERBOSE, errorMsg);
@@ -286,7 +205,7 @@ public abstract class AbstractSpikeEntityEventProcessor implements Processor {
 
     // Load the UEB payload data, any errors will result in a failure and discard
 
-    JSONObject spikeObjVertex = getUebContentAsJson(uebPayload, VERTEX_KEY);
+    JSONObject spikeObjVertex = NodeUtils.getUebContentAsJson(uebPayload, VERTEX_KEY, logger);
     if (spikeObjVertex == null) {
       returnWithError(exchange, uebPayload, "Payload is missing " + VERTEX_KEY);
       return null;
@@ -387,17 +306,7 @@ public abstract class AbstractSpikeEntityEventProcessor implements Processor {
     spikeEventEntity.setEntityPrimaryKeyName(entityPrimaryKeyFieldName);
     spikeEventEntity.setEntityPrimaryKeyValue(entityPrimaryKeyFieldName);
 
-    try {
-      spikeEventEntity.deriveFields();
-
-    } catch (NoSuchAlgorithmException e) {
-      logger.error(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE, "Cannot create unique SHA digest");
-      logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE, "Cannot create unique SHA digest",
-          uebPayload);
-
-      setResponse(exchange, ResponseType.FAILURE, additionalInfo);
-      return null;
-    }
+    spikeEventEntity.deriveFields();
     return spikeEventEntity;
   }
 
@@ -812,15 +721,7 @@ public abstract class AbstractSpikeEntityEventProcessor implements Processor {
 
     meta.setSpikeEventVertex(spikeEventVertex);
 
-    DynamicJAXBContext oxmJaxbContext = loadOxmContext(oxmVersion);
-    if (oxmJaxbContext == null) {
-      logger.error(EntityEventPolicyMsgs.OXM_VERSION_NOT_SUPPORTED, oxmVersion);
-      logger.debug(EntityEventPolicyMsgs.DISCARD_EVENT_VERBOSE, "OXM version mismatch",
-          eventPayload);
-
-      setResponse(exchange, ResponseType.FAILURE, additionalInfo);
-      return null;
-    }
+    DynamicJAXBContext oxmJaxbContext = readOxm(exchange, eventPayload);
 
     meta.setOxmJaxbContext(oxmJaxbContext);
 
