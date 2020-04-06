@@ -50,7 +50,7 @@ public class SpikeEntitySearchProcessor extends AbstractSpikeEntityEventProcesso
   }
 
   @Override
-  public void process(Exchange exchange) throws Exception {
+  public void process(Exchange exchange) {
 
     long startTime = System.currentTimeMillis();
 
@@ -111,7 +111,7 @@ public class SpikeEntitySearchProcessor extends AbstractSpikeEntityEventProcesso
    * logger.error(EntityEventPolicyMsgs.NO_ETAG_AVAILABLE_FAILURE, entitySearchIndex, entityId); }
    * 
    * ArrayList<JsonNode> sourceObject = new ArrayList<>();
-   * NodeUtils.extractObjectsByKey(NodeUtils.convertJsonStrToJsonNode(storedEntity.getResult()),
+   * NodeUtils.extractObjectsByKey(NodeUtils.convertJsonStringToJsonNode(storedEntity.getResult(), null),
    * "content", sourceObject);
    * 
    * if (!sourceObject.isEmpty()) { JsonNode node = sourceObject.get(0); final String sourceCer =

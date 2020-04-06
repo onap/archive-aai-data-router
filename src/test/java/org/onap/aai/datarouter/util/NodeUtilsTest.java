@@ -37,7 +37,6 @@ public class NodeUtilsTest {
 
     @Test
     public void testGenerateUniqueShaDigest_NullParam(){
-        NodeUtils utils = new NodeUtils();
         String keys=null;
         String hashdId = NodeUtils.generateUniqueShaDigest();
         Assert.assertNull(hashdId);
@@ -60,9 +59,9 @@ public class NodeUtilsTest {
     }
 
     @Test
-    public void testConvertJsonStrToJsonNode_NullJsonStr() throws IOException {
+    public void testConvertJsonStrToJsonNode_NullJsonStr() {
         String jsonStr = null;
-        JsonNode jsonNode = NodeUtils.convertJsonStrToJsonNode(jsonStr);
+        JsonNode jsonNode = NodeUtils.convertJsonStringToJsonNode(jsonStr, null);
         Assert.assertNull(jsonNode);
     }
 

@@ -21,6 +21,7 @@
 package org.onap.aai.datarouter.policy;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 
 import org.apache.camel.Exchange;
@@ -48,7 +49,7 @@ public class SpikeAggregateGenericVnfProcessor extends AbstractSpikeEntityEventP
   }
 
   @Override
-  public void process(Exchange exchange) throws Exception {
+  public void process(Exchange exchange) throws IOException {
 
     long startTime = System.currentTimeMillis();
 

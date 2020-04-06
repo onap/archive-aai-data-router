@@ -85,7 +85,7 @@ public class ServiceIntegrityValidationPolicy {
         logger.info(ServiceIntegrityValidationsMsgs.SI_POLICY_REGISTRATION);
     }
 
-    public void process(Exchange exchange) throws Exception {
+    public void process(Exchange exchange) {
 
         logger.debug("Invoking ServiceIntegrityViolationPolicy with payload" + exchange.getIn().getBody());
 

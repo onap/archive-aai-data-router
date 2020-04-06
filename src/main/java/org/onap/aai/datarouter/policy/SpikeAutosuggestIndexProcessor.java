@@ -21,6 +21,7 @@
 package org.onap.aai.datarouter.policy;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -61,7 +62,7 @@ public class SpikeAutosuggestIndexProcessor extends AbstractSpikeEntityEventProc
   }
 
   @Override
-  public void process(Exchange exchange) throws Exception {
+  public void process(Exchange exchange) throws IOException {
    
   long startTime = System.currentTimeMillis();
     
