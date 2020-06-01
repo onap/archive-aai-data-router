@@ -2,6 +2,7 @@ FROM @aai.docker.namespace@/aai-common-@aai.base.image@:@aai.base.image.version@
 
 ARG MICRO_HOME=/opt/app/data-router
 ARG BIN_HOME=$MICRO_HOME/bin
+ARG DR_LOGS=/var/log/onap/AAI-DR
 
 # AAI-2176 Additional optional steps for Ubuntu
 RUN if  ((uname -v | grep -i "ubuntu") || ( cat /etc/*release|grep -i "ubuntu")      ) ; then \
@@ -18,21 +19,19 @@ RUN if  ((uname -v | grep -i "ubuntu") || ( cat /etc/*release|grep -i "ubuntu") 
      JAVA_HOME=usr/lib/jvm/java-8-openjdk-amd64; \
      export JAVA_HOME ; \
    fi; \
-   ##########################################
-   #Install gosu if not present
-   ##########################################  
-   if type  gosu   2>/dev/null; then \     
-     echo "skipping gosu installation"; \
-   else \
-     set -x ; \
-     add-apt-repository -y ppa:tianon/gosu; \ 
-     sudo apt-get update; \
-     sudo apt-get install gosu; \
-   fi;\
 fi
-RUN mkdir -p $MICRO_HOME
+RUN mkdir -p $MICRO_HOME $MICRO_HOME/logs $DR_LOGS
+
+RUN groupadd aaiadmin -g 1000
+RUN adduser -u 1000 -h /opt/aaihome/aaiadmin -S -D -G aaiadmin -s /bin/bash aaiadmin
+
 WORKDIR $MICRO_HOME
-COPY /maven/data-router/ .
+RUN chown -R aaiadmin:aaiadmin $MICRO_HOME $MICRO_HOME/logs $DR_LOGS
+
+COPY --chown=aaiadmin:aaiadmin /maven/data-router/ .
+
+USER aaiadmin
+
 RUN chmod 755 $BIN_HOME/* \
     && ln -snf /logs $MICRO_HOME/logs
 
