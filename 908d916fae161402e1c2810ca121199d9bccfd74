@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "53504c3d_bc1ff31d",
+        "filename": "pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 6597
+      },
+      "writtenOn": "2020-07-16T20:54:32Z",
+      "side": 1,
+      "message": "Do we want to use a Milestone version?",
+      "revId": "908d916fae161402e1c2810ca121199d9bccfd74",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}
