@@ -47,7 +47,7 @@ limitations under the License.
         <installOwnerUser>aaiadmin</installOwnerUser>
         <installOwnerGroup>aaiadmin</installOwnerGroup>
         <ownerManagementGroup>com.att.csid.lab</ownerManagementGroup>
-        <version.aai-schema>1.6.6</version.aai-schema>
+        <version.aai-schema>1.7.3</version.aai-schema>
 
         <!-- docker related properties -->
         <docker.fabric.version>0.28.0</docker.fabric.version>
