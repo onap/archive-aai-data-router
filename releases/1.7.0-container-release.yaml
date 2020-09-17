@@ -1,0 +1,7 @@
+distribution_type: container
+container_release_tag: 1.7.0
+project: data-router
+ref: a2bf9700807b8670985c5912763c65eba09cd4cb
+containers:
+    - name: data-router
+      version: 1.7-STAGING-20200917T153850Z
