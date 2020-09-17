@@ -47,7 +47,7 @@ limitations under the License.
         <installOwnerUser>aaiadmin</installOwnerUser>
         <installOwnerGroup>aaiadmin</installOwnerGroup>
         <ownerManagementGroup>com.att.csid.lab</ownerManagementGroup>
-        <version.aai-schema>1.7.3</version.aai-schema>
+        <version.aai-schema>1.7.9</version.aai-schema>
 
         <!-- docker related properties -->
         <docker.fabric.version>0.28.0</docker.fabric.version>
@@ -197,7 +197,7 @@ limitations under the License.
         <dependency>
             <groupId>org.onap.aai.router-core</groupId>
             <artifactId>router-core</artifactId>
-            <version>1.7.0-SNAPSHOT</version>
+            <version>1.7.0</version>
         </dependency>
 
         <dependency>
